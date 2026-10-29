@@ -156,7 +156,7 @@
         <h1 class="text-2xl sm:text-5xl font-black font-orbitron text-white tracking-wide mb-4">
           COMPETITIVE MINECRAFT PVP TIERS
         </h1>
-        <p class="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base mb-6 leading-relaxed whitespace-nowrap overflow-x-auto" data-i18n="hero_desc">
+        <p class="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base mb-6 leading-relaxed" data-i18n="hero_desc">
           clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。
         </p>
         <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold font-orbitron px-8 py-3.5 rounded-xl shadow-lg shadow-purple-600/30 transition-all hover:scale-105">
@@ -371,28 +371,38 @@
     let activeKitFilter = 'OVERALL';
 
     const playersData = [
-      { rank: 1, name: "JokingDK", country: "🇩🇰", tierTitle: "High Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT2", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2", UHC: "HT1" } },
-      { rank: 2, name: "xTkI4ler", country: "🇩🇪", tierTitle: "High Tier 2", kits: { VANILLA: "LT1", SWORD: "HT1", AXE: "LT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2", UHC: "HT2" } },
-      { rank: 3, name: "Spaunplayer", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT2", SWORD: "LT1", AXE: "HT2", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3", UHC: "LT1" } },
-      { rank: 4, name: "Technoblade", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
-      { rank: 5, name: "Huahwi", country: "🇨🇦", tierTitle: "Low Tier 2", kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "HT3", UHC: "HT3" } }
+      { name: "JokingDK", country: "🇩🇰", tierTitle: "High Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT2", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2", UHC: "HT1" } },
+      { name: "xTkI4ler", country: "🇩🇪", tierTitle: "High Tier 2", kits: { VANILLA: "LT1", SWORD: "HT1", AXE: "LT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2", UHC: "HT2" } },
+      { name: "Spaunplayer", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT2", SWORD: "LT1", AXE: "HT2", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3", UHC: "LT1" } },
+      { name: "Technoblade", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
+      { name: "Huahwi", country: "🇨🇦", tierTitle: "Low Tier 2", kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "HT3", UHC: "HT3" } }
     ];
 
-    // Tierの強さを数値化して並び替えするためのスコア関数 (HT1が一番上=最高値)
-    function getTierScore(tierStr) {
-      if (!tierStr) return 99;
-      const upper = tierStr.toUpperCase();
-      // HT1 = 1, LT1 = 2, HT2 = 3, LT2 = 4, HT3 = 5, LT3 = 6 などの順序
-      const match = upper.match(/([HL]T)(\d+)/);
+    // 各Tier文字列を数値スコアに変換（大きいほど高位）
+    // HT1=180, LT1=170, HT2=160, LT2=150, HT3=140, LT3=130, HT4=120, MT4=115, LT4=110...
+    function getTierScoreValue(tierStr) {
+      if (!tierStr) return 0;
+      const upper = tierStr.toUpperCase().trim();
+      const match = upper.match(/([HLM]T)(\d+)/);
       if (match) {
-        const type = match[1]; // HT または LT
-        const num = parseInt(match[2]); // 数字
-        let base = num * 10;
-        if (type === 'HT') base += 1;
-        else if (type === 'LT') base += 2;
-        return base;
+        const type = match[1]; // HT, MT, LT
+        const num = parseInt(match[2]); // 数字 (1, 2, 3, 4, 5, 6...)
+        let score = (10 - num) * 30; // 数字が小さいほど高スコア
+        if (type === 'HT') score += 20;
+        else if (type === 'MT') score += 15;
+        else if (type === 'LT') score += 10;
+        return score;
       }
-      return 50; // その他 (MT3など)
+      return 5;
+    }
+
+    // OVERALL順位用：裏でプレイヤーが所持している全KitのTierスコアを合計計算
+    function calculatePlayerOverallScore(player) {
+      let totalScore = 0;
+      for (const tier of Object.values(player.kits)) {
+        totalScore += getTierScoreValue(tier);
+      }
+      return totalScore;
     }
 
     // キットごとのファイル名マッピング
@@ -485,21 +495,23 @@
         return nameMatch && (p.kits[activeKitFilter] !== undefined);
       });
 
-      // 2. 個別キット選択時はTier順（HT1が上）にソート、OVERALLの時は元のランク順
-      if (activeKitFilter !== 'OVERALL') {
-        filtered.sort((a, b) => {
-          const scoreA = getTierScore(a.kits[activeKitFilter]);
-          const scoreB = getTierScore(b.kits[activeKitFilter]);
-          return scoreA - scoreB;
-        });
+      // 2. 順位の裏計算ソート処理
+      if (activeKitFilter === 'OVERALL') {
+        // OVERALL選択時：全キットの合計スコアが大きい順に自動並び替え
+        filtered.sort((a, b) => calculatePlayerOverallScore(b) - calculatePlayerOverallScore(a));
       } else {
-        filtered.sort((a, b) => a.rank - b.rank);
+        // 個別キット選択時：対象キットのTierが高い順（HT1が最上位）に自動並び替え
+        filtered.sort((a, b) => {
+          const scoreA = getTierScoreValue(a.kits[activeKitFilter]);
+          const scoreB = getTierScoreValue(b.kits[activeKitFilter]);
+          return scoreB - scoreA;
+        });
       }
 
       filtered.forEach((p, idx) => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-brand-purple/15 transition-colors cursor-pointer";
-        tr.onclick = () => openModal(p);
+        tr.onclick = () => openModal(p, idx + 1);
 
         const rankNum = idx + 1;
         let rankBadge = `<span class="font-bold text-gray-400">${rankNum}</span>`;
@@ -539,10 +551,10 @@
       });
     }
 
-    function openModal(player) {
+    function openModal(player, currentRank) {
       document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
-      document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
+      document.getElementById('modal-rank-text').innerText = `RANK #${currentRank || 1} • ${player.tierTitle.toUpperCase()}`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
