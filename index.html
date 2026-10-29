@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>clytiers | Official Tier List & Community</title>
+  <!-- サイトを開いたときのアイコン（ファビコン） -->
+  <link rel="icon" href="./IMG_8286.png" type="image/png">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,7 +210,7 @@
         <span data-i18n="beta_notice">These Tiers are BETA TIERS and will be reset at the end of beta.</span>
       </div>
 
-      <!-- Kit Tabs (画像アイコン設定済み / SMP削除・Axe/Cart追加) -->
+      <!-- Kit Tabs -->
       <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none" id="kit-tabs-container">
         <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
           <i class="fa-solid fa-trophy"></i> OVERALL
@@ -276,52 +279,36 @@
 
   <!-- Player Detail Modal -->
   <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-6 relative glow-box overflow-hidden shadow-2xl">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-md w-full p-5 sm:p-6 relative glow-box overflow-hidden shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="skin-showcase-bg rounded-xl p-5 mb-5 border border-brand-border flex flex-col sm:flex-row items-center gap-6 relative">
-        <div class="absolute top-3 left-3 text-[10px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
+      <!-- Profile Header -->
+      <div class="skin-showcase-bg rounded-xl p-4 sm:p-5 mb-4 border border-brand-border flex items-center gap-4 sm:gap-6 relative">
+        <div class="absolute top-2 left-3 text-[9px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
         </div>
-        <div class="relative group mt-3 sm:mt-0">
+        <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <div class="relative w-28 h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
+          <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
             <img id="modal-fullbody" src="" alt="Skin" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
-        <div class="text-center sm:text-left z-10">
-          <h3 id="modal-name" class="text-2xl font-black font-orbitron text-white tracking-wide mb-1 glow-text"></h3>
-          <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3"></p>
-          <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-3 py-1.5 rounded-lg border border-brand-border">
+        <div class="text-left z-10 overflow-hidden mt-2">
+          <h3 id="modal-name" class="text-xl sm:text-2xl font-black font-orbitron text-white tracking-wide mb-1 truncate glow-text"></h3>
+          <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3 truncate"></p>
+          <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-2.5 py-1 rounded-lg border border-brand-border">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[11px] font-mono text-gray-300">Verified Player</span>
+            <span class="text-[10px] sm:text-[11px] font-mono text-gray-300">Verified Player</span>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 text-xs mb-5">
-        <div class="bg-brand-dark p-3 rounded-xl border border-brand-border flex items-center justify-between">
-          <div>
-            <span class="text-gray-400 block mb-1 text-[10px] font-orbitron" data-i18n="modal_points">Points</span>
-            <span id="modal-points" class="text-lg font-black text-yellow-400 font-orbitron"></span>
-          </div>
-          <i class="fa-solid fa-bolt text-yellow-500/30 text-2xl"></i>
-        </div>
-        <div class="bg-brand-dark p-3 rounded-xl border border-brand-border flex items-center justify-between">
-          <div>
-            <span class="text-gray-400 block mb-1 text-[10px] font-orbitron" data-i18n="modal_record">Total Record</span>
-            <span id="modal-record" class="text-sm font-bold text-white font-mono"></span>
-          </div>
-          <i class="fa-solid fa-chart-line text-brand-purple/30 text-2xl"></i>
-        </div>
-      </div>
-
-      <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2">
+      <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
         <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown</span>
       </h4>
-      <div id="modal-kits" class="grid grid-cols-2 gap-2 text-xs max-h-40 overflow-y-auto pr-1">
+      <div id="modal-kits" class="grid grid-cols-2 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
         <!-- Dynamic -->
       </div>
     </div>
@@ -353,8 +340,6 @@
         th_player: "PLAYER",
         th_country: "国",
         th_kits: "獲得KIT TIER",
-        modal_points: "獲得ポイント",
-        modal_record: "戦績 (勝 / 敗)",
         modal_kit_breakdown: "Kit別詳細 Tier"
       },
       en: {
@@ -377,8 +362,6 @@
         th_player: "PLAYER",
         th_country: "COUNTRY",
         th_kits: "CONTRIBUTING KITS",
-        modal_points: "Total Points",
-        modal_record: "Record (W / L)",
         modal_kit_breakdown: "Kit Tier Breakdown"
       }
     };
@@ -387,11 +370,11 @@
     let activeKitFilter = 'OVERALL';
 
     const playersData = [
-      { rank: 1, name: "JokingDK", country: "🇩🇰", points: 260, tierTitle: "High Tier 2", wins: 42, losses: 5, kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT2", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2", UHC: "HT1" } },
-      { rank: 2, name: "xTkI4ler", country: "🇩🇪", points: 235, tierTitle: "High Tier 2", wins: 38, losses: 8, kits: { VANILLA: "LT1", SWORD: "HT1", AXE: "LT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2", UHC: "HT2" } },
-      { rank: 3, name: "Spaunplayer", country: "🇺🇸", points: 212, tierTitle: "Mid Tier 2", wins: 29, losses: 11, kits: { VANILLA: "HT2", SWORD: "LT1", AXE: "HT2", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3", UHC: "LT1" } },
-      { rank: 4, name: "Technoblade", country: "🇺🇸", points: 195, tierTitle: "Mid Tier 2", wins: 50, losses: 2, kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
-      { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "LT3", UHC: "HT3" } }
+      { rank: 1, name: "JokingDK", country: "🇩🇰", tierTitle: "High Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT2", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2", UHC: "HT1" } },
+      { rank: 2, name: "xTkI4ler", country: "🇩🇪", tierTitle: "High Tier 2", kits: { VANILLA: "LT1", SWORD: "HT1", AXE: "LT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2", UHC: "HT2" } },
+      { rank: 3, name: "Spaunplayer", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT2", SWORD: "LT1", AXE: "HT2", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3", UHC: "LT1" } },
+      { rank: 4, name: "Technoblade", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
+      { rank: 5, name: "Huahwi", country: "🇨🇦", tierTitle: "Low Tier 2", kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "HT3", UHC: "HT3" } }
     ];
 
     // キットごとのファイル名マッピング
@@ -515,7 +498,7 @@
               <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow">
               <div>
                 <div class="font-bold text-white tracking-wide">${p.name}</div>
-                <div class="text-[10px] text-brand-lightPurple font-mono">${p.tierTitle} (${p.points} Pts)</div>
+                <div class="text-[10px] text-brand-lightPurple font-mono">${p.tierTitle}</div>
               </div>
             </div>
           </td>
@@ -530,8 +513,6 @@
       document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
-      document.getElementById('modal-points').innerText = `${player.points} Pts`;
-      document.getElementById('modal-record').innerText = `${player.wins}W / ${player.losses}L`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
