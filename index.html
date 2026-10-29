@@ -24,7 +24,8 @@
               accent: '#d946ef',
               gold: '#f59e0b',
               silver: '#9ca3af',
-              bronze: '#d97706'
+              bronze: '#d97706',
+              blue: '#3b82f6'
             }
           },
           fontFamily: {
@@ -47,7 +48,7 @@
       background-attachment: fixed;
     }
 
-    /* 鮮やかな紫〜ピンクの美グラデーションテキスト */
+    /* 紫ベースの美グラデーションロゴ */
     .clytiers-gradient-logo {
       background: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #8b5cf6 100%);
       -webkit-background-clip: text;
@@ -66,22 +67,38 @@
       border-bottom: 1px solid rgba(139, 92, 246, 0.25);
     }
 
+    /* ご指定のTierカラー定義 (1: 金, 2: 銀, 3: 茶, その他: 青) */
     .tier-badge {
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 4px;
       display: inline-block;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .tier-ht1 { background: #dc2626; color: white; }
-    .tier-lt1 { background: #ea580c; color: white; }
-    .tier-ht2 { background: #d97706; color: white; }
-    .tier-lt2 { background: #ca8a04; color: white; }
-    .tier-ht3 { background: #16a34a; color: white; }
-    .tier-lt3 { background: #2563eb; color: white; }
-    .tier-ht4 { background: #9333ea; color: white; }
-    .tier-lt4 { background: #4b5563; color: white; }
+    .tier-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+    .tier-silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; box-shadow: 0 0 8px rgba(156, 163, 175, 0.4); }
+    .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
+    .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
+
+    /* スキン表示エリアをよりカッコよく演出するエフェクト */
+    .skin-showcase-bg {
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(7, 3, 13, 0.9) 80%);
+      position: relative;
+      overflow: hidden;
+    }
+    .skin-showcase-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(217, 70, 239, 0.1), transparent);
+      animation: scanline 3s linear infinite;
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #07030d; }
@@ -103,7 +120,6 @@
           <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
         </button>
 
-        <!-- 昔の紫ベースグラデーションを復刻 -->
         <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
           CLYTIERS
         </a>
@@ -209,7 +225,7 @@
         <span data-i18n="beta_notice">These Tiers are BETA TIERS and will be reset at the end of beta.</span>
       </div>
 
-      <!-- Kit Tabs (ゲームモードを大幅拡充) -->
+      <!-- Kit Tabs -->
       <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none" id="kit-tabs-container">
         <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
           <i class="fa-solid fa-trophy"></i> OVERALL
@@ -220,8 +236,6 @@
         <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
           <i class="fa-solid fa-sword"></i> SWORD
         </button>
-
-        <!-- 質問で挙げられていたMACE, SPEAR等の主要Kitを追加 -->
         <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
           <i class="fa-solid fa-hammer"></i> MACE
         </button>
@@ -277,34 +291,58 @@
 
   </main>
 
-  <!-- Player Detail Modal -->
-  <div id="player-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-brand-card border border-brand-purple rounded-2xl max-w-md w-full p-6 relative glow-box">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg">
+  <!-- Player Detail Modal (リニューアルされたカッコいいスキン表示) -->
+  <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-6 relative glow-box overflow-hidden shadow-2xl">
+      <!-- 閉じるボタン -->
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="flex items-center gap-4 border-b border-brand-border pb-4 mb-4">
-        <img id="modal-avatar" src="" alt="Skin" class="w-16 h-16 rounded-xl border-2 border-brand-purple bg-brand-dark p-1">
-        <div>
-          <h3 id="modal-name" class="text-xl font-black font-orbitron text-white"></h3>
-          <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple"></p>
+      <!-- ヘッダー＆スキンショーケースエリア -->
+      <div class="skin-showcase-bg rounded-xl p-5 mb-5 border border-brand-border flex flex-col sm:flex-row items-center gap-6 relative">
+        <div class="absolute top-3 left-3 text-[10px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
+          // PLAYER PROFILE
+        </div>
+        <!-- 3Dフルボディスキン (Minotar Body) -->
+        <div class="relative group mt-3 sm:mt-0">
+          <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
+          <div class="relative w-24 h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
+            <img id="modal-fullbody" src="" alt="Skin 3D" class="h-full object-contain filter drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">
+          </div>
+        </div>
+        <div class="text-center sm:text-left z-10">
+          <h3 id="modal-name" class="text-2xl font-black font-orbitron text-white tracking-wide mb-1 glow-text"></h3>
+          <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3"></p>
+          <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-3 py-1.5 rounded-lg border border-brand-border">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[11px] font-mono text-gray-300" id="modal-country-display">Verified Player</span>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 text-xs mb-4">
-        <div class="bg-brand-dark p-3 rounded-lg border border-brand-border">
-          <span class="text-gray-400 block mb-1" data-i18n="modal_points">Points</span>
-          <span id="modal-points" class="text-base font-bold text-yellow-400 font-orbitron"></span>
+      <!-- スタッツグリッド -->
+      <div class="grid grid-cols-2 gap-3 text-xs mb-5">
+        <div class="bg-brand-dark p-3 rounded-xl border border-brand-border flex items-center justify-between">
+          <div>
+            <span class="text-gray-400 block mb-1 text-[10px] font-orbitron" data-i18n="modal_points">Points</span>
+            <span id="modal-points" class="text-lg font-black text-yellow-400 font-orbitron"></span>
+          </div>
+          <i class="fa-solid fa-bolt text-yellow-500/30 text-2xl"></i>
         </div>
-        <div class="bg-brand-dark p-3 rounded-lg border border-brand-border">
-          <span class="text-gray-400 block mb-1" data-i18n="modal_record">Total Record</span>
-          <span id="modal-record" class="text-base font-bold text-white font-mono"></span>
+        <div class="bg-brand-dark p-3 rounded-xl border border-brand-border flex items-center justify-between">
+          <div>
+            <span class="text-gray-400 block mb-1 text-[10px] font-orbitron" data-i18n="modal_record">Total Record</span>
+            <span id="modal-record" class="text-sm font-bold text-white font-mono"></span>
+          </div>
+          <i class="fa-solid fa-chart-line text-brand-purple/30 text-2xl"></i>
         </div>
       </div>
 
-      <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase" data-i18n="modal_kit_breakdown">Kit Breakdown</h4>
-      <div id="modal-kits" class="grid grid-cols-2 gap-2 text-xs">
+      <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2">
+        <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown</span>
+      </h4>
+      <div id="modal-kits" class="grid grid-cols-2 gap-2 text-xs max-h-40 overflow-y-auto pr-1">
         <!-- Kit badges dynamically injected -->
       </div>
     </div>
@@ -371,7 +409,6 @@
     let currentLang = 'ja';
     let activeKitFilter = 'OVERALL';
 
-    // Mock Tier Players Data (ゲームモード拡充版)
     const playersData = [
       { rank: 1, name: "JokingDK", country: "🇩🇰", points: 260, tierTitle: "High Tier 2", wins: 42, losses: 5, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3" } },
       { rank: 2, name: "xTkI4ler", country: "🇩🇪", points: 235, tierTitle: "High Tier 2", wins: 38, losses: 8, kits: { VANILLA: "LT1", SWORD: "HT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "LT1", SHIELD: "HT2", POT: "MT3" } },
@@ -379,6 +416,14 @@
       { rank: 4, name: "Technoblade", country: "🇺🇸", points: 195, tierTitle: "Mid Tier 2", wins: 50, losses: 2, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "HT2", UHC: "HT1", SMP: "HT1", SHIELD: "LT3", POT: "LT3" } },
       { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", MACE: "LT3", SPEAR: "HT3", SHIELD: "LT3", POT: "HT4" } }
     ];
+
+    // Tier文字列からカラークラス（金・銀・茶・青）を判定する関数
+    function getTierColorClass(tierStr) {
+      if (tierStr.includes('1')) return 'tier-gold';   // 1が含まれるなら金色
+      if (tierStr.includes('2')) return 'tier-silver'; // 2が含まれるなら銀色
+      if (tierStr.includes('3')) return 'tier-bronze'; // 3が含まれるなら茶色
+      return 'tier-blue';                              // それ以外は青色
+    }
 
     function toggleLangDropdown(e) {
       e.stopPropagation();
@@ -417,7 +462,6 @@
       }
     }
 
-    // Kitフィルター切り替え処理の修正と改善
     function filterKit(kit) {
       activeKitFilter = kit;
       
@@ -437,7 +481,6 @@
       const search = document.getElementById('search-input').value.toLowerCase();
       tbody.innerHTML = '';
 
-      // Kitフィルターと検索文字列でフィルタリング
       const filtered = playersData.filter(p => {
         const nameMatch = p.name.toLowerCase().includes(search);
         if (activeKitFilter === 'OVERALL') return nameMatch;
@@ -446,7 +489,7 @@
 
       filtered.forEach((p, idx) => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-brand-purple/10 transition-colors cursor-pointer";
+        tr.className = "hover:bg-brand-purple/15 transition-colors cursor-pointer";
         tr.onclick = () => openModal(p);
 
         const rankNum = idx + 1;
@@ -458,21 +501,23 @@
         let kitBadges = '';
         if (activeKitFilter === 'OVERALL') {
           for (const [kit, tier] of Object.entries(p.kits)) {
-            kitBadges += `<span class="tier-badge tier-${tier.toLowerCase()} mr-1">${kit}: ${tier}</span>`;
+            const colorClass = getTierColorClass(tier);
+            kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${kit}: ${tier}</span>`;
           }
         } else {
           const tier = p.kits[activeKitFilter];
-          kitBadges = `<span class="tier-badge tier-${tier.toLowerCase()}">${activeKitFilter}: ${tier}</span>`;
+          const colorClass = getTierColorClass(tier);
+          kitBadges = `<span class="tier-badge ${colorClass}">${activeKitFilter}: ${tier}</span>`;
         }
 
         tr.innerHTML = `
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark">
+              <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow">
               <div>
-                <div class="font-bold text-white">${p.name}</div>
-                <div class="text-[10px] text-brand-lightPurple">${p.tierTitle} (${p.points} Pts)</div>
+                <div class="font-bold text-white tracking-wide">${p.name}</div>
+                <div class="text-[10px] text-brand-lightPurple font-mono">${p.tierTitle} (${p.points} Pts)</div>
               </div>
             </div>
           </td>
@@ -484,19 +529,21 @@
     }
 
     function openModal(player) {
-      document.getElementById('modal-avatar').src = `https://minotar.net/bust/${player.name}/100.png`;
+      // カッコよくなった3D全身スキン (Minotar Body)
+      document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
-      document.getElementById('modal-rank-text').innerText = `Rank #${player.rank} • ${player.tierTitle}`;
+      document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
       document.getElementById('modal-points').innerText = `${player.points} Pts`;
       document.getElementById('modal-record').innerText = `${player.wins}W / ${player.losses}L`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
       for (const [kit, tier] of Object.entries(player.kits)) {
+        const colorClass = getTierColorClass(tier);
         kitsContainer.innerHTML += `
-          <div class="bg-brand-dark p-2 rounded border border-brand-border flex justify-between items-center">
-            <span class="text-gray-400 font-orbitron">${kit}</span>
-            <span class="tier-badge tier-${tier.toLowerCase()}">${tier}</span>
+          <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
+            <span class="text-gray-300 font-orbitron text-xs">${kit}</span>
+            <span class="tier-badge ${colorClass}">${tier}</span>
           </div>
         `;
       }
