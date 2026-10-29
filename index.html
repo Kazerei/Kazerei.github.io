@@ -79,6 +79,7 @@
       gap: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
     .tier-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
     .tier-silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; box-shadow: 0 0 8px rgba(156, 163, 175, 0.4); }
@@ -155,7 +156,7 @@
         <h1 class="text-2xl sm:text-5xl font-black font-orbitron text-white tracking-wide mb-4">
           COMPETITIVE MINECRAFT PVP TIERS
         </h1>
-        <p class="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base mb-6 leading-relaxed" data-i18n="hero_desc">
+        <p class="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base mb-6 leading-relaxed whitespace-nowrap overflow-x-auto" data-i18n="hero_desc">
           clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。
         </p>
         <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold font-orbitron px-8 py-3.5 rounded-xl shadow-lg shadow-purple-600/30 transition-all hover:scale-105">
@@ -297,7 +298,7 @@
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
           <h3 id="modal-name" class="text-xl sm:text-2xl font-black font-orbitron text-white tracking-wide mb-1 truncate glow-text"></h3>
-          <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3 truncate"></p>
+          <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3 whitespace-nowrap"></p>
           <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-2.5 py-1 rounded-lg border border-brand-border">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-[10px] sm:text-[11px] font-mono text-gray-300">Verified Player</span>
@@ -376,6 +377,23 @@
       { rank: 4, name: "Technoblade", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
       { rank: 5, name: "Huahwi", country: "🇨🇦", tierTitle: "Low Tier 2", kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "HT3", UHC: "HT3" } }
     ];
+
+    // Tierの強さを数値化して並び替えするためのスコア関数 (HT1が一番上=最高値)
+    function getTierScore(tierStr) {
+      if (!tierStr) return 99;
+      const upper = tierStr.toUpperCase();
+      // HT1 = 1, LT1 = 2, HT2 = 3, LT2 = 4, HT3 = 5, LT3 = 6 などの順序
+      const match = upper.match(/([HL]T)(\d+)/);
+      if (match) {
+        const type = match[1]; // HT または LT
+        const num = parseInt(match[2]); // 数字
+        let base = num * 10;
+        if (type === 'HT') base += 1;
+        else if (type === 'LT') base += 2;
+        return base;
+      }
+      return 50; // その他 (MT3など)
+    }
 
     // キットごとのファイル名マッピング
     function getKitImageTag(kitName) {
@@ -460,11 +478,23 @@
       const search = document.getElementById('search-input').value.toLowerCase();
       tbody.innerHTML = '';
 
-      const filtered = playersData.filter(p => {
+      // 1. 検索とキットフィルターで絞り込み
+      let filtered = playersData.filter(p => {
         const nameMatch = p.name.toLowerCase().includes(search);
         if (activeKitFilter === 'OVERALL') return nameMatch;
         return nameMatch && (p.kits[activeKitFilter] !== undefined);
       });
+
+      // 2. 個別キット選択時はTier順（HT1が上）にソート、OVERALLの時は元のランク順
+      if (activeKitFilter !== 'OVERALL') {
+        filtered.sort((a, b) => {
+          const scoreA = getTierScore(a.kits[activeKitFilter]);
+          const scoreB = getTierScore(b.kits[activeKitFilter]);
+          return scoreA - scoreB;
+        });
+      } else {
+        filtered.sort((a, b) => a.rank - b.rank);
+      }
 
       filtered.forEach((p, idx) => {
         const tr = document.createElement('tr');
@@ -495,15 +525,15 @@
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow">
-              <div>
-                <div class="font-bold text-white tracking-wide">${p.name}</div>
-                <div class="text-[10px] text-brand-lightPurple font-mono">${p.tierTitle}</div>
+              <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0">
+              <div class="overflow-hidden">
+                <div class="font-bold text-white tracking-wide truncate">${p.name}</div>
+                <div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${p.tierTitle}</div>
               </div>
             </div>
           </td>
           <td class="p-3 text-center text-base">${p.country}</td>
-          <td class="p-3 text-right">${kitBadges}</td>
+          <td class="p-3 text-right overflow-x-auto max-w-[200px] sm:max-w-none">${kitBadges}</td>
         `;
         tbody.appendChild(tr);
       });
