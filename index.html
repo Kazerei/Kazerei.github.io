@@ -207,7 +207,7 @@
         <span data-i18n="beta_notice">These Tiers are BETA TIERS and will be reset at the end of beta.</span>
       </div>
 
-      <!-- Kit Tabs (画像アイコンを各タブの前に配置) -->
+      <!-- Kit Tabs (画像アイコン設定済み / SMP削除・Axe/Cart追加) -->
       <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none" id="kit-tabs-container">
         <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
           <i class="fa-solid fa-trophy"></i> OVERALL
@@ -217,6 +217,9 @@
         </button>
         <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
           <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
+        </button>
+        <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
+          <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
         </button>
         <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
           <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
@@ -234,13 +237,10 @@
           <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
         </button>
         <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
-          <i class="fa-solid fa-train"></i> CART
+          <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
         </button>
         <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
           <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
-        </button>
-        <button onclick="filterKit('SMP')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SMP">
-          <i class="fa-solid fa-earth-americas"></i> SMP
         </button>
       </div>
 
@@ -387,14 +387,14 @@
     let activeKitFilter = 'OVERALL';
 
     const playersData = [
-      { rank: 1, name: "JokingDK", country: "🇩🇰", points: 260, tierTitle: "High Tier 2", wins: 42, losses: 5, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2" } },
-      { rank: 2, name: "xTkI4ler", country: "🇩🇪", points: 235, tierTitle: "High Tier 2", wins: 38, losses: 8, kits: { VANILLA: "LT1", SWORD: "HT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2" } },
-      { rank: 3, name: "Spaunplayer", country: "🇺🇸", points: 212, tierTitle: "Mid Tier 2", wins: 29, losses: 11, kits: { VANILLA: "HT2", SWORD: "LT1", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3" } },
-      { rank: 4, name: "Technoblade", country: "🇺🇸", points: 195, tierTitle: "Mid Tier 2", wins: 50, losses: 2, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SMP: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1" } },
-      { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "LT3" } }
+      { rank: 1, name: "JokingDK", country: "🇩🇰", points: 260, tierTitle: "High Tier 2", wins: 42, losses: 5, kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT2", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2", UHC: "HT1" } },
+      { rank: 2, name: "xTkI4ler", country: "🇩🇪", points: 235, tierTitle: "High Tier 2", wins: 38, losses: 8, kits: { VANILLA: "LT1", SWORD: "HT1", AXE: "LT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2", UHC: "HT2" } },
+      { rank: 3, name: "Spaunplayer", country: "🇺🇸", points: 212, tierTitle: "Mid Tier 2", wins: 29, losses: 11, kits: { VANILLA: "HT2", SWORD: "LT1", AXE: "HT2", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3", UHC: "LT1" } },
+      { rank: 4, name: "Technoblade", country: "🇺🇸", points: 195, tierTitle: "Mid Tier 2", wins: 50, losses: 2, kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
+      { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "LT3", UHC: "HT3" } }
     ];
 
-    // 各キットに対応する画像をマッピングする関数
+    // キットごとのファイル名マッピング
     function getKitImageTag(kitName) {
       const map = {
         CRYSTAL: 'IMG_8232.png',
@@ -404,12 +404,14 @@
         MACE: 'IMG_8236.png',
         SHIELD: 'IMG_8237.png',
         UHC: 'IMG_8238.png',
-        POT: 'IMG_8239.png'
+        POT: 'IMG_8239.png',
+        CART: 'IMG_8244.png',
+        AXE: 'IMG_8246.png'
       };
       if (map[kitName]) {
         return `<img src="./${map[kitName]}" alt="${kitName}" class="w-4 h-4 object-contain inline-block">`;
       }
-      return ''; // 画像がないCartやSMPなどは文字だけにする
+      return '';
     }
 
     function getTierColorClass(tierStr) {
