@@ -369,40 +369,50 @@
 
     let currentLang = 'ja';
     let activeKitFilter = 'OVERALL';
+    let playersData = [];
 
-    const playersData = [
-      { name: "JokingDK", country: "🇩🇰", tierTitle: "High Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT2", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2", UHC: "HT1" } },
-      { name: "xTkI4ler", country: "🇩🇪", tierTitle: "High Tier 2", kits: { VANILLA: "LT1", SWORD: "HT1", AXE: "LT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2", UHC: "HT2" } },
-      { name: "Spaunplayer", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT2", SWORD: "LT1", AXE: "HT2", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3", UHC: "LT1" } },
-      { name: "Technoblade", country: "🇺🇸", tierTitle: "Mid Tier 2", kits: { VANILLA: "HT1", SWORD: "HT1", AXE: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1", SPEAR: "HT1" } },
-      { name: "Huahwi", country: "🇨🇦", tierTitle: "Low Tier 2", kits: { VANILLA: "LT2", SWORD: "HT2", AXE: "LT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "HT3", UHC: "HT3" } }
-    ];
-
-    // 各Tier文字列を数値スコアに変換（大きいほど高位）
-    // HT1=180, LT1=170, HT2=160, LT2=150, HT3=140, LT3=130, HT4=120, MT4=115, LT4=110...
-    function getTierScoreValue(tierStr) {
-      if (!tierStr) return 0;
-      const upper = tierStr.toUpperCase().trim();
-      const match = upper.match(/([HLM]T)(\d+)/);
-      if (match) {
-        const type = match[1]; // HT, MT, LT
-        const num = parseInt(match[2]); // 数字 (1, 2, 3, 4, 5, 6...)
-        let score = (10 - num) * 30; // 数字が小さいほど高スコア
-        if (type === 'HT') score += 20;
-        else if (type === 'MT') score += 15;
-        else if (type === 'LT') score += 10;
-        return score;
-      }
-      return 5;
+    // 国名（英語など）を自動で絵文字フラグに変換するヘルパー
+    function formatCountry(countryStr) {
+      if (!countryStr) return '';
+      const clean = countryStr.trim().toLowerCase();
+      const map = {
+        'japan': '🇯🇵', 'jp': '🇯🇵', '日本': '🇯🇵',
+        'america': '🇺🇸', 'usa': '🇺🇸', 'us': '🇺🇸',
+        'denmark': '🇩🇰', 'dk': '🇩🇰',
+        'germany': '🇩🇪', 'de': '🇩🇪',
+        'canada': '🇨🇦', 'ca': '🇨🇦',
+        'uk': '🇬🇧', 'united kingdom': '🇬🇧', 'england': '🇬🇧',
+        'korea': '🇰🇷', 'kr': '🇰🇷',
+        'china': '🇨🇳', 'cn': '🇨🇳',
+        'france': '🇫🇷', 'fr': '🇫🇷'
+      };
+      return map[clean] || countryStr;
     }
 
-    // OVERALL順位用：裏でプレイヤーが所持している全KitのTierスコアを合計計算
-    function calculatePlayerOverallScore(player) {
-      let totalScore = 0;
-      for (const tier of Object.values(player.kits)) {
-        totalScore += getTierScoreValue(tier);
+    // Tier表記の正規化・数値スコア化 (lt6 < mt6 < ht6 < ... < ht1)
+    function getTierScoreValue(tierStr) {
+      if (!tierStr) return 0;
+      const clean = tierStr.toUpperCase().trim();
+      const match = clean.match(/([HLM]T)(\d+)/);
+      if (match) {
+        const type = match[1];
+        const num = parseInt(match[2]);
+        let baseScore = (7 - num) * 30;
+        if (type === 'HT') baseScore += 3;
+        else if (type === 'MT') baseScore += 2;
+        else if (type === 'LT') baseScore += 1;
+        return baseScore;
       }
-      return totalScore;
+      return 1;
+    }
+
+    // 全キットのスコア合計（OVERALL用）
+    function calculatePlayerOverallScore(player) {
+      let total = 0;
+      for (const tier of Object.values(player.kits)) {
+        total += getTierScoreValue(tier);
+      }
+      return total;
     }
 
     // キットごとのファイル名マッピング
@@ -426,9 +436,11 @@
     }
 
     function getTierColorClass(tierStr) {
-      if (tierStr.includes('1')) return 'tier-gold';
-      if (tierStr.includes('2')) return 'tier-silver';
-      if (tierStr.includes('3')) return 'tier-bronze';
+      if (!tierStr) return 'tier-blue';
+      const upper = tierStr.toUpperCase();
+      if (upper.includes('1')) return 'tier-gold';
+      if (upper.includes('2')) return 'tier-silver';
+      if (upper.includes('3')) return 'tier-bronze';
       return 'tier-blue';
     }
 
@@ -465,7 +477,7 @@
       document.getElementById(`nav-${tabName}`).classList.replace('text-gray-300', 'text-brand-lightPurple');
 
       if (tabName === 'tiers') {
-        renderTable();
+        fetchSpreadsheetData();
       }
     }
 
@@ -483,29 +495,64 @@
       renderTable();
     }
 
+    // スプレッドシートからデータを取得
+    async function fetchSpreadsheetData() {
+      const tbody = document.getElementById('tier-tbody');
+      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
+
+      try {
+        // 取得したウェブアプリのURLを設定済み
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxCBMdqmqAEorlZFCbzcf4HtvqlxnRphEgQ_8C4BWGaNmovZ1PXRNGhykN9mH6F2_sX2w/exec";
+        
+        const response = await fetch(webAppUrl);
+        const rawData = await response.json();
+
+        // データの正規化（小文字→大文字、国名変換など）
+        playersData = rawData.map(p => {
+          let normalizedKits = {};
+          if (p.kits) {
+            for (let [k, v] of Object.entries(p.kits)) {
+              normalizedKits[k.toUpperCase()] = v ? v.toString().trim().toUpperCase() : '';
+            }
+          }
+          return {
+            ...p,
+            country: formatCountry(p.country),
+            kits: normalizedKits
+          };
+        });
+
+        renderTable();
+      } catch (error) {
+        console.error("Failed to load spreadsheet data:", error);
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-red-400">データの取得に失敗しました。</td></tr>`;
+      }
+    }
+
     function renderTable() {
       const tbody = document.getElementById('tier-tbody');
       const search = document.getElementById('search-input').value.toLowerCase();
       tbody.innerHTML = '';
 
-      // 1. 検索とキットフィルターで絞り込み
       let filtered = playersData.filter(p => {
         const nameMatch = p.name.toLowerCase().includes(search);
         if (activeKitFilter === 'OVERALL') return nameMatch;
-        return nameMatch && (p.kits[activeKitFilter] !== undefined);
+        return nameMatch && (p.kits[activeKitFilter] !== undefined && p.kits[activeKitFilter] !== '');
       });
 
-      // 2. 順位の裏計算ソート処理
       if (activeKitFilter === 'OVERALL') {
-        // OVERALL選択時：全キットの合計スコアが大きい順に自動並び替え
         filtered.sort((a, b) => calculatePlayerOverallScore(b) - calculatePlayerOverallScore(a));
       } else {
-        // 個別キット選択時：対象キットのTierが高い順（HT1が最上位）に自動並び替え
         filtered.sort((a, b) => {
           const scoreA = getTierScoreValue(a.kits[activeKitFilter]);
           const scoreB = getTierScoreValue(b.kits[activeKitFilter]);
           return scoreB - scoreA;
         });
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400">プレイヤーが見つかりません。</td></tr>`;
+        return;
       }
 
       filtered.forEach((p, idx) => {
@@ -522,6 +569,7 @@
         let kitBadges = '';
         if (activeKitFilter === 'OVERALL') {
           for (const [kit, tier] of Object.entries(p.kits)) {
+            if (!tier) continue;
             const colorClass = getTierColorClass(tier);
             const imgTag = getKitImageTag(kit);
             kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
@@ -540,11 +588,11 @@
               <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0">
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name}</div>
-                <div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${p.tierTitle}</div>
+                <div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${p.tierTitle || 'Verified'}</div>
               </div>
             </div>
           </td>
-          <td class="p-3 text-center text-base">${p.country}</td>
+          <td class="p-3 text-center text-base">${p.country || ''}</td>
           <td class="p-3 text-right overflow-x-auto max-w-[200px] sm:max-w-none">${kitBadges}</td>
         `;
         tbody.appendChild(tr);
@@ -554,11 +602,12 @@
     function openModal(player, currentRank) {
       document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
-      document.getElementById('modal-rank-text').innerText = `RANK #${currentRank || 1} • ${player.tierTitle.toUpperCase()}`;
+      document.getElementById('modal-rank-text').innerText = `RANK #${currentRank || 1} • ${(player.tierTitle || 'MEMBER').toUpperCase()}`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
       for (const [kit, tier] of Object.entries(player.kits)) {
+        if (!tier) continue;
         const colorClass = getTierColorClass(tier);
         const imgTag = getKitImageTag(kit);
         kitsContainer.innerHTML += `
@@ -575,8 +624,6 @@
     function closeModal() {
       document.getElementById('player-modal').classList.add('hidden');
     }
-
-    renderTable();
   </script>
 </body>
 </html>
