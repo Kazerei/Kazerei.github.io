@@ -176,7 +176,7 @@
           <ul class="space-y-3 text-sm text-gray-300">
             <li class="flex items-start gap-2"><span class="text-red-400 font-bold">1.</span><span data-i18n="rule_1">他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 font-bold">2.</span><span data-i18n="rule_2">荒らし行為は理由を問わず即Ban対象となります。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span data-i18n="rule_3">Tierテスト中のりคนที่（リキット）の使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span data-i18n="rule_3">Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 font-bold">4.</span><span data-i18n="rule_4">その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。</span></li>
           </ul>
         </div>
@@ -277,7 +277,7 @@
 
   </main>
 
-  <!-- Player Detail Modal (Crafatar 3D斜めアングルスキン表示) -->
+  <!-- Player Detail Modal (MCIDベースの斜め向き3Dスキン表示) -->
   <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-6 relative glow-box overflow-hidden shadow-2xl">
       <!-- 閉じるボタン -->
@@ -290,11 +290,11 @@
         <div class="absolute top-3 left-3 text-[10px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
         </div>
-        <!-- Crafatar 3D立体・斜め向きアングルレンダー -->
+        <!-- 確実に斜め向き3Dを描画するスキン表示エリア -->
         <div class="relative group mt-3 sm:mt-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
           <div class="relative w-32 h-44 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
-            <img id="modal-fullbody" src="" alt="Skin 3D Isometric" class="h-full object-contain filter drop-shadow-[0_0_12px_rgba(168,85,247,0.7)] transform hover:scale-105 transition-transform duration-300">
+            <img id="modal-fullbody" src="" alt="Skin 3D Isometric" class="h-full object-contain filter drop-shadow-[0_0_12px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-center sm:text-left z-10">
@@ -349,7 +349,7 @@
         sub_server_rules: "サーバー利用規約",
         rule_1: "他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。",
         rule_2: "荒らし行為は理由を問わず即Ban対象となります。",
-        rule_3: "Tierテスト中のりキット（リキット）の使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。",
+        rule_3: "Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。",
         rule_4: "その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。",
         title_test_rules: "TIER TEST RULES",
         sub_test_rules: "テスト規定",
@@ -513,13 +513,16 @@
       });
     }
 
-    function openModal(player) {
-      // Crafatar APIを利用した、ご希望通りの斜め向き立体3D全身スキン表示
-      document.getElementById('modal-fullbody').src = `https://crafatar.com/renders/body/${player.name}?scale=5&overlay`;
+    async function openModal(player) {
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
       document.getElementById('modal-points').innerText = `${player.points} Pts`;
       document.getElementById('modal-record').innerText = `${player.wins}W / ${player.losses}L`;
+
+      // CrafatarでMCIDから直接正確な立体3Dスキンを取得するため、まずはMOJANG API等でUUIDを取得するか、
+      // Crafatarのプレイヤ名対応エンドポイント（https://crafatar.com/renders/body/{username}）を安全に利用します
+      const skinImg = document.getElementById('modal-fullbody');
+      skinImg.src = `https://crafatar.com/renders/body/${player.name}?scale=6&overlay`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
