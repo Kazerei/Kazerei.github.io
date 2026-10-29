@@ -48,7 +48,6 @@
       background-attachment: fixed;
     }
 
-    /* 紫ベースの美グラデーションロゴ */
     .clytiers-gradient-logo {
       background: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #8b5cf6 100%);
       -webkit-background-clip: text;
@@ -67,7 +66,6 @@
       border-bottom: 1px solid rgba(139, 92, 246, 0.25);
     }
 
-    /* ご指定のTierカラー定義 (1: 金, 2: 銀, 3: 茶, その他: 青) */
     .tier-badge {
       font-size: 10px;
       font-weight: 800;
@@ -82,22 +80,10 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
-    /* スキン表示エリアをよりカッコよく演出するエフェクト */
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(7, 3, 13, 0.9) 80%);
       position: relative;
       overflow: hidden;
-    }
-    .skin-showcase-bg::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(217, 70, 239, 0.1), transparent);
-      animation: scanline 3s linear infinite;
-    }
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
     }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -291,7 +277,7 @@
 
   </main>
 
-  <!-- Player Detail Modal (リニューアルされたカッコいいスキン表示) -->
+  <!-- Player Detail Modal (ナナメ向きアングルに対応したスキン表示) -->
   <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-6 relative glow-box overflow-hidden shadow-2xl">
       <!-- 閉じるボタン -->
@@ -304,11 +290,12 @@
         <div class="absolute top-3 left-3 text-[10px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
         </div>
-        <!-- 3Dフルボディスキン (Minotar Body) -->
+        <!-- ご指定のナナメ向きアングル (Minotar 3D Isometric / 傾きレンダリング) -->
         <div class="relative group mt-3 sm:mt-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <div class="relative w-24 h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
-            <img id="modal-fullbody" src="" alt="Skin 3D" class="h-full object-contain filter drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">
+          <div class="relative w-28 h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
+            <!-- ダーティ＆斜め向きのレンダリングエンドポイント -->
+            <img id="modal-fullbody" src="" alt="Skin Isometric" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)] transform hover:scale-105 transition-transform duration-300">
           </div>
         </div>
         <div class="text-center sm:text-left z-10">
@@ -316,7 +303,7 @@
           <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3"></p>
           <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-3 py-1.5 rounded-lg border border-brand-border">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[11px] font-mono text-gray-300" id="modal-country-display">Verified Player</span>
+            <span class="text-[11px] font-mono text-gray-300">Verified Player</span>
           </div>
         </div>
       </div>
@@ -417,12 +404,11 @@
       { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", MACE: "LT3", SPEAR: "HT3", SHIELD: "LT3", POT: "HT4" } }
     ];
 
-    // Tier文字列からカラークラス（金・銀・茶・青）を判定する関数
     function getTierColorClass(tierStr) {
-      if (tierStr.includes('1')) return 'tier-gold';   // 1が含まれるなら金色
-      if (tierStr.includes('2')) return 'tier-silver'; // 2が含まれるなら銀色
-      if (tierStr.includes('3')) return 'tier-bronze'; // 3が含まれるなら茶色
-      return 'tier-blue';                              // それ以外は青色
+      if (tierStr.includes('1')) return 'tier-gold';
+      if (tierStr.includes('2')) return 'tier-silver';
+      if (tierStr.includes('3')) return 'tier-bronze';
+      return 'tier-blue';
     }
 
     function toggleLangDropdown(e) {
@@ -529,8 +515,8 @@
     }
 
     function openModal(player) {
-      // カッコよくなった3D全身スキン (Minotar Body)
-      document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
+      // ナナメ向きアングル用のMinotarスキンエンドポイント (`/armor/body/` または `/skin/` で斜め表示)
+      document.getElementById('modal-fullbody').src = `https://minotar.net/armor/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
       document.getElementById('modal-points').innerText = `${player.points} Pts`;
