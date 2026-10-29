@@ -69,9 +69,11 @@
     .tier-badge {
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -142,7 +144,6 @@
 
     <!-- HOME TAB -->
     <section id="tab-home" class="space-y-8">
-      <!-- Hero Banner -->
       <div class="glow-box bg-brand-card rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden">
         <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-brand-purple/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="inline-block px-3 py-1 rounded-full bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple font-orbitron text-xs mb-4">
@@ -160,9 +161,7 @@
         </a>
       </div>
 
-      <!-- Rules Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Server Rules Card -->
         <div class="glow-box bg-brand-card rounded-xl p-6 relative">
           <div class="flex items-center gap-3 border-b border-brand-border pb-4 mb-4">
             <div class="w-10 h-10 rounded-lg bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
@@ -181,7 +180,6 @@
           </ul>
         </div>
 
-        <!-- Tier Test Rules Card -->
         <div class="glow-box bg-brand-card rounded-xl p-6 relative">
           <div class="flex items-center gap-3 border-b border-brand-border pb-4 mb-4">
             <div class="w-10 h-10 rounded-lg bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center text-brand-lightPurple">
@@ -204,41 +202,42 @@
 
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
-      
-      <!-- Beta Warning Banner -->
       <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-center text-xs sm:text-sm text-red-300 font-mono">
         <i class="fa-solid fa-triangle-exclamation mr-1"></i>
         <span data-i18n="beta_notice">These Tiers are BETA TIERS and will be reset at the end of beta.</span>
       </div>
 
-      <!-- Kit Tabs -->
+      <!-- Kit Tabs (画像アイコンを各タブの前に配置) -->
       <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none" id="kit-tabs-container">
         <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
           <i class="fa-solid fa-trophy"></i> OVERALL
         </button>
         <button onclick="filterKit('VANILLA')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="VANILLA">
-          <i class="fa-solid fa-apple-whole"></i> VANILLA
+          <img src="./IMG_8235.png" alt="Vanilla" class="w-4 h-4 object-contain"> VANILLA
         </button>
         <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
-          <i class="fa-solid fa-sword"></i> SWORD
+          <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
         </button>
         <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
-          <i class="fa-solid fa-hammer"></i> MACE
+          <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
         </button>
         <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
-          <i class="fa-solid fa-location-arrow"></i> SPEAR
+          <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
         </button>
         <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
-          <i class="fa-solid fa-gem"></i> CRYSTAL
+          <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
         </button>
         <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
-          <i class="fa-solid fa-shield"></i> SHIELD
+          <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
         </button>
         <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
-          <i class="fa-solid fa-flask"></i> POT
+          <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
+        </button>
+        <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
+          <i class="fa-solid fa-train"></i> CART
         </button>
         <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
-          <i class="fa-solid fa-heart-pulse"></i> UHC
+          <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
         </button>
         <button onclick="filterKit('SMP')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SMP">
           <i class="fa-solid fa-earth-americas"></i> SMP
@@ -272,25 +271,20 @@
           </tbody>
         </table>
       </div>
-
     </section>
-
   </main>
 
-  <!-- Player Detail Modal (確実に表示されるMinotar安定版スキン表示) -->
+  <!-- Player Detail Modal -->
   <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-6 relative glow-box overflow-hidden shadow-2xl">
-      <!-- 閉じるボタン -->
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- ヘッダー＆スキンショーケースエリア -->
       <div class="skin-showcase-bg rounded-xl p-5 mb-5 border border-brand-border flex flex-col sm:flex-row items-center gap-6 relative">
         <div class="absolute top-3 left-3 text-[10px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
         </div>
-        <!-- 安定動作するMinotarボディスキン -->
         <div class="relative group mt-3 sm:mt-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
           <div class="relative w-28 h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
@@ -307,7 +301,6 @@
         </div>
       </div>
 
-      <!-- スタッツグリッド -->
       <div class="grid grid-cols-2 gap-3 text-xs mb-5">
         <div class="bg-brand-dark p-3 rounded-xl border border-brand-border flex items-center justify-between">
           <div>
@@ -329,17 +322,15 @@
         <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown</span>
       </h4>
       <div id="modal-kits" class="grid grid-cols-2 gap-2 text-xs max-h-40 overflow-y-auto pr-1">
-        <!-- Kit badges dynamically injected -->
+        <!-- Dynamic -->
       </div>
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="border-t border-brand-border/40 bg-brand-dark py-4 text-center text-xs text-gray-500 font-mono">
     &copy; 2026 clytiers. All rights reserved. Not affiliated with Mojang AB.
   </footer>
 
-  <!-- App Script -->
   <script>
     const i18nData = {
       ja: {
@@ -396,12 +387,30 @@
     let activeKitFilter = 'OVERALL';
 
     const playersData = [
-      { rank: 1, name: "JokingDK", country: "🇩🇰", points: 260, tierTitle: "High Tier 2", wins: 42, losses: 5, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3" } },
-      { rank: 2, name: "xTkI4ler", country: "🇩🇪", points: 235, tierTitle: "High Tier 2", wins: 38, losses: 8, kits: { VANILLA: "LT1", SWORD: "HT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "LT1", SHIELD: "HT2", POT: "MT3" } },
-      { rank: 3, name: "Spaunplayer", country: "🇺🇸", points: 212, tierTitle: "Mid Tier 2", wins: 29, losses: 11, kits: { VANILLA: "HT2", SWORD: "LT1", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4" } },
-      { rank: 4, name: "Technoblade", country: "🇺🇸", points: 195, tierTitle: "Mid Tier 2", wins: 50, losses: 2, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "HT2", UHC: "HT1", SMP: "HT1", SHIELD: "LT3", POT: "LT3" } },
-      { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", MACE: "LT3", SPEAR: "HT3", SHIELD: "LT3", POT: "HT4" } }
+      { rank: 1, name: "JokingDK", country: "🇩🇰", points: 260, tierTitle: "High Tier 2", wins: 42, losses: 5, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "LT1", SPEAR: "HT2", CRYSTAL: "HT1", SHIELD: "HT2", POT: "HT3", CART: "HT2" } },
+      { rank: 2, name: "xTkI4ler", country: "🇩🇪", points: 235, tierTitle: "High Tier 2", wins: 38, losses: 8, kits: { VANILLA: "LT1", SWORD: "HT1", MACE: "LT2", SPEAR: "LT1", CRYSTAL: "HT1", SHIELD: "HT2", POT: "MT3", CART: "LT2" } },
+      { rank: 3, name: "Spaunplayer", country: "🇺🇸", points: 212, tierTitle: "Mid Tier 2", wins: 29, losses: 11, kits: { VANILLA: "HT2", SWORD: "LT1", MACE: "HT2", SPEAR: "HT2", CRYSTAL: "LT2", SHIELD: "MT2", POT: "HT4", CART: "HT3" } },
+      { rank: 4, name: "Technoblade", country: "🇺🇸", points: 195, tierTitle: "Mid Tier 2", wins: 50, losses: 2, kits: { VANILLA: "HT1", SWORD: "HT1", MACE: "HT2", CRYSTAL: "HT1", UHC: "HT1", SMP: "HT1", SHIELD: "LT3", POT: "LT3", CART: "HT1" } },
+      { rank: 5, name: "Huahwi", country: "🇨🇦", points: 180, tierTitle: "Low Tier 2", wins: 24, losses: 14, kits: { VANILLA: "LT2", SWORD: "HT2", MACE: "LT3", SPEAR: "HT3", CRYSTAL: "HT2", SHIELD: "LT3", POT: "HT4", CART: "LT3" } }
     ];
+
+    // 各キットに対応する画像をマッピングする関数
+    function getKitImageTag(kitName) {
+      const map = {
+        CRYSTAL: 'IMG_8232.png',
+        SPEAR: 'IMG_8233.png',
+        SWORD: 'IMG_8234.png',
+        VANILLA: 'IMG_8235.png',
+        MACE: 'IMG_8236.png',
+        SHIELD: 'IMG_8237.png',
+        UHC: 'IMG_8238.png',
+        POT: 'IMG_8239.png'
+      };
+      if (map[kitName]) {
+        return `<img src="./${map[kitName]}" alt="${kitName}" class="w-4 h-4 object-contain inline-block">`;
+      }
+      return ''; // 画像がないCartやSMPなどは文字だけにする
+    }
 
     function getTierColorClass(tierStr) {
       if (tierStr.includes('1')) return 'tier-gold';
@@ -487,12 +496,14 @@
         if (activeKitFilter === 'OVERALL') {
           for (const [kit, tier] of Object.entries(p.kits)) {
             const colorClass = getTierColorClass(tier);
-            kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${kit}: ${tier}</span>`;
+            const imgTag = getKitImageTag(kit);
+            kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
           }
         } else {
           const tier = p.kits[activeKitFilter];
           const colorClass = getTierColorClass(tier);
-          kitBadges = `<span class="tier-badge ${colorClass}">${activeKitFilter}: ${tier}</span>`;
+          const imgTag = getKitImageTag(activeKitFilter);
+          kitBadges = `<span class="tier-badge ${colorClass}">${imgTag} ${activeKitFilter}: ${tier}</span>`;
         }
 
         tr.innerHTML = `
@@ -514,7 +525,6 @@
     }
 
     function openModal(player) {
-      // Minotarの安定した全身・正面スキン描画
       document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
@@ -525,9 +535,10 @@
       kitsContainer.innerHTML = '';
       for (const [kit, tier] of Object.entries(player.kits)) {
         const colorClass = getTierColorClass(tier);
+        const imgTag = getKitImageTag(kit);
         kitsContainer.innerHTML += `
           <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
-            <span class="text-gray-300 font-orbitron text-xs">${kit}</span>
+            <span class="text-gray-300 font-orbitron text-xs flex items-center gap-1.5">${imgTag} ${kit}</span>
             <span class="tier-badge ${colorClass}">${tier}</span>
           </div>
         `;
@@ -540,7 +551,6 @@
       document.getElementById('player-modal').classList.add('hidden');
     }
 
-    // Init
     renderTable();
   </script>
 </body>
