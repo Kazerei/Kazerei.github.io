@@ -277,7 +277,7 @@
 
   </main>
 
-  <!-- Player Detail Modal (MCIDベースの斜め向き3Dスキン表示) -->
+  <!-- Player Detail Modal (確実に表示されるMinotar安定版スキン表示) -->
   <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-6 relative glow-box overflow-hidden shadow-2xl">
       <!-- 閉じるボタン -->
@@ -290,11 +290,11 @@
         <div class="absolute top-3 left-3 text-[10px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
         </div>
-        <!-- 確実に斜め向き3Dを描画するスキン表示エリア -->
+        <!-- 安定動作するMinotarボディスキン -->
         <div class="relative group mt-3 sm:mt-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <div class="relative w-32 h-44 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
-            <img id="modal-fullbody" src="" alt="Skin 3D Isometric" class="h-full object-contain filter drop-shadow-[0_0_12px_rgba(168,85,247,0.7)]">
+          <div class="relative w-28 h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
+            <img id="modal-fullbody" src="" alt="Skin" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-center sm:text-left z-10">
@@ -513,16 +513,13 @@
       });
     }
 
-    async function openModal(player) {
+    function openModal(player) {
+      // Minotarの安定した全身・正面スキン描画
+      document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-rank-text').innerText = `RANK #${player.rank} • ${player.tierTitle.toUpperCase()}`;
       document.getElementById('modal-points').innerText = `${player.points} Pts`;
       document.getElementById('modal-record').innerText = `${player.wins}W / ${player.losses}L`;
-
-      // CrafatarでMCIDから直接正確な立体3Dスキンを取得するため、まずはMOJANG API等でUUIDを取得するか、
-      // Crafatarのプレイヤ名対応エンドポイント（https://crafatar.com/renders/body/{username}）を安全に利用します
-      const skinImg = document.getElementById('modal-fullbody');
-      skinImg.src = `https://crafatar.com/renders/body/${player.name}?scale=6&overlay`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
