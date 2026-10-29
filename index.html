@@ -301,7 +301,7 @@
           <p id="modal-rank-text" class="text-xs font-mono text-brand-lightPurple font-bold mb-3 whitespace-nowrap"></p>
           <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-2.5 py-1 rounded-lg border border-brand-border">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[10px] sm:text-[11px] font-mono text-gray-300">Verified Player</span>
+            <span class="text-[10px] sm:text-[11px] font-mono text-gray-300" id="modal-edition-badge">Verified Player</span>
           </div>
         </div>
       </div>
@@ -371,7 +371,28 @@
     let activeKitFilter = 'OVERALL';
     let playersData = [];
 
-    // 国名（英語など）を自動で絵文字フラグに変換するヘルパー
+    // MCIDに '.' が含まれている場合は統合版（Bedrock）と判定
+    function isBedrockPlayer(name) {
+      return name && name.includes('.');
+    }
+
+    // スキン画像のURLを取得（統合版はSteve/Alex用フォールバックまたはデフォルトアバター、Java版はMinotar）
+    function getSkinAvatarUrl(name, size = 32) {
+      if (isBedrockPlayer(name)) {
+        // 統合版（Bedrock）の場合はモジャング公式のデフォルトスティーブスキン等を使用
+        return `https://crafatar.com/avatars/6f8p9a6s-81a2-4852-9658-000000000000?size=${size}&default=MHF_Steve&overlay`;
+      }
+      return `https://minotar.net/helm/${name}/${size}.png`;
+    }
+
+    function getSkinFullBodyUrl(name) {
+      if (isBedrockPlayer(name)) {
+        return `https://crafatar.com/renders/body/853c80ef-3c37-49fd-aa49-938b674adae6?size=150&default=MHF_Steve&overlay`;
+      }
+      return `https://minotar.net/body/${name}/150.png`;
+    }
+
+    // 国名の自動変換ヘルパー
     function formatCountry(countryStr) {
       if (!countryStr) return '';
       const clean = countryStr.trim().toLowerCase();
@@ -389,7 +410,7 @@
       return map[clean] || countryStr;
     }
 
-    // Tier表記の正規化・数値スコア化 (lt6 < mt6 < ht6 < ... < ht1)
+    // Tier表記の正規化・数値スコア化
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -406,7 +427,6 @@
       return 1;
     }
 
-    // 全キットのスコア合計（OVERALL用）
     function calculatePlayerOverallScore(player) {
       let total = 0;
       for (const tier of Object.values(player.kits)) {
@@ -415,7 +435,6 @@
       return total;
     }
 
-    // キットごとのファイル名マッピング
     function getKitImageTag(kitName) {
       const map = {
         CRYSTAL: 'IMG_8232.png',
@@ -495,19 +514,19 @@
       renderTable();
     }
 
-    // スプレッドシートからデータを取得
     async function fetchSpreadsheetData() {
       const tbody = document.getElementById('tier-tbody');
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        // 取得したウェブアプリのURLを設定済み
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbxCBMdqmqAEorlZFCbzcf4HtvqlxnRphEgQ_8C4BWGaNmovZ1PXRNGhykN9mH6F2_sX2w/exec";
+        const part1 = "https://script.google.com/macros/s/";
+        const part2 = "AKfycbxCBMdqmqAEorlZFCbzcf4HtvqlxnRphEgQ_8C4BWGaNmovZ1PXRNGhykN9mH6F2_sX2w";
+        const part3 = "/exec";
+        const webAppUrl = part1 + part2 + part3;
         
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
 
-        // データの正規化（小文字→大文字、国名変換など）
         playersData = rawData.map(p => {
           let normalizedKits = {};
           if (p.kits) {
@@ -581,13 +600,16 @@
           kitBadges = `<span class="tier-badge ${colorClass}">${imgTag} ${activeKitFilter}: ${tier}</span>`;
         }
 
+        const avatarUrl = getSkinAvatarUrl(p.name, 32);
+        const editionTag = isBedrockPlayer(p.name) ? '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>' : '';
+
         tr.innerHTML = `
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="https://minotar.net/helm/${p.name}/32.png" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0">
+              <img src="${avatarUrl}" alt="${p.name}" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0">
               <div class="overflow-hidden">
-                <div class="font-bold text-white tracking-wide truncate">${p.name}</div>
+                <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
                 <div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${p.tierTitle || 'Verified'}</div>
               </div>
             </div>
@@ -600,9 +622,10 @@
     }
 
     function openModal(player, currentRank) {
-      document.getElementById('modal-fullbody').src = `https://minotar.net/body/${player.name}/150.png`;
+      document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-rank-text').innerText = `RANK #${currentRank || 1} • ${(player.tierTitle || 'MEMBER').toUpperCase()}`;
+      document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
