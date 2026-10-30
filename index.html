@@ -289,7 +289,7 @@
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <!-- Canvas による綺麗で自然な立ち姿の描画コンテナ -->
+          <!-- 正しい比率に調整されたCanvasレンダリングコンテナ -->
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-1 overflow-hidden">
             <canvas id="modal-pose-canvas" width="120" height="180" class="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]"></canvas>
           </div>
@@ -465,12 +465,12 @@
       return 'tier-blue';
     }
 
-    // --- 自然な直立ポーズ（頭・胴体・手足・帽子レイヤー合成）描画関数 ---
+    // --- マイクラの正しい体型比率に調整した Canvas レンダリング関数 ---
     function renderPosedSkinOnCanvas(canvasId, name) {
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.imageSmoothingEnabled = false; // ドット絵をくっきり表示
+      ctx.imageSmoothingEnabled = false; // ドット絵をくっきり描画
 
       if (isBedrockPlayer(name)) {
         drawFallbackPoseImage(ctx, canvas);
@@ -484,25 +484,23 @@
       skinImg.onload = () => {
         try {
           const cx = canvas.width / 2;
-          const cy = 25;
+          const cy = 20; // 描画開始位置
 
-          // 1. 左脚 (x:0, y:20, w:4, h:12)
-          ctx.drawImage(skinImg, 0, 20, 4, 12, cx - 11, cy + 85, 11, 38);
-          // 2. 右脚 (x:4, y:20, w:4, h:12)
-          ctx.drawImage(skinImg, 4, 20, 4, 12, cx, cy + 85, 11, 38);
+          // 1. 脚
+          ctx.drawImage(skinImg, 16, 52, 4, 12, cx - 8, cy + 90, 8, 32); // 左脚
+          ctx.drawImage(skinImg, 4, 20, 4, 12, cx, cy + 90, 8, 32);       // 右脚
 
-          // 3. 胴体 (x:20, y:20, w:8, h:12)
-          ctx.drawImage(skinImg, 20, 20, 8, 12, cx - 11, cy + 47, 22, 40);
+          // 2. 胴体
+          ctx.drawImage(skinImg, 20, 20, 8, 12, cx - 8, cy + 54, 16, 36);
 
-          // 4. 左腕 (x:44, y:20, w:4, h:12)
-          ctx.drawImage(skinImg, 44, 20, 4, 12, cx - 21, cy + 47, 11, 40);
-          // 5. 右腕 (x:44, y:20, w:4, h:12)
-          ctx.drawImage(skinImg, 44, 20, 4, 12, cx + 10, cy + 47, 11, 40);
+          // 3. 腕
+          ctx.drawImage(skinImg, 36, 52, 4, 12, cx - 16, cy + 54, 8, 36); // 左腕
+          ctx.drawImage(skinImg, 44, 20, 4, 12, cx + 8, cy + 54, 8, 36);  // 右腕
 
-          // 6. 頭部 (x:8, y:8, w:8, h:8)
-          ctx.drawImage(skinImg, 8, 8, 8, 8, cx - 18, cy, 36, 36);
-          // 7. 帽子 / 髪の毛オーバーレイ層 (x:40, y:8, w:8, h:8)
-          ctx.drawImage(skinImg, 40, 8, 8, 8, cx - 20, cy - 2, 40, 40);
+          // 4. 頭部
+          ctx.drawImage(skinImg, 8, 8, 8, 8, cx - 12, cy + 24, 24, 24);
+          // 5. 帽子 / 髪の毛オーバーレイ層
+          ctx.drawImage(skinImg, 40, 8, 8, 8, cx - 14, cy + 22, 28, 28);
 
         } catch (e) {
           drawFallbackPoseImage(ctx, canvas);
@@ -690,7 +688,6 @@
     }
 
     function openModal(player, currentRank) {
-      // 直立ポーズで髪の毛・帽子レイヤー（2nd layer）込みのテクスチャ描画
       renderPosedSkinOnCanvas('modal-pose-canvas', player.name);
 
       document.getElementById('modal-name').innerText = player.name;
