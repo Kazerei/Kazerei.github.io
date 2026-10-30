@@ -211,7 +211,7 @@
         <span data-i18n="beta_notice">These Tiers are BETA TIERS and will be reset at the end of beta.</span>
       </div>
 
-      <!-- Kit Tabs (VANILLAを消去済み) -->
+      <!-- Kit Tabs -->
       <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none" id="kit-tabs-container">
         <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
           <i class="fa-solid fa-trophy"></i> OVERALL
@@ -367,21 +367,19 @@
     let activeKitFilter = 'OVERALL';
     let playersData = [];
 
-    // 確実で安定したデフォルト Steve アイコン（1×1 SVGデータ）
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
     const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
-    // MCIDに '.' が含まれている場合は統合版（Bedrock）と判定
     function isBedrockPlayer(name) {
       return name && name.includes('.');
     }
 
-    // スキン画像URL（統合版はmc-headsのSteveに固定）
+    // スキン画像URL（Java版は2nd layer/お面などのオーバーレイに対応した Bust レンダリングを使用）
     function getSkinAvatarUrl(name, size = 32) {
       if (isBedrockPlayer(name)) {
         return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
       }
-      return `https://minotar.net/helm/${name}/${size}.png`;
+      return `https://minotar.net/bust/${name}/${size}.png`;
     }
 
     function getSkinFullBodyUrl(name) {
@@ -391,7 +389,6 @@
       return `https://minotar.net/body/${name}/150.png`;
     }
 
-    // 国名の自動変換ヘルパー
     function formatCountry(countryStr) {
       if (!countryStr) return '';
       const clean = countryStr.trim().toLowerCase();
@@ -409,7 +406,23 @@
       return map[clean] || countryStr;
     }
 
-    // Tier表記の正規化・数値スコア化
+    // Tier文字列（HT3, LT2など）を正規の表示名（High Tier 3, Low Tier 2など）に変換
+    function formatTierFullTitle(tierStr) {
+      if (!tierStr) return '';
+      const clean = tierStr.toUpperCase().trim();
+      const match = clean.match(/([HLM]T)(\d+)/);
+      if (match) {
+        const type = match[1];
+        const num = match[2];
+        let typeName = 'Tier';
+        if (type === 'HT') typeName = 'High Tier';
+        else if (type === 'MT') typeName = 'Mid Tier';
+        else if (type === 'LT') typeName = 'Low Tier';
+        return `${typeName} ${num}`;
+      }
+      return tierStr;
+    }
+
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -439,7 +452,6 @@
         CRYSTAL: 'IMG_8232.png',
         SPEAR: 'IMG_8233.png',
         SWORD: 'IMG_8234.png',
-        VANILLA: 'IMG_8235.png',
         MACE: 'IMG_8236.png',
         SHIELD: 'IMG_8237.png',
         UHC: 'IMG_8238.png',
@@ -585,6 +597,8 @@
         if (rankNum === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-600/20 text-amber-500 border border-amber-600/50 flex items-center justify-center font-bold mx-auto">3</span>`;
 
         let kitBadges = '';
+        let subTierTextHtml = '';
+
         if (activeKitFilter === 'OVERALL') {
           for (const [kit, tier] of Object.entries(p.kits)) {
             if (!tier) continue;
@@ -592,24 +606,32 @@
             const imgTag = getKitImageTag(kit);
             kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
           }
+          // OVERALL のときは名前の下に Tier テキストを表示しない
+          subTierTextHtml = '';
         } else {
           const tier = p.kits[activeKitFilter];
           const colorClass = getTierColorClass(tier);
           const imgTag = getKitImageTag(activeKitFilter);
           kitBadges = `<span class="tier-badge ${colorClass}">${imgTag} ${activeKitFilter}: ${tier}</span>`;
+          
+          // キット別タブのときは名前の下に Full Title（例: Low Tier 3）を表示
+          const fullTitle = formatTierFullTitle(tier);
+          if (fullTitle) {
+            subTierTextHtml = `<div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${fullTitle}</div>`;
+          }
         }
 
         const avatarUrl = getSkinAvatarUrl(p.name, 32);
         const editionTag = isBedrockPlayer(p.name) ? '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>' : '';
 
-        // High Tier 2 などの余分なテキストを消去し、名前だけに整理
         tr.innerHTML = `
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0">
+              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
+                ${subTierTextHtml}
               </div>
             </div>
           </td>
