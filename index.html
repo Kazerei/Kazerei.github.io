@@ -92,21 +92,6 @@
       overflow: hidden;
     }
 
-    /* CSS 3D キャラクター全体のコンテナ */
-    .mc-character-3d {
-      position: relative;
-      width: 80px;
-      height: 140px;
-      transform-style: preserve-3d;
-      transform: scale(0.9) rotateX(10deg) rotateY(-25deg);
-    }
-
-    .mc-part {
-      position: absolute;
-      transform-style: preserve-3d;
-      image-rendering: pixelated;
-    }
-
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #07030d; }
     ::-webkit-scrollbar-thumb { background: #2a164f; border-radius: 3px; }
@@ -304,9 +289,9 @@
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <!-- CSS 3D スキン表示コンテナ -->
+          <!-- 安定して確実に全身を表示する mc-heads.net の全身API（オーバーレイ対応）を使用 -->
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <div id="modal-3d-container" class="w-full h-full flex items-center justify-center"></div>
+            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -384,6 +369,7 @@
     let playersData = [];
 
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
+    const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
     function isBedrockPlayer(name) {
       return name && name.includes('.');
@@ -396,53 +382,12 @@
       return `https://minotar.net/bust/${name}/${size}.png`;
     }
 
-    // CSS 3D でマイクラのスキンをテクスチャとして展開・立体構築する関数
-    function render3DSkin(containerId, name) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-
-      const skinUrl = isBedrockPlayer(name) ? 'https://mc-heads.net/body/MHF_Steve/150' : `https://minotar.net/skin/${name}`;
-
-      const charDiv = document.createElement('div');
-      charDiv.className = 'mc-character-3d';
-
-      // パーツ生成ヘルパー（正しいブロック比率とUV背景位置を指定）
-      // ※今回は簡易的かつ確実に綺麗に表示するため、各パーツの主要面（前面・側面）をCSS背景位置で切り出す構造に最適化しています
-      const parts = [
-        { name: 'head', w: 32, h: 32, t: 0, l: 24, bgX: -8, bgY: -8, overlayBgX: -40, overlayBgY: -8 },
-        { name: 'body', w: 32, h: 48, t: 32, l: 24, bgX: -20, bgY: -20, overlayBgX: -20, overlayBgY: -36 },
-        { name: 'arm-left', w: 16, h: 48, t: 32, l: 8, bgX: -44, bgY: -20 },
-        { name: 'arm-right', w: 16, h: 48, t: 32, l: 56, bgX: -44, bgY: -20 },
-        { name: 'leg-left', w: 16, h: 48, t: 80, l: 24, bgX: -4, bgY: -20 },
-        { name: 'leg-right', w: 16, h: 48, t: 80, l: 40, bgX: -4, bgY: -20 }
-      ];
-
-      parts.forEach(p => {
-        const partEl = document.createElement('div');
-        partEl.className = 'mc-part';
-        partEl.style.width = `${p.w}px`;
-        partEl.style.height = `${p.h}px`;
-        partEl.style.top = `${p.t}px`;
-        partEl.style.left = `${p.l}px`;
-        partEl.style.backgroundImage = `url(${skinUrl})`;
-        partEl.style.backgroundSize = '128px 128px'; // 64x64スキンの2倍スケール
-        partEl.style.backgroundPosition = `${p.bgX * 2}px ${p.bgY * 2}px`;
-
-        // 2層目（オーバーレイ）が存在する場合は重ねて表示
-        if (p.overlayBgX !== undefined) {
-          const overlayEl = document.createElement('div');
-          overlayEl.style.position = 'absolute';
-          overlayEl.style.inset = '0';
-          overlayEl.style.backgroundImage = `url(${skinUrl})`;
-          overlayEl.style.backgroundSize = '128px 128px';
-          overlayEl.style.backgroundPosition = `${p.overlayBgX * 2}px ${p.overlayBgY * 2}px`;
-          partEl.appendChild(overlayEl);
-        }
-
-        charDiv.appendChild(partEl);
-      });
-
-      container.appendChild(charDiv);
+    function getSkinFullBodyUrl(name) {
+      if (isBedrockPlayer(name)) {
+        return DEFAULT_STEVE_BODY;
+      }
+      // mc-heads.net の body エンドポイントは、オーバーレイ（2層目）を自動合成して綺麗に表示してくれます
+      return `https://mc-heads.net/body/${name}/150`;
     }
 
     function formatCountry(countryStr) {
@@ -696,8 +641,7 @@
     }
 
     function openModal(player, currentRank) {
-      // CSS 3D スキンのレンダリングを実行
-      render3DSkin('modal-3d-container', player.name);
+      document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
