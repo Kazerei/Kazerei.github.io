@@ -92,21 +92,6 @@
       overflow: hidden;
     }
 
-    /* CSS 3D キャラクター全体のコンテナ */
-    .mc-character-3d {
-      position: relative;
-      width: 80px;
-      height: 140px;
-      transform-style: preserve-3d;
-      transform: scale(0.9) rotateX(10deg) rotateY(-25deg);
-    }
-
-    .mc-part {
-      position: absolute;
-      transform-style: preserve-3d;
-      image-rendering: pixelated;
-    }
-
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #07030d; }
     ::-webkit-scrollbar-thumb { background: #2a164f; border-radius: 3px; }
@@ -257,10 +242,13 @@
           </button>
         </div>
 
-        <!-- Load Button -->
-        <button onclick="fetchSpreadsheetData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg transition-all hover:scale-105 shrink-0 mb-2">
-          <i class="fa-solid fa-rotate" id="load-icon"></i> <span data-i18n="btn_load">LOAD</span>
-        </button>
+        <!-- Load Button & CoolDown Display -->
+        <div class="flex flex-col items-end shrink-0 mb-2">
+          <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
+          <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg transition-all hover:scale-105">
+            <i class="fa-solid fa-rotate" id="load-icon"></i> <span data-i18n="btn_load">LOAD</span>
+          </button>
+        </div>
       </div>
 
       <!-- Search & Filters -->
@@ -307,9 +295,8 @@
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <!-- CSS 3D スキン表示コンテナ -->
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <div id="modal-3d-container" class="w-full h-full flex items-center justify-center"></div>
+            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -385,73 +372,27 @@
     let currentLang = 'ja';
     let activeKitFilter = 'OVERALL';
     let playersData = [];
+    let cooldownTimer = null;
 
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
-    const DEFAULT_STEVE_AVATAR = "https://mc-heads.net/avatar/MHF_Steve/64";
+    const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
     function isBedrockPlayer(name) {
       return name && name.includes('.');
     }
 
-    // ランキング一覧の小さいプレイヤーアイコン（オーバーレイ2層目・立体感対応）
     function getSkinAvatarUrl(name, size = 64) {
       if (isBedrockPlayer(name)) {
         return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
       }
-      // mc-heads.net の avatar エンドポイントは2層目（髪の毛や帽子）が綺麗に立体合成されます
       return `https://mc-heads.net/avatar/${name}/${size}`;
     }
 
     function getSkinFullBodyUrl(name) {
       if (isBedrockPlayer(name)) {
-        return "https://mc-heads.net/body/MHF_Steve/150";
+        return DEFAULT_STEVE_BODY;
       }
       return `https://mc-heads.net/body/${name}/150`;
-    }
-
-    function render3DSkin(containerId, name) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-
-      const skinUrl = isBedrockPlayer(name) ? 'https://mc-heads.net/body/MHF_Steve/150' : `https://minotar.net/skin/${name}`;
-
-      const charDiv = document.createElement('div');
-      charDiv.className = 'mc-character-3d';
-
-      const parts = [
-        { name: 'head', w: 32, h: 32, t: 0, l: 24, bgX: -8, bgY: -8, overlayBgX: -40, overlayBgY: -8 },
-        { name: 'body', w: 32, h: 48, t: 32, l: 24, bgX: -20, bgY: -20, overlayBgX: -20, overlayBgY: -36 },
-        { name: 'arm-left', w: 16, h: 48, t: 32, l: 8, bgX: -44, bgY: -20 },
-        { name: 'arm-right', w: 16, h: 48, t: 32, l: 56, bgX: -44, bgY: -20 },
-        { name: 'leg-left', w: 16, h: 48, t: 80, l: 24, bgX: -4, bgY: -20 },
-        { name: 'leg-right', w: 16, h: 48, t: 80, l: 40, bgX: -4, bgY: -20 }
-      ];
-
-      parts.forEach(p => {
-        const partEl = document.createElement('div');
-        partEl.className = 'mc-part';
-        partEl.style.width = `${p.w}px`;
-        partEl.style.height = `${p.h}px`;
-        partEl.style.top = `${p.t}px`;
-        partEl.style.left = `${p.l}px`;
-        partEl.style.backgroundImage = `url(${skinUrl})`;
-        partEl.style.backgroundSize = '128px 128px';
-        partEl.style.backgroundPosition = `${p.bgX * 2}px ${p.bgY * 2}px`;
-
-        if (p.overlayBgX !== undefined) {
-          const overlayEl = document.createElement('div');
-          overlayEl.style.position = 'absolute';
-          overlayEl.style.inset = '0';
-          overlayEl.style.backgroundImage = `url(${skinUrl})`;
-          overlayEl.style.backgroundSize = '128px 128px';
-          overlayEl.style.backgroundPosition = `${p.overlayBgX * 2}px ${p.overlayBgY * 2}px`;
-          partEl.appendChild(overlayEl);
-        }
-
-        charDiv.appendChild(partEl);
-      });
-
-      container.appendChild(charDiv);
     }
 
     function formatCountry(countryStr) {
@@ -594,7 +535,7 @@
       const loadIcon = document.getElementById('load-icon');
       if (loadIcon) loadIcon.classList.add('fa-spin');
 
-      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading latest data...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
         const part1 = "https://script.google.com/macros/s/";
@@ -626,6 +567,38 @@
       } finally {
         if (loadIcon) loadIcon.classList.remove('fa-spin');
       }
+    }
+
+    // 1分間（60秒）のクールダウン付きLOADボタン制御
+    function handleLoadData() {
+      const loadBtn = document.getElementById('load-btn');
+      const cooldownText = document.getElementById('cooldown-text');
+      
+      if (loadBtn.disabled) return;
+
+      // データを取得
+      fetchSpreadsheetData();
+
+      // ボタンを一時無効化
+      loadBtn.disabled = true;
+      loadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      let timeLeft = 60;
+      cooldownText.innerText = `Cooldown: ${timeLeft}s`;
+
+      if (cooldownTimer) clearInterval(cooldownTimer);
+
+      cooldownTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          cooldownText.innerText = `Cooldown: ${timeLeft}s`;
+        } else {
+          clearInterval(cooldownTimer);
+          cooldownText.innerText = '';
+          loadBtn.disabled = false;
+          loadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }, 1000);
     }
 
     function renderTable() {
@@ -695,10 +668,10 @@
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_AVATAR}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
+              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
-                ${subTierTestHtml}
+                ${subTierTextHtml}
               </div>
             </div>
           </td>
@@ -710,7 +683,7 @@
     }
 
     function openModal(player, currentRank) {
-      render3DSkin('modal-3d-container', player.name);
+      document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
