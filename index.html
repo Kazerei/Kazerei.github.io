@@ -289,8 +289,9 @@
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
+          <!-- Canvas による軽量2Dポーズ描画コンテナ -->
+          <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-1 overflow-hidden">
+            <canvas id="modal-pose-canvas" width="120" height="180" class="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]"></canvas>
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -368,25 +369,16 @@
     let playersData = [];
 
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
-    const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
     function isBedrockPlayer(name) {
       return name && name.includes('.');
     }
 
-    // スキン画像URL（Java版は2nd layer/お面などのオーバーレイに対応した Bust レンダリングを使用）
     function getSkinAvatarUrl(name, size = 32) {
       if (isBedrockPlayer(name)) {
         return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
       }
       return `https://minotar.net/bust/${name}/${size}.png`;
-    }
-
-    function getSkinFullBodyUrl(name) {
-      if (isBedrockPlayer(name)) {
-        return DEFAULT_STEVE_BODY;
-      }
-      return `https://minotar.net/body/${name}/150.png`;
     }
 
     function formatCountry(countryStr) {
@@ -406,7 +398,6 @@
       return map[clean] || countryStr;
     }
 
-    // Tier文字列（HT3, LT2など）を正規の表示名（High Tier 3, Low Tier 2など）に変換
     function formatTierFullTitle(tierStr) {
       if (!tierStr) return '';
       const clean = tierStr.toUpperCase().trim();
@@ -472,6 +463,84 @@
       if (upper.includes('2')) return 'tier-silver';
       if (upper.includes('3')) return 'tier-bronze';
       return 'tier-blue';
+    }
+
+    // --- HTML5 Canvas（2D）を使った軽量ポーズ描画機能 ---
+    function renderPosedSkinOnCanvas(canvasId, name) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = false; // ドット絵風のくっきり描画
+
+      // 統合版（Bedrock）の場合はポーズ済みのフォールバック描画を実行
+      if (isBedrockPlayer(name)) {
+        drawFallbackPoseImage(ctx, canvas);
+        return;
+      }
+
+      const skinImg = new Image();
+      skinImg.crossOrigin = "Anonymous";
+      skinImg.src = `https://minotar.net/skin/${name}`;
+
+      skinImg.onload = () => {
+        // スキン画像からポーズを構築（切り出し描画）
+        try {
+          const s = 3.2; // 拡大スケール
+          const cx = canvas.width / 2;
+          const cy = 25;
+
+          // 1. 左脚 (x:0, y:20, w:4, h:12)
+          ctx.save();
+          ctx.translate(cx - 8, cy + 85);
+          ctx.rotate(0.12);
+          ctx.drawImage(skinImg, 0, 20, 4, 12, -6, 0, 12, 38);
+          ctx.restore();
+
+          // 2. 右脚 (x:4, y:20, w:4, h:12)
+          ctx.save();
+          ctx.translate(cx + 8, cy + 85);
+          ctx.rotate(-0.1);
+          ctx.drawImage(skinImg, 4, 20, 4, 12, -6, 0, 12, 38);
+          ctx.restore();
+
+          // 3. 胴体 (x:20, y:20, w:8, h:12)
+          ctx.drawImage(skinImg, 20, 20, 8, 12, cx - 13, cy + 45, 26, 40);
+
+          // 4. 左腕 (x:44, y:20, w:4, h:12) - 構えポーズ
+          ctx.save();
+          ctx.translate(cx - 15, cy + 47);
+          ctx.rotate(0.35);
+          ctx.drawImage(skinImg, 44, 20, 4, 12, -6, 0, 12, 38);
+          ctx.restore();
+
+          // 5. 右腕 (x:44, y:20, w:4, h:12) - アタックポーズ
+          ctx.save();
+          ctx.translate(cx + 15, cy + 47);
+          ctx.rotate(-0.45);
+          ctx.drawImage(skinImg, 44, 20, 4, 12, -6, 0, 12, 38);
+          ctx.restore();
+
+          // 6. 頭部 (x:8, y:8, w:8, h:8) & 帽子重ね着 (x:40, y:8, w:8, h:8)
+          ctx.drawImage(skinImg, 8, 8, 8, 8, cx - 20, cy, 40, 40);
+          ctx.drawImage(skinImg, 40, 8, 8, 8, cx - 22, cy - 2, 44, 44);
+
+        } catch (e) {
+          drawFallbackPoseImage(ctx, canvas);
+        }
+      };
+
+      skinImg.onerror = () => {
+        drawFallbackPoseImage(ctx, canvas);
+      };
+    }
+
+    function drawFallbackPoseImage(ctx, canvas) {
+      const fallbackImg = new Image();
+      fallbackImg.crossOrigin = "Anonymous";
+      fallbackImg.src = "https://mc-heads.net/body/MHF_Steve/150";
+      fallbackImg.onload = () => {
+        ctx.drawImage(fallbackImg, 0, 0, canvas.width, canvas.height);
+      };
     }
 
     function toggleLangDropdown(e) {
@@ -606,7 +675,6 @@
             const imgTag = getKitImageTag(kit);
             kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
           }
-          // OVERALL のときは名前の下に Tier テキストを表示しない
           subTierTextHtml = '';
         } else {
           const tier = p.kits[activeKitFilter];
@@ -614,7 +682,6 @@
           const imgTag = getKitImageTag(activeKitFilter);
           kitBadges = `<span class="tier-badge ${colorClass}">${imgTag} ${activeKitFilter}: ${tier}</span>`;
           
-          // キット別タブのときは名前の下に Full Title（例: Low Tier 3）を表示
           const fullTitle = formatTierFullTitle(tier);
           if (fullTitle) {
             subTierTextHtml = `<div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${fullTitle}</div>`;
@@ -643,7 +710,9 @@
     }
 
     function openModal(player, currentRank) {
-      document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
+      // モーダル表示時に Canvas でポーズ立ち姿を動的レンダリング
+      renderPosedSkinOnCanvas('modal-pose-canvas', player.name);
+
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
 
