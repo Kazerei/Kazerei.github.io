@@ -92,6 +92,21 @@
       overflow: hidden;
     }
 
+    /* CSS 3D キャラクター全体のコンテナ */
+    .mc-character-3d {
+      position: relative;
+      width: 80px;
+      height: 140px;
+      transform-style: preserve-3d;
+      transform: scale(0.9) rotateX(10deg) rotateY(-25deg);
+    }
+
+    .mc-part {
+      position: absolute;
+      transform-style: preserve-3d;
+      image-rendering: pixelated;
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #07030d; }
     ::-webkit-scrollbar-thumb { background: #2a164f; border-radius: 3px; }
@@ -206,42 +221,45 @@
 
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
-      <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-center text-xs sm:text-sm text-red-300 font-mono">
-        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-        <span data-i18n="beta_notice">These Tiers are BETA TIERS and will be reset at the end of beta.</span>
-      </div>
+      <!-- Kit Tabs & Load Button Container -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Kit Tabs -->
+        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
+          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
+            <i class="fa-solid fa-trophy"></i> OVERALL
+          </button>
+          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
+            <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
+          </button>
+          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
+            <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
+          </button>
+          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
+            <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
+          </button>
+          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
+            <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
+          </button>
+          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
+            <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
+          </button>
+          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
+            <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
+          </button>
+          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
+            <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
+          </button>
+          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
+            <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
+          </button>
+          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
+            <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
+          </button>
+        </div>
 
-      <!-- Kit Tabs -->
-      <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none" id="kit-tabs-container">
-        <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
-          <i class="fa-solid fa-trophy"></i> OVERALL
-        </button>
-        <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
-          <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
-        </button>
-        <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
-          <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
-        </button>
-        <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
-          <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
-        </button>
-        <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
-          <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
-        </button>
-        <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
-          <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
-        </button>
-        <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
-          <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
-        </button>
-        <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
-          <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
-        </button>
-        <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
-          <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
-        </button>
-        <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
-          <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
+        <!-- Load Button -->
+        <button onclick="fetchSpreadsheetData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg transition-all hover:scale-105 shrink-0 mb-2">
+          <i class="fa-solid fa-rotate" id="load-icon"></i> <span data-i18n="btn_load">LOAD</span>
         </button>
       </div>
 
@@ -289,9 +307,9 @@
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <!-- 安定して確実に全身を表示する mc-heads.net の全身API（オーバーレイ対応）を使用 -->
+          <!-- CSS 3D スキン表示コンテナ -->
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
+            <div id="modal-3d-container" class="w-full h-full flex items-center justify-center"></div>
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -333,7 +351,7 @@
         test_rule_2: "クールダウンはありませんが、1日に受けられるTestは最大2回までです。",
         test_rule_3: "使用KitはLT3まではVanilla Kitであれば自由です。HT3からはDrain Kitを使用します。",
         test_rule_4: "チート・マクロの使用禁止。キーボード2個使いも禁止です。",
-        beta_notice: "現在のTier表はベータ版であり、ベータ終了時にリセットされます。",
+        btn_load: "LOAD",
         click_player_hint: "※ プレイヤー行をクリックで詳細プロフィールを表示",
         th_player: "PLAYER",
         th_country: "国",
@@ -355,7 +373,7 @@
         test_rule_2: "No cooldowns, but you can take a maximum of 2 tests per day.",
         test_rule_3: "Kits up to LT3 are free for Vanilla Kits. HT3 and above require Drain Kit.",
         test_rule_4: "No cheats or macros! Dual keyboard usage is strictly forbidden.",
-        beta_notice: "These Tiers are BETA TIERS and will be reset at the end of beta.",
+        btn_load: "LOAD",
         click_player_hint: "* Click on any player row to view detailed profile",
         th_player: "PLAYER",
         th_country: "COUNTRY",
@@ -369,25 +387,71 @@
     let playersData = [];
 
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
-    const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
+    const DEFAULT_STEVE_AVATAR = "https://mc-heads.net/avatar/MHF_Steve/64";
 
     function isBedrockPlayer(name) {
       return name && name.includes('.');
     }
 
-    function getSkinAvatarUrl(name, size = 32) {
+    // ランキング一覧の小さいプレイヤーアイコン（オーバーレイ2層目・立体感対応）
+    function getSkinAvatarUrl(name, size = 64) {
       if (isBedrockPlayer(name)) {
         return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
       }
-      return `https://minotar.net/bust/${name}/${size}.png`;
+      // mc-heads.net の avatar エンドポイントは2層目（髪の毛や帽子）が綺麗に立体合成されます
+      return `https://mc-heads.net/avatar/${name}/${size}`;
     }
 
     function getSkinFullBodyUrl(name) {
       if (isBedrockPlayer(name)) {
-        return DEFAULT_STEVE_BODY;
+        return "https://mc-heads.net/body/MHF_Steve/150";
       }
-      // mc-heads.net の body エンドポイントは、オーバーレイ（2層目）を自動合成して綺麗に表示してくれます
       return `https://mc-heads.net/body/${name}/150`;
+    }
+
+    function render3DSkin(containerId, name) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      const skinUrl = isBedrockPlayer(name) ? 'https://mc-heads.net/body/MHF_Steve/150' : `https://minotar.net/skin/${name}`;
+
+      const charDiv = document.createElement('div');
+      charDiv.className = 'mc-character-3d';
+
+      const parts = [
+        { name: 'head', w: 32, h: 32, t: 0, l: 24, bgX: -8, bgY: -8, overlayBgX: -40, overlayBgY: -8 },
+        { name: 'body', w: 32, h: 48, t: 32, l: 24, bgX: -20, bgY: -20, overlayBgX: -20, overlayBgY: -36 },
+        { name: 'arm-left', w: 16, h: 48, t: 32, l: 8, bgX: -44, bgY: -20 },
+        { name: 'arm-right', w: 16, h: 48, t: 32, l: 56, bgX: -44, bgY: -20 },
+        { name: 'leg-left', w: 16, h: 48, t: 80, l: 24, bgX: -4, bgY: -20 },
+        { name: 'leg-right', w: 16, h: 48, t: 80, l: 40, bgX: -4, bgY: -20 }
+      ];
+
+      parts.forEach(p => {
+        const partEl = document.createElement('div');
+        partEl.className = 'mc-part';
+        partEl.style.width = `${p.w}px`;
+        partEl.style.height = `${p.h}px`;
+        partEl.style.top = `${p.t}px`;
+        partEl.style.left = `${p.l}px`;
+        partEl.style.backgroundImage = `url(${skinUrl})`;
+        partEl.style.backgroundSize = '128px 128px';
+        partEl.style.backgroundPosition = `${p.bgX * 2}px ${p.bgY * 2}px`;
+
+        if (p.overlayBgX !== undefined) {
+          const overlayEl = document.createElement('div');
+          overlayEl.style.position = 'absolute';
+          overlayEl.style.inset = '0';
+          overlayEl.style.backgroundImage = `url(${skinUrl})`;
+          overlayEl.style.backgroundSize = '128px 128px';
+          overlayEl.style.backgroundPosition = `${p.overlayBgX * 2}px ${p.overlayBgY * 2}px`;
+          partEl.appendChild(overlayEl);
+        }
+
+        charDiv.appendChild(partEl);
+      });
+
+      container.appendChild(charDiv);
     }
 
     function formatCountry(countryStr) {
@@ -476,7 +540,7 @@
 
     function toggleLangDropdown(e) {
       e.stopPropagation();
-      document.getElementById('lang-dropdown').classList.toggle('hidden');
+      document.getElementById('lang-dropdown').classList.add('hidden');
     }
 
     document.addEventListener('click', () => {
@@ -527,13 +591,16 @@
 
     async function fetchSpreadsheetData() {
       const tbody = document.getElementById('tier-tbody');
-      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
+      const loadIcon = document.getElementById('load-icon');
+      if (loadIcon) loadIcon.classList.add('fa-spin');
+
+      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading latest data...</td></tr>`;
 
       try {
         const part1 = "https://script.google.com/macros/s/";
         const part2 = "AKfycbxCBMdqmqAEorlZFCbzcf4HtvqlxnRphEgQ_8C4BWGaNmovZ1PXRNGhykN9mH6F2_sX2w";
         const part3 = "/exec";
-        const webAppUrl = part1 + part2 + part3;
+        const webAppUrl = part1 + part2 + part3 + "?t=" + new Date().getTime();
         
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
@@ -556,6 +623,8 @@
       } catch (error) {
         console.error("Failed to load spreadsheet data:", error);
         tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-red-400">データの取得に失敗しました。</td></tr>`;
+      } finally {
+        if (loadIcon) loadIcon.classList.remove('fa-spin');
       }
     }
 
@@ -619,17 +688,17 @@
           }
         }
 
-        const avatarUrl = getSkinAvatarUrl(p.name, 32);
+        const avatarUrl = getSkinAvatarUrl(p.name, 64);
         const editionTag = isBedrockPlayer(p.name) ? '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>' : '';
 
         tr.innerHTML = `
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
+              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_AVATAR}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
-                ${subTierTextHtml}
+                ${subTierTestHtml}
               </div>
             </div>
           </td>
@@ -641,7 +710,7 @@
     }
 
     function openModal(player, currentRank) {
-      document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
+      render3DSkin('modal-3d-container', player.name);
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
