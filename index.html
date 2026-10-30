@@ -289,7 +289,7 @@
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <!-- 綺麗にレンダリング済みの全身画像を直接表示するコンテナ -->
+          <!-- 2層目（オーバーレイ）込みで綺麗にレンダリングするCrafatar APIに変更 -->
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
             <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
@@ -369,7 +369,7 @@
     let playersData = [];
 
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
-    const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
+    const DEFAULT_STEVE_BODY = "https://crafatar.com/renders/body/85324feec25241d5881f3ad3f1353ab6?scale=6&overlay";
 
     function isBedrockPlayer(name) {
       return name && name.includes('.');
@@ -384,10 +384,10 @@
 
     function getSkinFullBodyUrl(name) {
       if (isBedrockPlayer(name)) {
-        return DEFAULT_STEVE_BODY;
+        return "https://crafatar.com/renders/body/85324feec25241d5881f3ad3f1353ab6?scale=6&overlay";
       }
-      // minotarなどの公式レンダリングAPIで全身像を綺麗に取得
-      return `https://minotar.net/body/${name}/150.png`;
+      // Crafatar APIの renders/body を使い、末尾に ?overlay をつけることで2層目（髪の毛や帽子）を完全に反映させる
+      return `https://crafatar.com/renders/body/${name}?scale=6&overlay`;
     }
 
     function formatCountry(countryStr) {
@@ -641,7 +641,6 @@
     }
 
     function openModal(player, currentRank) {
-      // 綺麗にレンダリング済みの公式API画像（スリム/クラシック自動判別対応）をセット
       document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
 
       document.getElementById('modal-name').innerText = player.name;
