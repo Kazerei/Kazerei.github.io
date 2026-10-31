@@ -168,8 +168,8 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="glow-box bg-brand-card rounded-xl p-6 relative">
           <div class="flex items-center gap-3 border-b border-brand-border pb-4 mb-4">
-            <div class="w-10 h-10 rounded-lg bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
-              <i class="fa-solid fa-shield-halved text-xl"></i>
+            <div class="w-10 h-10 rounded-lg bg-red-500/20 border border-red-500/40 flex items-center justify-center p-2">
+              <img src="./IMG_8237.png" alt="Shield" class="w-full h-full object-contain">
             </div>
             <div>
               <h2 class="text-xl font-bold font-orbitron text-white" data-i18n="title_server_rules">SERVER RULES</h2>
@@ -186,8 +186,8 @@
 
         <div class="glow-box bg-brand-card rounded-xl p-6 relative">
           <div class="flex items-center gap-3 border-b border-brand-border pb-4 mb-4">
-            <div class="w-10 h-10 rounded-lg bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center text-brand-lightPurple">
-              <i class="fa-solid fa-swords text-xl"></i>
+            <div class="w-10 h-10 rounded-lg bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center p-2">
+              <img src="./IMG_8232.png" alt="Crystal" class="w-full h-full object-contain">
             </div>
             <div>
               <h2 class="text-xl font-bold font-orbitron text-white" data-i18n="title_test_rules">TIER TEST RULES</h2>
@@ -252,13 +252,19 @@
       </div>
 
       <!-- Search & Filters -->
-      <div class="flex flex-wrap items-center justify-between gap-4 bg-brand-card p-4 rounded-xl border border-brand-border">
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-brand-card p-4 rounded-xl border border-brand-border">
         <div class="relative flex-1 min-w-[200px]">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
           <input type="text" id="search-input" onkeyup="renderTable()" placeholder="Search MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg pl-9 pr-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
         </div>
-        <div class="text-xs text-gray-400 font-mono">
-          <span data-i18n="click_player_hint">※ プレイヤー行をクリックで詳細プロフィールを表示</span>
+        <div class="flex items-center gap-3">
+          <!-- Tier Criteria Button -->
+          <button onclick="openCriteriaModal()" class="bg-brand-purple/20 hover:bg-brand-purple/40 border border-brand-purple/50 text-brand-lightPurple px-3 py-2 rounded-lg font-orbitron text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105">
+            <i class="fa-solid fa-circle-info"></i> <span data-i18n="btn_criteria">TIER CRITERIA</span>
+          </button>
+          <div class="text-xs text-gray-400 font-mono hidden sm:block">
+            <span data-i18n="click_player_hint">※ プレイヤー行をクリックで詳細プロフィールを表示</span>
+          </div>
         </div>
       </div>
 
@@ -317,6 +323,51 @@
     </div>
   </div>
 
+  <!-- Tier Criteria Modal -->
+  <div id="criteria-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-lg w-full p-5 sm:p-6 relative glow-box overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
+      <button onclick="closeCriteriaModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="border-b border-brand-border pb-3 mb-4">
+        <h3 class="text-lg font-black font-orbitron text-white flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="criteria_title">TIER CRITERIA & STANDARDS</span>
+        </h3>
+        <p class="text-xs text-gray-400 font-mono mt-1" data-i18n="criteria_sub">Tier評価基準ガイドライン</p>
+      </div>
+
+      <div class="overflow-y-auto space-y-4 pr-1 font-mono text-xs text-gray-300">
+        <!-- HT -->
+        <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-gold/40 relative">
+          <div class="flex items-center gap-2 font-orbitron font-bold text-brand-gold text-sm mb-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-gold shadow-[0_0_8px_#f59e0b]"></span>
+            HIGH TIER (HT1 ~ HT3)
+          </div>
+          <p class="text-gray-300 leading-relaxed" data-i18n="criteria_ht">最上位プレイヤー帯。高いメカニクスと戦略性を兼ね備え、サーバーやコミュニティのトップレベルで活躍するプレイヤー。</p>
+        </div>
+
+        <!-- MT -->
+        <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-silver/40 relative">
+          <div class="flex items-center gap-2 font-orbitron font-bold text-brand-silver text-sm mb-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-silver shadow-[0_0_8px_#9ca3af]"></span>
+            MID TIER (MT1 ~ MT3)
+          </div>
+          <p class="text-gray-300 leading-relaxed" data-i18n="criteria_mt">中堅上級プレイヤー帯。基礎技術が非常に高く、実践経験も豊富な立ち回りができる実力者。</p>
+        </div>
+
+        <!-- LT -->
+        <div class="bg-brand-dark p-3.5 rounded-xl border border-brand-bronze/40 relative">
+          <div class="flex items-center gap-2 font-orbitron font-bold text-brand-bronze text-sm mb-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-bronze shadow-[0_0_8px_#d97706]"></span>
+            LOW TIER (LT1 ~ LT3)
+          </div>
+          <p class="text-gray-300 leading-relaxed" data-i18n="criteria_lt">標準〜初級者帯。基本の動きをマスターし、テストを通過した実績のあるプレイヤー。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="border-t border-brand-border/40 bg-brand-dark py-4 text-center text-xs text-gray-500 font-mono">
     &copy; 2026 clytiers. All rights reserved. Not affiliated with Mojang AB.
   </footer>
@@ -339,11 +390,17 @@
         test_rule_3: "使用KitはLT3まではVanilla Kitであれば自由です。HT3からはDrain Kitを使用します。",
         test_rule_4: "チート・マクロの使用禁止。キーボード2個使いも禁止です。",
         btn_load: "LOAD",
+        btn_criteria: "TIER 基準",
         click_player_hint: "※ プレイヤー行をクリックで詳細プロフィールを表示",
         th_player: "PLAYER",
         th_country: "国",
         th_kits: "獲得KIT TIER",
-        modal_kit_breakdown: "Kit別詳細 Tier"
+        modal_kit_breakdown: "Kit別詳細 Tier",
+        criteria_title: "TIER CRITERIA & STANDARDS",
+        criteria_sub: "Tier評価基準ガイドライン",
+        criteria_ht: "最上位プレイヤー帯。高いメカニクスと戦略性を兼ね備え、サーバーやコミュニティのトップレベルで活躍するプレイヤー。",
+        criteria_mt: "中堅上級プレイヤー帯。基礎技術が非常に高く、実践経験も豊富な立ち回りができる実力者。",
+        criteria_lt: "標準〜初級者帯。基本の動きをマスターし、テストを通過した実績のあるプレイヤー。"
       },
       en: {
         hero_desc: "Welcome to clytiers! Take tier tests in our official Discord server and climb the leaderboard.",
@@ -361,11 +418,17 @@
         test_rule_3: "Kits up to LT3 are free for Vanilla Kits. HT3 and above require Drain Kit.",
         test_rule_4: "No cheats or macros! Dual keyboard usage is strictly forbidden.",
         btn_load: "LOAD",
+        btn_criteria: "TIER CRITERIA",
         click_player_hint: "* Click on any player row to view detailed profile",
         th_player: "PLAYER",
         th_country: "COUNTRY",
         th_kits: "CONTRIBUTING KITS",
-        modal_kit_breakdown: "Kit Tier Breakdown"
+        modal_kit_breakdown: "Kit Tier Breakdown",
+        criteria_title: "TIER CRITERIA & STANDARDS",
+        criteria_sub: "Tier Standards & Guidelines",
+        criteria_ht: "Top-tier competitive players with supreme mechanics, strategy, and consistent competitive dominance.",
+        criteria_mt: "Advanced players with high solid mechanics, excellent game sense, and strong match experience.",
+        criteria_lt: "Standard to entry-level tier players who have mastered the basics and passed official testing."
       }
     };
 
@@ -479,13 +542,15 @@
       return 'tier-blue';
     }
 
+    // 言語切り替えドロップダウンの開閉
     function toggleLangDropdown(e) {
       e.stopPropagation();
-      document.getElementById('lang-dropdown').classList.add('hidden');
+      document.getElementById('lang-dropdown').classList.toggle('hidden');
     }
 
     document.addEventListener('click', () => {
-      document.getElementById('lang-dropdown').classList.add('hidden');
+      const dropdown = document.getElementById('lang-dropdown');
+      if (dropdown) dropdown.classList.add('hidden');
     });
 
     function changeLanguage(lang) {
@@ -576,10 +641,8 @@
       
       if (loadBtn.disabled) return;
 
-      // データを取得
       fetchSpreadsheetData();
 
-      // ボタンを一時無効化
       loadBtn.disabled = true;
       loadBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
@@ -707,6 +770,15 @@
 
     function closeModal() {
       document.getElementById('player-modal').classList.add('hidden');
+    }
+
+    // Tier Criteria モーダル制御
+    function openCriteriaModal() {
+      document.getElementById('criteria-modal').classList.remove('hidden');
+    }
+
+    function closeCriteriaModal() {
+      document.getElementById('criteria-modal').classList.add('hidden');
     }
   </script>
 </body>
