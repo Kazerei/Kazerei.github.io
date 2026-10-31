@@ -51,11 +51,22 @@
       background-attachment: fixed;
     }
 
+    /* より美しく輝く洗練されたロゴグラデーション */
     .clytiers-gradient-logo {
-      background: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #8b5cf6 100%);
+      background: linear-gradient(135deg, #c084fc 0%, #e879f9 40%, #a855f7 70%, #8b5cf6 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.6));
+      filter: drop-shadow(0 0 16px rgba(192, 132, 252, 0.5));
+      animation: logo-glow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes logo-glow {
+      0% {
+        filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
+      }
+      100% {
+        filter: drop-shadow(0 0 20px rgba(232, 121, 249, 0.8));
+      }
     }
 
     .glow-box {
@@ -134,24 +145,24 @@
       border: 1px solid rgba(253, 230, 138, 0.6);
     }
 
-    /* 2位：シルバー（光るアニメーション付き） */
+    /* 2位：シルバー */
     .rank-2 {
       background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
       box-shadow: 0 0 12px rgba(209, 213, 219, 0.5);
       border: 1px solid rgba(243, 244, 246, 0.6);
     }
     .rank-2::after {
-      animation-delay: 0.5s; /* 1位と少しズレて光る */
+      animation-delay: 0.5s;
     }
 
-    /* 3位：ブロンズ（光るアニメーション付き） */
+    /* 3位：ブロンズ */
     .rank-3 {
       background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
       box-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
       border: 1px solid rgba(253, 186, 116, 0.6);
     }
     .rank-3::after {
-      animation-delay: 1s; /* 1〜2位と少しズレて光る */
+      animation-delay: 1s;
     }
 
     /* 4位以降：ブルー系標準 */
@@ -710,7 +721,6 @@
         const rankNum = idx + 1;
         let rankBadge = '';
         
-        // 1位～3位（光るバッジ）、4位以降のバッジ生成
         if (rankNum === 1) {
           rankBadge = `<div class="rank-banner rank-1">${rankNum}.</div>`;
         } else if (rankNum === 2) {
