@@ -86,6 +86,75 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
+    /* 画像風のランクバッジデザイン */
+    .rank-banner {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      color: #ffffff;
+      clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+      min-width: 55px;
+      overflow: hidden;
+    }
+
+    /* 1位：ゴールド（きらりと光るエフェクト付き） */
+    .rank-1 {
+      background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+      border: 1px solid rgba(253, 230, 138, 0.6);
+    }
+    .rank-1::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.4) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) rotate(30deg); }
+      20% { transform: translateX(100%) rotate(30deg); }
+      100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    /* 2位：シルバー */
+    .rank-2 {
+      background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 50%, #6b7280 100%);
+      box-shadow: 0 0 10px rgba(156, 163, 175, 0.5);
+      border: 1px solid rgba(229, 231, 235, 0.6);
+    }
+
+    /* 3位：ブロンズ */
+    .rank-3 {
+      background: linear-gradient(135deg, #fb923c 0%, #d97706 50%, #b45309 100%);
+      box-shadow: 0 0 10px rgba(217, 119, 6, 0.5);
+      border: 1px solid rgba(253, 186, 116, 0.6);
+    }
+
+    /* 4位以降：ブルー系標準 */
+    .rank-normal {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      font-size: 13px;
+      padding: 4px 10px;
+    }
+
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(7, 3, 13, 0.9) 80%);
       position: relative;
@@ -267,7 +336,7 @@
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
             <tr class="border-b border-brand-border bg-brand-dark/50 text-[11px] font-orbitron text-gray-400 uppercase">
-              <th class="p-3 text-center w-12">#</th>
+              <th class="p-3 text-center w-16">#</th>
               <th class="p-3" data-i18n="th_player">PLAYER</th>
               <th class="p-3 text-center" data-i18n="th_country">COUNTRY</th>
               <th class="p-3 text-right" data-i18n="th_kits">CONTRIBUTING KITS</th>
@@ -631,10 +700,18 @@
         tr.onclick = () => openModal(p, idx + 1);
 
         const rankNum = idx + 1;
-        let rankBadge = `<span class="font-bold text-gray-400">${rankNum}</span>`;
-        if (rankNum === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 flex items-center justify-center font-bold mx-auto">1</span>`;
-        if (rankNum === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-400/20 text-gray-300 border border-gray-400/50 flex items-center justify-center font-bold mx-auto">2</span>`;
-        if (rankNum === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-600/20 text-amber-500 border border-amber-600/50 flex items-center justify-center font-bold mx-auto">3</span>`;
+        let rankBadge = '';
+        
+        // 1位～3位、4位以降のグラデーションバッジ生成
+        if (rankNum === 1) {
+          rankBadge = `<div class="rank-banner rank-1">${rankNum}.</div>`;
+        } else if (rankNum === 2) {
+          rankBadge = `<div class="rank-banner rank-2">${rankNum}.</div>`;
+        } else if (rankNum === 3) {
+          rankBadge = `<div class="rank-banner rank-3">${rankNum}.</div>`;
+        } else {
+          rankBadge = `<div class="rank-banner rank-normal">${rankNum}.</div>`;
+        }
 
         let kitBadges = '';
         let subTierTextHtml = '';
