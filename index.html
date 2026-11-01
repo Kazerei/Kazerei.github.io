@@ -444,7 +444,7 @@
         click_player_hint: "* Click on any player row to view detailed profile",
         th_player: "PLAYER",
         th_country: "COUNTRY",
-        th_kits: "CONTRIBUTING KITS",
+        th_kits: "CONTRIBUTINGKITS",
         modal_kit_breakdown: "Kit Tier Breakdown"
       }
     };
@@ -464,7 +464,7 @@
     const uuidCache = {};
     const nameHistoryCache = {};
 
-    // Ashcon APIを使ってCORS制限なしでUUIDから最新名と履歴を取得
+    // 安定性の高い mc-api.io を使用してUUIDから名前と履歴を取得
     async function resolveJavaPlayer(uuid) {
       const cleanUuid = uuid.trim();
       if (uuidCache[cleanUuid]) {
@@ -472,22 +472,36 @@
       }
 
       try {
-        const res = await fetch(`https://api.ashcon.app/mojang/v2/user/${cleanUuid}`);
+        const res = await fetch(`https://mc-api.io/v3/profile/${cleanUuid}`);
         if (!res.ok) throw new Error('API fetch failed');
         const data = await res.json();
         
-        const currentName = data.username;
+        const currentName = data.name || data.username;
+        if (!currentName) throw new Error('Name not found');
+
         uuidCache[cleanUuid] = currentName;
 
-        if (data.username_history) {
-          nameHistoryCache[cleanUuid] = data.username_history.map(h => h.username);
+        // 名前変更履歴の格納
+        if (data.name_history && Array.isArray(data.name_history)) {
+          nameHistoryCache[cleanUuid] = data.name_history.map(h => h.name);
         } else {
           nameHistoryCache[cleanUuid] = [currentName];
         }
 
         return currentName;
       } catch (err) {
-        console.error("Failed to resolve UUID via API:", err);
+        console.error("Failed to resolve UUID via API, trying fallback:", err);
+        // フォールバックとして別のAPIを試す
+        try {
+          const altRes = await fetch(`https://api.ashcon.app/mojang/v2/user/${cleanUuid}`);
+          if (altRes.ok) {
+            const altData = await altRes.json();
+            uuidCache[cleanUuid] = altData.username;
+            nameHistoryCache[cleanUuid] = altData.username_history ? altData.username_history.map(h => h.username) : [altData.username];
+            return altData.username;
+          }
+        } catch (e) {}
+
         uuidCache[cleanUuid] = cleanUuid.substring(0, 8);
         nameHistoryCache[cleanUuid] = [cleanUuid];
         return cleanUuid.substring(0, 8);
