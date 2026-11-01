@@ -366,7 +366,7 @@
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="handleSkinError(this)" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
+            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -375,6 +375,16 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-[10px] sm:text-[11px] font-mono text-gray-300" id="modal-edition-badge">Verified Player</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Previous Names Section (Java Edition only) -->
+      <div id="modal-names-history-container" class="mb-4 hidden">
+        <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-1.5 uppercase flex items-center gap-2">
+          <i class="fa-solid fa-history text-brand-purple"></i> <span>Name History</span>
+        </h4>
+        <div id="modal-names-list" class="bg-brand-dark p-2.5 rounded-lg border border-brand-border text-[11px] text-gray-300 font-mono flex flex-wrap gap-1.5">
+          <!-- Dynamic History -->
         </div>
       </div>
 
@@ -447,45 +457,63 @@
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
     const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
-    function isBedrockPlayer(name) {
-      return name && name.includes('.');
+    // JavaのUUID（32桁のヘクス値）か判定する関数
+    function isUuid(str) {
+      return str && /^[0-9a-fA-F]{32}$/.test(str.trim());
     }
 
-    // 常に今の最新スキンを重ね着レイヤー（overlay=true）＋キャッシュ破棄（?t=）で強制取得
-    function getSkinAvatarUrl(name, size = 64) {
-      if (isBedrockPlayer(name)) {
-        return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
+    function isBedrockPlayer(rawId) {
+      return rawId && (rawId.includes('.') || !isUuid(rawId));
+    }
+
+    // キャッシュ保存用マップ
+    const uuidCache = {};
+    const nameHistoryCache = {};
+
+    // UUIDから最新のMCIDと名前履歴を取得する非同期関数
+    async function resolveJavaPlayer(uuid) {
+      const cleanUuid = uuid.trim();
+      if (uuidCache[cleanUuid]) {
+        return uuidCache[cleanUuid];
       }
-      return `https://crafatar.com/avatars/${name}?size=${size}&overlay=true&t=${Date.now()}`;
-    }
 
-    function getSkinFullBodyUrl(name) {
-      if (isBedrockPlayer(name)) {
-        return DEFAULT_STEVE_BODY;
-      }
-      return `https://crafatar.com/renders/body/${name}?scale=5&overlay=true&t=${Date.now()}`;
-    }
+      try {
+        // Crafatar / Mojang API経由で現在の名前とプロファイルを取得
+        const res = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${cleanUuid}`);
+        if (!res.ok) throw new Error('Profile fetch failed');
+        const data = await res.json();
+        
+        const currentName = data.name;
+        uuidCache[cleanUuid] = currentName;
 
-    // アバター画像読み込みエラー時のフォールバック処理
-    function handleAvatarError(img, name) {
-      if (!img.dataset.fallbackStep) {
-        img.dataset.fallbackStep = "1";
-        img.src = `https://mc-heads.net/avatar/${name}/64?t=${Date.now()}`;
-      } else if (img.dataset.fallbackStep === "1") {
-        img.dataset.fallbackStep = "2";
-        img.src = DEFAULT_STEVE_HEAD;
-      }
-    }
+        // 名前変更履歴(Name History)の取得
+        try {
+          const historyRes = await fetch(`https://api.mojang.com/user/profiles/${cleanUuid}/names`);
+          if (historyRes.ok) {
+            const historyData = await historyRes.json();
+            nameHistoryCache[cleanUuid] = historyData.map(h => h.name);
+          }
+        } catch (e) {
+          nameHistoryCache[cleanUuid] = [currentName];
+        }
 
-    // 全身像読み込みエラー時のフォールバック処理
-    function handleSkinError(img) {
-      const name = img.dataset.playerName || '';
-      if (!img.dataset.fallbackStep) {
-        img.dataset.fallbackStep = "1";
-        img.src = `https://mc-heads.net/body/${name}/150?t=${Date.now()}`;
-      } else if (img.dataset.fallbackStep === "1") {
-        img.dataset.fallbackStep = "2";
-        img.src = DEFAULT_STEVE_BODY;
+        return currentName;
+      } catch (err) {
+        // フォールバック（万が一API制限等の場合の予備API）
+        try {
+          const altRes = await fetch(`https://corsproxy.io/?https://api.ashcon.app/mojang/v2/user/${cleanUuid}`);
+          if (altRes.ok) {
+            const altData = await altRes.json();
+            uuidCache[cleanUuid] = altData.username;
+            if (altData.username_history) {
+              nameHistoryCache[cleanUuid] = altData.username_history.map(h => h.username);
+            }
+            return altData.username;
+          }
+        } catch (e) {}
+        
+        // どうしても取れない場合のフォールバック
+        return cleanUuid.substring(0, 8);
       }
     }
 
@@ -641,19 +669,30 @@
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
 
-        playersData = rawData.map(p => {
+        playersData = await Promise.all(rawData.map(async (p) => {
           let normalizedKits = {};
           if (p.kits) {
             for (let [k, v] of Object.entries(p.kits)) {
               normalizedKits[k.toUpperCase()] = v ? v.toString().trim().toUpperCase() : '';
             }
           }
+
+          let resolvedName = p.name;
+          let isJavaUuid = isUuid(p.name);
+
+          if (isJavaUuid) {
+            resolvedName = await resolveJavaPlayer(p.name);
+          }
+
           return {
             ...p,
+            rawId: p.name, // スプレッドシートにあった値（UUIDまたは統合版名）
+            name: resolvedName, // 表示用最新ネーム
+            isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
           };
-        });
+        }));
 
         renderTable();
       } catch (error) {
@@ -699,7 +738,7 @@
       tbody.innerHTML = '';
 
       let filtered = playersData.filter(p => {
-        const nameMatch = p.name.toLowerCase().includes(search);
+        const nameMatch = p.name.toLowerCase().includes(search) || p.rawId.toLowerCase().includes(search);
         if (activeKitFilter === 'OVERALL') return nameMatch;
         return nameMatch && (p.kits[activeKitFilter] !== undefined && p.kits[activeKitFilter] !== '');
       });
@@ -760,14 +799,16 @@
           }
         }
 
-        const avatarUrl = getSkinAvatarUrl(p.name, 64);
-        const editionTag = isBedrockPlayer(p.name) ? '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>' : '';
+        // Java版ならUUIDベースでスキン取得、統合版なら名前ベース
+        const avatarIdentifier = p.isUuid ? p.rawId : p.name;
+        const avatarUrl = `https://mc-heads.net/avatar/${avatarIdentifier}/64`;
+        const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" alt="${p.name}" onerror="handleAvatarError(this, '${p.name}')" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
+              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
                 ${subTierTextHtml}
@@ -782,13 +823,24 @@
     }
 
     function openModal(player, currentRank) {
-      const modalImg = document.getElementById('modal-fullbody');
-      modalImg.dataset.playerName = player.name;
-      delete modalImg.dataset.fallbackStep;
-      modalImg.src = getSkinFullBodyUrl(player.name);
+      const skinIdentifier = player.isUuid ? player.rawId : player.name;
+      document.getElementById('modal-fullbody').src = `https://mc-heads.net/body/${skinIdentifier}/150`;
 
       document.getElementById('modal-name').innerText = player.name;
-      document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
+      document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
+
+      // 過去の名前履歴 (Name History) の表示切替
+      const historyContainer = document.getElementById('modal-names-history-container');
+      const namesListContainer = document.getElementById('modal-names-list');
+      
+      if (player.isUuid && nameHistoryCache[player.rawId] && nameHistoryCache[player.rawId].length > 1) {
+        historyContainer.classList.remove('hidden');
+        namesListContainer.innerHTML = nameHistoryCache[player.rawId]
+          .map((n, i) => `<span class="bg-brand-card px-2 py-1 rounded border border-brand-border ${i === nameHistoryCache[player.rawId].length - 1 ? 'text-brand-lightPurple font-bold' : 'text-gray-400'}">${n}</span>`)
+          .join('<span class="text-gray-600 self-center">→</span>');
+      } else {
+        historyContainer.classList.add('hidden');
+      }
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
