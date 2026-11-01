@@ -457,20 +457,14 @@
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
     const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
-    // JavaのUUID（32桁のヘクス値）か判定する関数
     function isUuid(str) {
       return str && /^[0-9a-fA-F]{32}$/.test(str.trim());
     }
 
-    function isBedrockPlayer(rawId) {
-      return rawId && (rawId.includes('.') || !isUuid(rawId));
-    }
-
-    // キャッシュ保存用マップ
     const uuidCache = {};
     const nameHistoryCache = {};
 
-    // UUIDから最新のMCIDと名前履歴を取得する非同期関数
+    // Ashcon APIを使ってCORS制限なしでUUIDから最新名と履歴を取得
     async function resolveJavaPlayer(uuid) {
       const cleanUuid = uuid.trim();
       if (uuidCache[cleanUuid]) {
@@ -478,41 +472,24 @@
       }
 
       try {
-        // Crafatar / Mojang API経由で現在の名前とプロファイルを取得
-        const res = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${cleanUuid}`);
-        if (!res.ok) throw new Error('Profile fetch failed');
+        const res = await fetch(`https://api.ashcon.app/mojang/v2/user/${cleanUuid}`);
+        if (!res.ok) throw new Error('API fetch failed');
         const data = await res.json();
         
-        const currentName = data.name;
+        const currentName = data.username;
         uuidCache[cleanUuid] = currentName;
 
-        // 名前変更履歴(Name History)の取得
-        try {
-          const historyRes = await fetch(`https://api.mojang.com/user/profiles/${cleanUuid}/names`);
-          if (historyRes.ok) {
-            const historyData = await historyRes.json();
-            nameHistoryCache[cleanUuid] = historyData.map(h => h.name);
-          }
-        } catch (e) {
+        if (data.username_history) {
+          nameHistoryCache[cleanUuid] = data.username_history.map(h => h.username);
+        } else {
           nameHistoryCache[cleanUuid] = [currentName];
         }
 
         return currentName;
       } catch (err) {
-        // フォールバック（万が一API制限等の場合の予備API）
-        try {
-          const altRes = await fetch(`https://corsproxy.io/?https://api.ashcon.app/mojang/v2/user/${cleanUuid}`);
-          if (altRes.ok) {
-            const altData = await altRes.json();
-            uuidCache[cleanUuid] = altData.username;
-            if (altData.username_history) {
-              nameHistoryCache[cleanUuid] = altData.username_history.map(h => h.username);
-            }
-            return altData.username;
-          }
-        } catch (e) {}
-        
-        // どうしても取れない場合のフォールバック
+        console.error("Failed to resolve UUID via API:", err);
+        uuidCache[cleanUuid] = cleanUuid.substring(0, 8);
+        nameHistoryCache[cleanUuid] = [cleanUuid];
         return cleanUuid.substring(0, 8);
       }
     }
@@ -522,7 +499,7 @@
       const clean = countryStr.trim().toLowerCase();
       const map = {
         'japan': '🇯🇵', 'jp': '🇯🇵', '日本': '🇯🇵',
-        'america': '🇺🇸', 'usa': '🇺🇸', 'us': '🇺🇸',
+        'america': '🇺🇸', 'usa': '🇺🇸', 'us': '🇺🇸', 'united states': '🇺🇸',
         'denmark': '🇩🇰', 'dk': '🇩🇰',
         'germany': '🇩🇪', 'de': '🇩🇪',
         'canada': '🇨🇦', 'ca': '🇨🇦',
@@ -686,8 +663,8 @@
 
           return {
             ...p,
-            rawId: p.name, // スプレッドシートにあった値（UUIDまたは統合版名）
-            name: resolvedName, // 表示用最新ネーム
+            rawId: p.name,
+            name: resolvedName,
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
@@ -799,7 +776,6 @@
           }
         }
 
-        // Java版ならUUIDベースでスキン取得、統合版なら名前ベース
         const avatarIdentifier = p.isUuid ? p.rawId : p.name;
         const avatarUrl = `https://mc-heads.net/avatar/${avatarIdentifier}/64`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
@@ -829,7 +805,6 @@
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
 
-      // 過去の名前履歴 (Name History) の表示切替
       const historyContainer = document.getElementById('modal-names-history-container');
       const namesListContainer = document.getElementById('modal-names-list');
       
