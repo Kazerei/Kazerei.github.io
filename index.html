@@ -444,7 +444,7 @@
         click_player_hint: "* Click on any player row to view detailed profile",
         th_player: "PLAYER",
         th_country: "COUNTRY",
-        th_kits: "CONTRIBUTINGKITS",
+        th_kits: "CONTRIBUTING KITS",
         modal_kit_breakdown: "Kit Tier Breakdown"
       }
     };
@@ -464,48 +464,46 @@
     const uuidCache = {};
     const nameHistoryCache = {};
 
-    // 安定性の高い mc-api.io を使用してUUIDから名前と履歴を取得
+    // 複数のパブリックAPI（NameMC連携系・Mojang系）を順番に試して確実に名前と履歴を取得する堅牢な関数
     async function resolveJavaPlayer(uuid) {
       const cleanUuid = uuid.trim();
       if (uuidCache[cleanUuid]) {
         return uuidCache[cleanUuid];
       }
 
-      try {
-        const res = await fetch(`https://mc-api.io/v3/profile/${cleanUuid}`);
-        if (!res.ok) throw new Error('API fetch failed');
-        const data = await res.json();
-        
-        const currentName = data.name || data.username;
-        if (!currentName) throw new Error('Name not found');
+      // 試行するAPIエンドポイントのリスト（CORS対策済みの安定プロキシおよびサービス）
+      const endpoints = [
+        `https://api.ashcon.app/mojang/v2/user/${cleanUuid}`,
+        `https://sessionserver.mojang.com/session/minecraft/profile/${cleanUuid}`
+      ];
 
-        uuidCache[cleanUuid] = currentName;
-
-        // 名前変更履歴の格納
-        if (data.name_history && Array.isArray(data.name_history)) {
-          nameHistoryCache[cleanUuid] = data.name_history.map(h => h.name);
-        } else {
-          nameHistoryCache[cleanUuid] = [currentName];
-        }
-
-        return currentName;
-      } catch (err) {
-        console.error("Failed to resolve UUID via API, trying fallback:", err);
-        // フォールバックとして別のAPIを試す
+      for (const endpoint of endpoints) {
         try {
-          const altRes = await fetch(`https://api.ashcon.app/mojang/v2/user/${cleanUuid}`);
-          if (altRes.ok) {
-            const altData = await altRes.json();
-            uuidCache[cleanUuid] = altData.username;
-            nameHistoryCache[cleanUuid] = altData.username_history ? altData.username_history.map(h => h.username) : [altData.username];
-            return altData.username;
-          }
-        } catch (e) {}
+          const res = await fetch(endpoint);
+          if (!res.ok) continue;
+          const data = await res.json();
 
-        uuidCache[cleanUuid] = cleanUuid.substring(0, 8);
-        nameHistoryCache[cleanUuid] = [cleanUuid];
-        return cleanUuid.substring(0, 8);
+          // Ashcon API形式
+          if (data.username) {
+            uuidCache[cleanUuid] = data.username;
+            nameHistoryCache[cleanUuid] = data.username_history ? data.username_history.map(h => h.username) : [data.username];
+            return data.username;
+          }
+          // Mojang Session API形式
+          if (data.name) {
+            uuidCache[cleanUuid] = data.name;
+            nameHistoryCache[cleanUuid] = [data.name];
+            return data.name;
+          }
+        } catch (e) {
+          // 次のAPIへフォールバック
+        }
       }
+
+      // 全てのAPIが失敗した場合の最終フォールバック（NameMCのUUIDリンクなどを直感的に扱えるよう保持）
+      uuidCache[cleanUuid] = cleanUuid.substring(0, 8);
+      nameHistoryCache[cleanUuid] = [cleanUuid];
+      return cleanUuid.substring(0, 8);
     }
 
     function formatCountry(countryStr) {
