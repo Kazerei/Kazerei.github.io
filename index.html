@@ -378,16 +378,6 @@
         </div>
       </div>
 
-      <!-- Previous Names Section (Java Edition only) -->
-      <div id="modal-names-history-container" class="mb-4 hidden">
-        <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-1.5 uppercase flex items-center gap-2">
-          <i class="fa-solid fa-history text-brand-purple"></i> <span>Name History</span>
-        </h4>
-        <div id="modal-names-list" class="bg-brand-dark p-2.5 rounded-lg border border-brand-border text-[11px] text-gray-300 font-mono flex flex-wrap gap-1.5">
-          <!-- Dynamic History -->
-        </div>
-      </div>
-
       <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
         <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown</span>
       </h4>
@@ -459,51 +449,6 @@
 
     function isUuid(str) {
       return str && /^[0-9a-fA-F]{32}$/.test(str.trim());
-    }
-
-    const uuidCache = {};
-    const nameHistoryCache = {};
-
-    // 複数のパブリックAPI（NameMC連携系・Mojang系）を順番に試して確実に名前と履歴を取得する堅牢な関数
-    async function resolveJavaPlayer(uuid) {
-      const cleanUuid = uuid.trim();
-      if (uuidCache[cleanUuid]) {
-        return uuidCache[cleanUuid];
-      }
-
-      // 試行するAPIエンドポイントのリスト（CORS対策済みの安定プロキシおよびサービス）
-      const endpoints = [
-        `https://api.ashcon.app/mojang/v2/user/${cleanUuid}`,
-        `https://sessionserver.mojang.com/session/minecraft/profile/${cleanUuid}`
-      ];
-
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(endpoint);
-          if (!res.ok) continue;
-          const data = await res.json();
-
-          // Ashcon API形式
-          if (data.username) {
-            uuidCache[cleanUuid] = data.username;
-            nameHistoryCache[cleanUuid] = data.username_history ? data.username_history.map(h => h.username) : [data.username];
-            return data.username;
-          }
-          // Mojang Session API形式
-          if (data.name) {
-            uuidCache[cleanUuid] = data.name;
-            nameHistoryCache[cleanUuid] = [data.name];
-            return data.name;
-          }
-        } catch (e) {
-          // 次のAPIへフォールバック
-        }
-      }
-
-      // 全てのAPIが失敗した場合の最終フォールバック（NameMCのUUIDリンクなどを直感的に扱えるよう保持）
-      uuidCache[cleanUuid] = cleanUuid.substring(0, 8);
-      nameHistoryCache[cleanUuid] = [cleanUuid];
-      return cleanUuid.substring(0, 8);
     }
 
     function formatCountry(countryStr) {
@@ -658,7 +603,7 @@
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
 
-        playersData = await Promise.all(rawData.map(async (p) => {
+        playersData = rawData.map(p => {
           let normalizedKits = {};
           if (p.kits) {
             for (let [k, v] of Object.entries(p.kits)) {
@@ -666,22 +611,20 @@
             }
           }
 
-          let resolvedName = p.name;
-          let isJavaUuid = isUuid(p.name);
-
-          if (isJavaUuid) {
-            resolvedName = await resolveJavaPlayer(p.name);
-          }
+          // スプレッドシート側のC列（p.resolvedName または p.mcid など。プロパティ名に合わせて調整。今回は p.resolvedName または p.displayName、無ければ p.name をフォールバック）
+          // ※スプレッドシートの返却データ構造に合わせて p.resolvedName や p.mcid を参照します
+          const resolvedName = p.resolvedName || p.mcid || p.name;
+          const isJavaUuid = isUuid(p.name);
 
           return {
             ...p,
-            rawId: p.name,
-            name: resolvedName,
+            rawId: p.name, // A列のUUID（または統合版名）
+            name: resolvedName, // C列から取得した最新MCID（または統合版名）
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
           };
-        }));
+        });
 
         renderTable();
       } catch (error) {
@@ -788,8 +731,9 @@
           }
         }
 
-        const avatarIdentifier = p.isUuid ? p.rawId : p.name;
-        const avatarUrl = `https://mc-heads.net/avatar/${avatarIdentifier}/64`;
+        // スキン取得にはJava版ならUUID（rawId）、統合版なら名前（name）を使用
+        const skinIdentifier = p.isUuid ? p.rawId : p.name;
+        const avatarUrl = `https://mc-heads.net/avatar/${skinIdentifier}/64`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
@@ -816,18 +760,6 @@
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
-
-      const historyContainer = document.getElementById('modal-names-history-container');
-      const namesListContainer = document.getElementById('modal-names-list');
-      
-      if (player.isUuid && nameHistoryCache[player.rawId] && nameHistoryCache[player.rawId].length > 1) {
-        historyContainer.classList.remove('hidden');
-        namesListContainer.innerHTML = nameHistoryCache[player.rawId]
-          .map((n, i) => `<span class="bg-brand-card px-2 py-1 rounded border border-brand-border ${i === nameHistoryCache[player.rawId].length - 1 ? 'text-brand-lightPurple font-bold' : 'text-gray-400'}">${n}</span>`)
-          .join('<span class="text-gray-600 self-center">→</span>');
-      } else {
-        historyContainer.classList.add('hidden');
-      }
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
