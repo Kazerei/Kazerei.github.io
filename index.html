@@ -51,7 +51,6 @@
       background-attachment: fixed;
     }
 
-    /* より美しく輝く洗練されたロゴグラデーション */
     .clytiers-gradient-logo {
       background: linear-gradient(135deg, #c084fc 0%, #e879f9 40%, #a855f7 70%, #8b5cf6 100%);
       -webkit-background-clip: text;
@@ -61,12 +60,8 @@
     }
 
     @keyframes logo-glow {
-      0% {
-        filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
-      }
-      100% {
-        filter: drop-shadow(0 0 20px rgba(232, 121, 249, 0.8));
-      }
+      0% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)); }
+      100% { filter: drop-shadow(0 0 20px rgba(232, 121, 249, 0.8)); }
     }
 
     .glow-box {
@@ -97,7 +92,6 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
-    /* 画像風のランクバッジデザイン */
     .rank-banner {
       position: relative;
       display: inline-flex;
@@ -114,7 +108,6 @@
       overflow: hidden;
     }
 
-    /* 共通のキラリと光るエフェクト（1〜3位適用） */
     .rank-1::after, .rank-2::after, .rank-3::after {
       content: '';
       position: absolute;
@@ -138,34 +131,23 @@
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
-    /* 1位：ゴールド */
     .rank-1 {
       background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
       box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
       border: 1px solid rgba(253, 230, 138, 0.6);
     }
-
-    /* 2位：シルバー */
     .rank-2 {
       background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
       box-shadow: 0 0 12px rgba(209, 213, 219, 0.5);
       border: 1px solid rgba(243, 244, 246, 0.6);
     }
-    .rank-2::after {
-      animation-delay: 0.5s;
-    }
-
-    /* 3位：ブロンズ */
+    .rank-2::after { animation-delay: 0.5s; }
     .rank-3 {
       background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
       box-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
       border: 1px solid rgba(253, 186, 116, 0.6);
     }
-    .rank-3::after {
-      animation-delay: 1s;
-    }
-
-    /* 4位以降：ブルー系標準 */
+    .rank-3::after { animation-delay: 1s; }
     .rank-normal {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
       box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
@@ -384,7 +366,7 @@
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
+            <img id="modal-fullbody" src="" alt="Skin" onerror="handleSkinError(this)" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -469,18 +451,42 @@
       return name && name.includes('.');
     }
 
+    // crafatar（Mojang直結API）優先で取得し、オーバーレイ表示にも対応
     function getSkinAvatarUrl(name, size = 64) {
       if (isBedrockPlayer(name)) {
         return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
       }
-      return `https://mc-heads.net/avatar/${name}/${size}`;
+      return `https://crafatar.com/avatars/${name}?size=${size}&overlay=true`;
     }
 
     function getSkinFullBodyUrl(name) {
       if (isBedrockPlayer(name)) {
         return DEFAULT_STEVE_BODY;
       }
-      return `https://mc-heads.net/body/${name}/150`;
+      return `https://crafatar.com/renders/body/${name}?scale=5&overlay=true`;
+    }
+
+    // アバター画像読み込みエラー時の順次切替（crafatar -> mc-heads -> Steve）
+    function handleAvatarError(img, name) {
+      if (!img.dataset.fallbackStep) {
+        img.dataset.fallbackStep = "1";
+        img.src = `https://mc-heads.net/avatar/${name}/64`;
+      } else if (img.dataset.fallbackStep === "1") {
+        img.dataset.fallbackStep = "2";
+        img.src = DEFAULT_STEVE_HEAD;
+      }
+    }
+
+    // 全身像読み込みエラー時の順次切替
+    function handleSkinError(img) {
+      const name = img.dataset.playerName || '';
+      if (!img.dataset.fallbackStep) {
+        img.dataset.fallbackStep = "1";
+        img.src = `https://mc-heads.net/body/${name}/150`;
+      } else if (img.dataset.fallbackStep === "1") {
+        img.dataset.fallbackStep = "2";
+        img.src = DEFAULT_STEVE_BODY;
+      }
     }
 
     function formatCountry(countryStr) {
@@ -761,7 +767,7 @@
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
+              <img src="${avatarUrl}" alt="${p.name}" onerror="handleAvatarError(this, '${p.name}')" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
                 ${subTierTextHtml}
@@ -776,7 +782,10 @@
     }
 
     function openModal(player, currentRank) {
-      document.getElementById('modal-fullbody').src = getSkinFullBodyUrl(player.name);
+      const modalImg = document.getElementById('modal-fullbody');
+      modalImg.dataset.playerName = player.name;
+      delete modalImg.dataset.fallbackStep;
+      modalImg.src = getSkinFullBodyUrl(player.name);
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = isBedrockPlayer(player.name) ? 'Bedrock Edition Player' : 'Java Edition Player';
