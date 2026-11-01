@@ -451,38 +451,38 @@
       return name && name.includes('.');
     }
 
-    // crafatar（Mojang直結API）優先で取得し、オーバーレイ表示にも対応
+    // 常に今の最新スキンを重ね着レイヤー（overlay=true）＋キャッシュ破棄（?t=）で強制取得
     function getSkinAvatarUrl(name, size = 64) {
       if (isBedrockPlayer(name)) {
         return `https://mc-heads.net/avatar/MHF_Steve/${size}`;
       }
-      return `https://crafatar.com/avatars/${name}?size=${size}&overlay=true`;
+      return `https://crafatar.com/avatars/${name}?size=${size}&overlay=true&t=${Date.now()}`;
     }
 
     function getSkinFullBodyUrl(name) {
       if (isBedrockPlayer(name)) {
         return DEFAULT_STEVE_BODY;
       }
-      return `https://crafatar.com/renders/body/${name}?scale=5&overlay=true`;
+      return `https://crafatar.com/renders/body/${name}?scale=5&overlay=true&t=${Date.now()}`;
     }
 
-    // アバター画像読み込みエラー時の順次切替（crafatar -> mc-heads -> Steve）
+    // アバター画像読み込みエラー時のフォールバック処理
     function handleAvatarError(img, name) {
       if (!img.dataset.fallbackStep) {
         img.dataset.fallbackStep = "1";
-        img.src = `https://mc-heads.net/avatar/${name}/64`;
+        img.src = `https://mc-heads.net/avatar/${name}/64?t=${Date.now()}`;
       } else if (img.dataset.fallbackStep === "1") {
         img.dataset.fallbackStep = "2";
         img.src = DEFAULT_STEVE_HEAD;
       }
     }
 
-    // 全身像読み込みエラー時の順次切替
+    // 全身像読み込みエラー時のフォールバック処理
     function handleSkinError(img) {
       const name = img.dataset.playerName || '';
       if (!img.dataset.fallbackStep) {
         img.dataset.fallbackStep = "1";
-        img.src = `https://mc-heads.net/body/${name}/150`;
+        img.src = `https://mc-heads.net/body/${name}/150?t=${Date.now()}`;
       } else if (img.dataset.fallbackStep === "1") {
         img.dataset.fallbackStep = "2";
         img.src = DEFAULT_STEVE_BODY;
