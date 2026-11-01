@@ -468,22 +468,7 @@
       return map[clean] || countryStr;
     }
 
-    function formatTierFullTitle(tierStr) {
-      if (!tierStr) return '';
-      const clean = tierStr.toUpperCase().trim();
-      const match = clean.match(/([HLM]T)(\d+)/);
-      if (match) {
-        const type = match[1];
-        const num = match[2];
-        let typeName = 'Tier';
-        if (type === 'HT') typeName = 'High Tier';
-        else if (type === 'MT') typeName = 'Mid Tier';
-        else if (type === 'LT') typeName = 'Low Tier';
-        return `${typeName} ${num}`;
-      }
-      return tierStr;
-    }
-
+    // MTランクを含む正確なTierスコア計算関数
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -500,10 +485,28 @@
       return 1;
     }
 
+    function formatTierFullTitle(tierStr) {
+      if (!tierStr) return '';
+      const clean = tierStr.toUpperCase().trim();
+      const match = clean.match(/([HLM]T)(\d+)/);
+      if (match) {
+        const type = match[1];
+        const num = match[2];
+        let typeName = 'Tier';
+        if (type === 'HT') typeName = 'High Tier';
+        else if (type === 'MT') typeName = 'Mid Tier';
+        else if (type === 'LT') typeName = 'Low Tier';
+        return `${typeName} ${num}`;
+      }
+      return tierStr;
+    }
+
     function calculatePlayerOverallScore(player) {
       let total = 0;
-      for (const tier of Object.values(player.kits)) {
-        total += getTierScoreValue(tier);
+      if (player.kits) {
+        for (const tier of Object.values(player.kits)) {
+          total += getTierScoreValue(tier);
+        }
       }
       return total;
     }
@@ -595,10 +598,7 @@
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        const part1 = "https://script.google.com/macros/s/";
-        const part2 = "AKfycbxCBMdqmqAEorlZFCbzcf4HtvqlxnRphEgQ_8C4BWGaNmovZ1PXRNGhykN9mH6F2_sX2w";
-        const part3 = "/exec";
-        const webAppUrl = part1 + part2 + part3 + "?t=" + new Date().getTime();
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbybXABVRz47h-EpEwjnfmsyUEGz2_BokIuHZDpB7vh6rOrXVsQMF8muCnLQk0mrFRG6dg/exec?t=" + new Date().getTime();
         
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
@@ -611,15 +611,12 @@
             }
           }
 
-          // スプレッドシート側のC列（p.resolvedName または p.mcid など。プロパティ名に合わせて調整。今回は p.resolvedName または p.displayName、無ければ p.name をフォールバック）
-          // ※スプレッドシートの返却データ構造に合わせて p.resolvedName や p.mcid を参照します
-          const resolvedName = p.resolvedName || p.mcid || p.name;
-          const isJavaUuid = isUuid(p.name);
+          const isJavaUuid = isUuid(p.uuid);
 
           return {
             ...p,
-            rawId: p.name, // A列のUUID（または統合版名）
-            name: resolvedName, // C列から取得した最新MCID（または統合版名）
+            rawId: p.uuid,   // A列のUUID（スキン取得用）
+            name: p.name,    // C列の最新MCID（表示用）
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
@@ -731,7 +728,7 @@
           }
         }
 
-        // スキン取得にはJava版ならUUID（rawId）、統合版なら名前（name）を使用
+        // スキン取得にはJava版ならUUID、統合版なら名前を使用
         const skinIdentifier = p.isUuid ? p.rawId : p.name;
         const avatarUrl = `https://mc-heads.net/avatar/${skinIdentifier}/64`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
@@ -763,16 +760,18 @@
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
-      for (const [kit, tier] of Object.entries(player.kits)) {
-        if (!tier) continue;
-        const colorClass = getTierColorClass(tier);
-        const imgTag = getKitImageTag(kit);
-        kitsContainer.innerHTML += `
-          <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
-            <span class="text-gray-300 font-orbitron text-xs flex items-center gap-1.5">${imgTag} ${kit}</span>
-            <span class="tier-badge ${colorClass}">${tier}</span>
-          </div>
-        `;
+      if (player.kits) {
+        for (const [kit, tier] of Object.entries(player.kits)) {
+          if (!tier) continue;
+          const colorClass = getTierColorClass(tier);
+          const imgTag = getKitImageTag(kit);
+          kitsContainer.innerHTML += `
+            <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
+              <span class="text-gray-300 font-orbitron text-xs flex items-center gap-1.5">${imgTag} ${kit}</span>
+              <span class="tier-badge ${colorClass}">${tier}</span>
+            </div>
+          `;
+        }
       }
 
       document.getElementById('player-modal').classList.remove('hidden');
