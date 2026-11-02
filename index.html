@@ -109,6 +109,7 @@
       overflow: hidden;
     }
 
+    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されないように分離） */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -460,34 +461,33 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 詳細モーダルで確実に表示できているプライマリスキン取得URL生成 (Crafatar API / 名前 or UUID両対応)
-    function getSkinUrl(player) {
+    // 💡 テーブルと詳細モーダルで完全に統一したスキン取得関数（UUID優先 → ダメならMCID）
+    function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
-        return `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
+        return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
       } else if (player && player.name) {
-        return `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
+        return `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/${size}`;
       }
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 全体表示と詳細モーダルで完全に同じ「詳細側APIをフォールバックとして使う」仕組みを共有
+    // 💡 共通の多段フォールバック関数（UUID別形式 → MCID → スティーブ）
     function handleSkinError(img, player) {
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // まずmc-headsを試す
         if (player && isUuid(player.rawId)) {
-          img.src = `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/140`;
+          img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
         } else if (player && player.name) {
-          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
+          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
-        // 次にMinotarを試す
         if (player && player.name) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
+          const sz = img.dataset.size || 140;
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${sz}.png`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
@@ -770,7 +770,7 @@
           }
         }
 
-        const bodyUrl = getSkinUrl(p);
+        const bodyUrl = getSkinUrl(p, 140);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
@@ -778,7 +778,7 @@
             <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
               <span>${rankNum}.</span>
               <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
           </td>
@@ -795,9 +795,10 @@
 
     function openModal(player, currentRank) {
       window.currentModalPlayer = player;
-      const bodyUrl = getSkinUrl(player);
+      const bodyUrl = getSkinUrl(player, 150);
       const modalBody = document.getElementById('modal-fullbody');
       modalBody.dataset.fallbackStep = "0";
+      modalBody.dataset.size = "150";
       modalBody.src = bodyUrl;
 
       document.getElementById('modal-name').innerText = player.name;
