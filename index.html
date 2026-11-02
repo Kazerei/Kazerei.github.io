@@ -92,21 +92,21 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
-    /* バナーの中に数字とスキンを収めるスタイル（少し大きく迫力を出す） */
+    /* すべてのランクバナーで統一されたサイズ感とデザイン */
     .rank-banner-box {
       position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 12px 4px 16px;
+      padding: 4px 10px 4px 14px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
-      font-size: 22px;
+      font-size: 20px;
       color: #ffffff;
       clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      width: 140px;
-      height: 64px;
+      width: 130px;
+      height: 56px;
       overflow: hidden;
     }
 
@@ -153,11 +153,8 @@
     .rank-3-box::after { animation-delay: 1s; }
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
-      border: 1px solid rgba(96, 165, 250, 0.6);
-      font-size: 16px;
-      width: 90px;
-      height: 52px;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+      border: 1px solid rgba(96, 165, 250, 0.7);
     }
 
     .skin-showcase-bg {
@@ -675,8 +672,8 @@
     function handleSkinError(img, player) {
       if (!img.dataset.fallbackTriggered) {
         img.dataset.fallbackTriggered = "true";
-        const cleanId = getCleanUuid(player.rawId);
-        img.src = `https://crafatar.com/renders/body/${cleanId}?scale=4&overlay=true`;
+        const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : player.name;
+        img.src = `https://crafatar.com/renders/body/${skinIdentifier}?scale=4&overlay=true`;
       } else {
         img.src = DEFAULT_STEVE_BODY;
       }
@@ -742,17 +739,18 @@
           }
         }
 
+        // モーダルと同じ仕組みでスキンIDを確実に取得
         const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : p.name;
         const bodyUrl = `https://mc-heads.net/body/${skinIdentifier}/140`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
-          <!-- 💡 ランキングバナーの中に数字と「上半身中心（下半身少し）」の3Dスキンを収める -->
+          <!-- 全ランキング共通でサイズ感・上半身メイン（下半身少なめ）に調整 -->
           <td class="py-3 px-4 text-center">
             <div class="rank-banner-box ${rankBoxClass} mx-auto">
               <span>${rankNum}.</span>
-              <div class="h-16 w-10 overflow-hidden flex items-end justify-center relative shrink-0">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-3" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+              <div class="h-14 w-9 overflow-hidden flex items-end justify-center relative shrink-0">
+                <img src="${bodyUrl}" alt="${p.name}" class="h-24 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-2" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
           </td>
