@@ -92,6 +92,7 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
+    /* 順位バナーの高さをスキン枠に合わせて拡張 */
     .rank-banner {
       position: relative;
       display: inline-flex;
@@ -105,6 +106,7 @@
       clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       min-width: 55px;
+      height: 48px;
       overflow: hidden;
     }
 
@@ -366,7 +368,7 @@
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
+            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain object-bottom filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -444,17 +446,14 @@
     let playersData = [];
     let cooldownTimer = null;
 
-    const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
-    const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
+    const DEFAULT_STEVE_BODY = "https://crafatar.com/renders/body/8667ba71-b85a-4004-af54-457a973daf31?scale=4&overlay=true";
 
-    // UUIDの判定：ハイフン有り無し両対応の32桁HEX判定
     function isUuid(str) {
       if (!str) return false;
       const clean = str.trim().replace(/-/g, "");
       return /^[0-9a-fA-F]{32}$/.test(clean);
     }
 
-    // スキン取得用にUUIDをハイフンなしの32文字小文字に正規化する関数
     function getCleanUuid(str) {
       if (!str) return "";
       return str.trim().replace(/-/g, "").toLowerCase();
@@ -669,6 +668,17 @@
       }, 1000);
     }
 
+    // エラー時にmc-headsからcrafatarへフォールバックするスキン処理関数
+    function handleSkinError(img, player) {
+      if (!img.dataset.fallbackTriggered) {
+        img.dataset.fallbackTriggered = "true";
+        const cleanId = getCleanUuid(player.rawId);
+        img.src = `https://crafatar.com/renders/body/${cleanId}?scale=4&overlay=true`;
+      } else {
+        img.src = DEFAULT_STEVE_BODY;
+      }
+    }
+
     function renderTable() {
       const tbody = document.getElementById('tier-tbody');
       const search = document.getElementById('search-input').value.toLowerCase();
@@ -736,16 +746,19 @@
           }
         }
 
-        // 💡 修正ポイント：Java版（UUID）なら必ずハイフンなしの綺麗に整えたUUIDをURLに渡し、統合版ならMCID名を使う
+        // 3D全身スキンURLを取得
         const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : p.name;
-        const avatarUrl = `https://mc-heads.net/avatar/${skinIdentifier}/64`;
+        const bodyUrl = `https://mc-heads.net/body/${skinIdentifier}/100`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
           <td class="p-3 text-center">${rankBadge}</td>
           <td class="p-3">
             <div class="flex items-center gap-3">
-              <img src="${avatarUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='${DEFAULT_STEVE_HEAD}';" class="w-8 h-8 rounded border border-brand-border bg-brand-dark shadow shrink-0 object-contain">
+              <!-- 3D全身スキン枠：下ぴったりに固定し、上余白を確保 -->
+              <div class="w-8 h-10 border border-brand-border bg-brand-dark/90 rounded overflow-hidden flex items-end justify-center shrink-0 shadow p-0.5">
+                <img src="${bodyUrl}" alt="${p.name}" class="h-full object-contain object-bottom" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+              </div>
               <div class="overflow-hidden">
                 <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
                 ${subTierTextHtml}
@@ -760,9 +773,10 @@
     }
 
     function openModal(player, currentRank) {
-      // 💡 モーダル側でも同様に綺麗に整形したUUIDをスキンAPIに渡す
       const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : player.name;
-      document.getElementById('modal-fullbody').src = `https://mc-heads.net/body/${skinIdentifier}/150`;
+      const modalBody = document.getElementById('modal-fullbody');
+      modalBody.dataset.fallbackTriggered = "";
+      modalBody.src = `https://mc-heads.net/body/${skinIdentifier}/150`;
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
