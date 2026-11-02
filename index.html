@@ -459,12 +459,65 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 確実に正しい識別子を取得。UUIDならそれ、違えばプレイヤー名をそのまま利用
-    function getSkinIdentifier(player) {
+    // 💡 ご要望のロジック:
+    // 1stステップ: A列のUUIDで取得を試みる (mc-heads)
+    function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
-        return getCleanUuid(player.rawId);
+        return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
+      } else if (player && player.name) {
+        return `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/${size}`;
       }
-      return player && player.name ? player.name.trim() : "";
+      return DEFAULT_STEVE_BODY;
+    }
+
+    // 💡 取得エラー時（スティーブになってしまった場合など）の多段フォールバック
+    // ステップ1: 別方式のUUIDエンドポイント (Crafatar)
+    // ステップ2: それでもダメならC列のMCID（プレイヤー名）から取得
+    // ステップ3: 最終的にダメならデフォルトのSteve
+    function handleSkinError(img, player) {
+      const step = img.dataset.fallbackStep || "0";
+      if (step === "0") {
+        img.dataset.fallbackStep = "1";
+        if (player && isUuid(player.rawId)) {
+          img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
+        } else if (player && player.name) {
+          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else if (step === "1") {
+        img.dataset.fallbackStep = "2";
+        if (player && player.name) {
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${img.dataset.size || 140}.png`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else {
+        img.src = DEFAULT_STEVE_BODY;
+      }
+    }
+
+    function handleModalSkinError(img) {
+      const step = img.dataset.fallbackStep || "0";
+      if (step === "0") {
+        img.dataset.fallbackStep = "1";
+        if (window.currentModalPlayer && isUuid(window.currentModalPlayer.rawId)) {
+          img.src = `https://crafatar.com/renders/body/${getCleanUuid(window.currentModalPlayer.rawId)}?scale=4&overlay=true`;
+        } else if (window.currentModalPlayer && window.currentModalPlayer.name) {
+          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(window.currentModalPlayer.name.trim())}?scale=4&overlay=true`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else if (step === "1") {
+        img.dataset.fallbackStep = "2";
+        if (window.currentModalPlayer && window.currentModalPlayer.name) {
+          img.src = `https://minotar.net/body/${encodeURIComponent(window.currentModalPlayer.name.trim())}/150.png`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else {
+        img.src = DEFAULT_STEVE_BODY;
+      }
     }
 
     function formatCountry(countryStr) {
@@ -676,39 +729,6 @@
       }, 1000);
     }
 
-    // 💡 信頼性の高い Crafatar をメインスキン取得元にし、mc-heads や minotar をフォールバックに利用
-    function handleSkinError(img, player) {
-      if (!img.dataset.fallbackStep) {
-        img.dataset.fallbackStep = "1";
-        img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name)}/140`;
-      } else if (img.dataset.fallbackStep === "1") {
-        img.dataset.fallbackStep = "2";
-        img.src = `https://minotar.net/body/${encodeURIComponent(player.name)}/140.png`;
-      } else {
-        img.src = DEFAULT_STEVE_BODY;
-      }
-    }
-
-    function handleModalSkinError(img) {
-      if (!img.dataset.fallbackStep) {
-        img.dataset.fallbackStep = "1";
-        if (window.currentModalPlayer) {
-          img.src = `https://mc-heads.net/body/${encodeURIComponent(window.currentModalPlayer.name)}/150`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else if (img.dataset.fallbackStep === "1") {
-        img.dataset.fallbackStep = "2";
-        if (window.currentModalPlayer) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(window.currentModalPlayer.name)}/150.png`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else {
-        img.src = DEFAULT_STEVE_BODY;
-      }
-    }
-
     function renderTable() {
       const tbody = document.getElementById('tier-tbody');
       const search = document.getElementById('search-input').value.toLowerCase();
@@ -769,9 +789,7 @@
           }
         }
 
-        // 💡 一番安定して名前・UUIDから取得できる Crafatar API をメインに指定
-        const skinIdent = getSkinIdentifier(p);
-        const bodyUrl = `https://crafatar.com/renders/body/${skinIdent}?scale=4&overlay=true`;
+        const bodyUrl = getSkinUrl(p, 140);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
@@ -780,65 +798,7 @@
               <span>${rankNum}.</span>
               <!-- スキンの位置をさらに左へ（-translate-x-2）、下半身を削って胸から上の表示（translate-y-8）に調整 -->
               <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
-              </div>
-            </div>
-          </td>
-          <td class="p-3">
-            <div class="font-bold text-white tracking-wide text-sm truncate">${p.name} ${editionTag}</div>
-            ${subTierTextHtml}
-          </td>
-          <td class="p-3 text-center text-base">${p.country || ''}</td>
-          <td class="p-3 text-right overflow-x-auto max-w-[200px] sm:max-w-none">${kitBadges}</td>
-        `;
-        tbody.innerHTML = ``; // bug fix cleanup
-        tbody.appendChild(tr);
-      });
-      
-      // 再ループで正しくすべて表示させるための修正
-      tbody.innerHTML = '';
-      filtered.forEach((p, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-brand-purple/15 transition-colors cursor-pointer";
-        tr.onclick = () => openModal(p, idx + 1);
-
-        const rankNum = idx + 1;
-        let rankBoxClass = 'rank-normal-box';
-        if (rankNum === 1) rankBoxClass = 'rank-1-box';
-        else if (rankNum === 2) rankBoxClass = 'rank-2-box';
-        else if (rankNum === 3) rankBoxClass = 'rank-3-box';
-
-        let kitBadges = '';
-        let subTierTextHtml = '';
-
-        if (activeKitFilter === 'OVERALL') {
-          for (const [kit, tier] of Object.entries(p.kits)) {
-            if (!tier) continue;
-            const colorClass = getTierColorClass(tier);
-            const imgTag = getKitImageTag(kit);
-            kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
-          }
-        } else {
-          const tier = p.kits[activeKitFilter];
-          const colorClass = getTierColorClass(tier);
-          const imgTag = getKitImageTag(activeKitFilter);
-          kitBadges = `<span class="tier-badge ${colorClass}">${imgTag} ${activeKitFilter}: ${tier}</span>`;
-          const fullTitle = formatTierFullTitle(tier);
-          if (fullTitle) {
-            subTierTextHtml = `<div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${fullTitle}</div>`;
-          }
-        }
-
-        const skinIdent = getSkinIdentifier(p);
-        const bodyUrl = `https://crafatar.com/renders/body/${skinIdent}?scale=4&overlay=true`;
-        const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
-
-        tr.innerHTML = `
-          <td class="py-3 px-4 text-center">
-            <div class="rank-banner-box ${rankBoxClass} mx-auto">
-              <span>${rankNum}.</span>
-              <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
           </td>
@@ -855,10 +815,11 @@
 
     function openModal(player, currentRank) {
       window.currentModalPlayer = player;
-      const skinIdent = getSkinIdentifier(player);
+      const bodyUrl = getSkinUrl(player, 150);
       const modalBody = document.getElementById('modal-fullbody');
-      modalBody.dataset.fallbackStep = "";
-      modalBody.src = `https://crafatar.com/renders/body/${skinIdent}?scale=4&overlay=true`;
+      modalBody.dataset.fallbackStep = "0";
+      modalBody.dataset.size = "150";
+      modalBody.src = bodyUrl;
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
