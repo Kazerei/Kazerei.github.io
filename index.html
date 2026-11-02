@@ -92,13 +92,12 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
-    /* すべてのランクバナーで統一されたサイズ感とデザイン */
     .rank-banner-box {
       position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 10px 4px 14px;
+      padding: 4px 8px 4px 12px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
       font-size: 20px;
@@ -367,7 +366,7 @@
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
           <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="this.onerror=null; this.src='https://mc-heads.net/body/MHF_Steve/150';" class="h-full object-contain object-bottom filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
+            <img id="modal-fullbody" src="" alt="Skin" onerror="handleModalSkinError(this)" class="h-full object-contain object-bottom filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
@@ -669,11 +668,37 @@
       }, 1000);
     }
 
+    // テーブル行のスキン取得ロジック（詳細モーダルと完全同期し、Crafatar/mc-headsをフォールバックに利用）
     function handleSkinError(img, player) {
-      if (!img.dataset.fallbackTriggered) {
-        img.dataset.fallbackTriggered = "true";
-        const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : player.name;
+      if (!img.dataset.fallbackStep) {
+        img.dataset.fallbackStep = "1";
+        const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : encodeURIComponent(player.name);
         img.src = `https://crafatar.com/renders/body/${skinIdentifier}?scale=4&overlay=true`;
+      } else if (img.dataset.fallbackStep === "1") {
+        img.dataset.fallbackStep = "2";
+        img.src = `https://minotar.net/body/${encodeURIComponent(player.name)}/140.png`;
+      } else {
+        img.src = DEFAULT_STEVE_BODY;
+      }
+    }
+
+    function handleModalSkinError(img) {
+      if (!img.dataset.fallbackStep) {
+        img.dataset.fallbackStep = "1";
+        if (window.currentModalPlayer) {
+          const p = window.currentModalPlayer;
+          const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : encodeURIComponent(p.name);
+          img.src = `https://crafatar.com/renders/body/${skinIdentifier}?scale=4&overlay=true`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else if (img.dataset.fallbackStep === "1") {
+        img.dataset.fallbackStep = "2";
+        if (window.currentModalPlayer) {
+          img.src = `https://minotar.net/body/${encodeURIComponent(window.currentModalPlayer.name)}/150.png`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
       } else {
         img.src = DEFAULT_STEVE_BODY;
       }
@@ -739,18 +764,17 @@
           }
         }
 
-        // モーダルと同じ仕組みでスキンIDを確実に取得
-        const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : p.name;
+        const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : encodeURIComponent(p.name);
         const bodyUrl = `https://mc-heads.net/body/${skinIdentifier}/140`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
-          <!-- 全ランキング共通でサイズ感・上半身メイン（下半身少なめ）に調整 -->
           <td class="py-3 px-4 text-center">
             <div class="rank-banner-box ${rankBoxClass} mx-auto">
               <span>${rankNum}.</span>
-              <div class="h-14 w-9 overflow-hidden flex items-end justify-center relative shrink-0">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-24 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-2" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+              <!-- スキンの位置をもう少し左（-translate-x-1）にし、下半身をさらに削って上半身・頭部メインに調整 -->
+              <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
+                <img src="${bodyUrl}" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-6" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
           </td>
@@ -766,9 +790,10 @@
     }
 
     function openModal(player, currentRank) {
-      const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : player.name;
+      window.currentModalPlayer = player;
+      const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : encodeURIComponent(player.name);
       const modalBody = document.getElementById('modal-fullbody');
-      modalBody.dataset.fallbackTriggered = "";
+      modalBody.dataset.fallbackStep = "";
       modalBody.src = `https://mc-heads.net/body/${skinIdentifier}/150`;
 
       document.getElementById('modal-name').innerText = player.name;
@@ -795,6 +820,7 @@
 
     function closeModal() {
       document.getElementById('player-modal').classList.add('hidden');
+      window.currentModalPlayer = null;
     }
   </script>
 </body>
