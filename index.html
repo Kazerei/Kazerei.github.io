@@ -471,12 +471,19 @@
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 取得に失敗した場合（スティーブになった場合）、詳細側で使っている強力なAPI（Crafatar等）に切り替えるフォールバック関数
-    function handleSkinError(img, player) {
+    // 💡 取得エラー時：詳細側で使っている強力なAPI（Crafatar等）に切り替えるフォールバック関数
+    // プレイヤーデータが文字列化してしまっていても、ID（名前やUUID）から安全に逆引きできるように改良
+    function handleSkinError(img, playerParam) {
+      let player = playerParam;
+      // 万が一オブジェクトではなく文字列やIDとして渡ってきた場合の安全ガード
+      if (typeof player !== 'object' || player === null) {
+        player = playersData.find(p => p.name === img.alt || p.rawId === img.alt) || { name: img.alt };
+      }
+
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // ステップ1: 詳細側（モーダル）でも成功しているCrafatar APIを使用
+        // ステップ1: 詳細側と同じ Crafatar API を使用
         if (player && isUuid(player.rawId)) {
           img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
         } else if (player && player.name) {
@@ -486,7 +493,7 @@
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
-        // ステップ2: 次にMinotar APIを使用
+        // ステップ2: Minotar APIを使用
         if (player && player.name) {
           const sz = img.dataset.size || 140;
           img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${sz}.png`;
@@ -780,7 +787,7 @@
             <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
               <span>${rankNum}.</span>
               <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, playersData[${idx}])">
               </div>
             </div>
           </td>
