@@ -461,7 +461,7 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 テーブル一覧用のメインスキン取得関数
+    // 💡 プレイヤーのデータオブジェクトから確実にスキンURLを生成する関数
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
         return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
@@ -471,11 +471,9 @@
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 取得エラー時：詳細側で使っている強力なAPI（Crafatar等）に切り替えるフォールバック関数
-    // プレイヤーデータが文字列化してしまっていても、ID（名前やUUID）から安全に逆引きできるように改良
+    // 💡 修正したフォールバック関数：渡されたプレイヤー情報（または名前）を元に、確実に正しい代行APIを順に試す
     function handleSkinError(img, playerParam) {
       let player = playerParam;
-      // 万が一オブジェクトではなく文字列やIDとして渡ってきた場合の安全ガード
       if (typeof player !== 'object' || player === null) {
         player = playersData.find(p => p.name === img.alt || p.rawId === img.alt) || { name: img.alt };
       }
@@ -483,7 +481,7 @@
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // ステップ1: 詳細側と同じ Crafatar API を使用
+        // ステップ1: 詳細モーダルでも実績のある Crafatar API を使用
         if (player && isUuid(player.rawId)) {
           img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
         } else if (player && player.name) {
@@ -782,12 +780,15 @@
         const bodyUrl = getSkinUrl(p, 140);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
+        // 💡 修正ポイント：フィルタリングや並び替え後でも、該当プレイヤーの正確なオブジェクトをインラインで安全に渡すように変更
+        const playerJsonStr = JSON.stringify(p).replace(/"/g, '&quot;');
+
         tr.innerHTML = `
           <td class="py-3 px-4 text-center">
             <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
               <span>${rankNum}.</span>
               <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, playersData[${idx}])">
+                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, JSON.parse('${playerJsonStr}'))">
               </div>
             </div>
           </td>
@@ -820,6 +821,7 @@
           if (!tier) continue;
           const colorClass = getTierColorClass(tier);
           const imgTag = getKitImageTag(kit);
+          kitsContainer.imageUrl = '';
           kitsContainer.innerHTML += `
             <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
               <span class="text-gray-300 font-orbitron text-xs flex items-center gap-1.5">${imgTag} ${kit}</span>
