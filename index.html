@@ -109,7 +109,7 @@
       overflow: hidden;
     }
 
-    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されないように分離） */
+    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されない） */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -461,33 +461,33 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 テーブルと詳細モーダルで完全に統一したスキン取得関数（UUID優先 → ダメならMCID）
+    // 💡 詳細モーダル側で大成功している「CrafatarのレンダリングAPI（名前 or UUID両対応）」をテーブル一覧でもメインに採用！
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
-        return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
+        return `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
       } else if (player && player.name) {
-        return `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/${size}`;
+        return `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
       }
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 共通の多段フォールバック関数（UUID別形式 → MCID → スティーブ）
+    // 💡 一覧とモーダルで共通の超堅牢なフォールバック
     function handleSkinError(img, player) {
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
+        // 次のフォールバックとして mc-heads の名前ベース / UUIDベースを試す
         if (player && isUuid(player.rawId)) {
-          img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
+          img.src = `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/140`;
         } else if (player && player.name) {
-          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
+          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
         if (player && player.name) {
-          const sz = img.dataset.size || 140;
-          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${sz}.png`;
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
@@ -778,7 +778,7 @@
             <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
               <span>${rankNum}.</span>
               <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                <img src="${bodyUrl}" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
           </td>
@@ -798,7 +798,6 @@
       const bodyUrl = getSkinUrl(player, 150);
       const modalBody = document.getElementById('modal-fullbody');
       modalBody.dataset.fallbackStep = "0";
-      modalBody.dataset.size = "150";
       modalBody.src = bodyUrl;
 
       document.getElementById('modal-name').innerText = player.name;
