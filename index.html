@@ -92,25 +92,25 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
 
-    /* 順位バナーの高さをスキン枠に合わせて拡張 */
-    .rank-banner {
+    /* バナーの中に数字とスキンを収めるスタイル（少し大きく迫力を出す） */
+    .rank-banner-box {
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 6px 14px;
+      justify-content: space-between;
+      padding: 4px 12px 4px 16px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
-      font-size: 16px;
+      font-size: 22px;
       color: #ffffff;
-      clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+      clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      min-width: 55px;
-      height: 48px;
+      width: 140px;
+      height: 64px;
       overflow: hidden;
     }
 
-    .rank-1::after, .rank-2::after, .rank-3::after {
+    .rank-banner-box::after {
       content: '';
       position: absolute;
       top: -50%;
@@ -125,6 +125,7 @@
       );
       transform: rotate(30deg);
       animation: shine 3s infinite;
+      pointer-events: none;
     }
 
     @keyframes shine {
@@ -133,29 +134,30 @@
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
-    .rank-1 {
+    .rank-1-box {
       background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-      border: 1px solid rgba(253, 230, 138, 0.6);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
+      border: 1px solid rgba(253, 230, 138, 0.8);
     }
-    .rank-2 {
+    .rank-2-box {
       background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-      box-shadow: 0 0 12px rgba(209, 213, 219, 0.5);
-      border: 1px solid rgba(243, 244, 246, 0.6);
+      box-shadow: 0 0 16px rgba(209, 213, 219, 0.6);
+      border: 1px solid rgba(243, 244, 246, 0.8);
     }
-    .rank-2::after { animation-delay: 0.5s; }
-    .rank-3 {
+    .rank-2-box::after { animation-delay: 0.5s; }
+    .rank-3-box {
       background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
-      box-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
-      border: 1px solid rgba(253, 186, 116, 0.6);
+      box-shadow: 0 0 16px rgba(217, 119, 6, 0.6);
+      border: 1px solid rgba(253, 186, 116, 0.8);
     }
-    .rank-3::after { animation-delay: 1s; }
-    .rank-normal {
+    .rank-3-box::after { animation-delay: 1s; }
+    .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
-      border: 1px solid rgba(96, 165, 250, 0.4);
-      font-size: 13px;
-      padding: 4px 10px;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+      border: 1px solid rgba(96, 165, 250, 0.6);
+      font-size: 16px;
+      width: 90px;
+      height: 52px;
     }
 
     .skin-showcase-bg {
@@ -339,7 +341,7 @@
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
             <tr class="border-b border-brand-border bg-brand-dark/50 text-[11px] font-orbitron text-gray-400 uppercase">
-              <th class="p-3 text-center w-16">#</th>
+              <th class="p-3 text-center w-36" data-i18n="th_rank">RANK</th>
               <th class="p-3" data-i18n="th_player">PLAYER</th>
               <th class="p-3 text-center" data-i18n="th_country">COUNTRY</th>
               <th class="p-3 text-right" data-i18n="th_kits">CONTRIBUTING KITS</th>
@@ -412,6 +414,7 @@
         test_rule_4: "チート・マクロの使用禁止。キーボード2個使いも禁止です。",
         btn_load: "LOAD",
         click_player_hint: "※ プレイヤー行をクリックで詳細プロフィールを表示",
+        th_rank: "RANK",
         th_player: "PLAYER",
         th_country: "国",
         th_kits: "獲得KIT TIER",
@@ -434,6 +437,7 @@
         test_rule_4: "No cheats or macros! Dual keyboard usage is strictly forbidden.",
         btn_load: "LOAD",
         click_player_hint: "* Click on any player row to view detailed profile",
+        th_rank: "RANK",
         th_player: "PLAYER",
         th_country: "COUNTRY",
         th_kits: "CONTRIBUTING KITS",
@@ -622,8 +626,8 @@
 
           return {
             ...p,
-            rawId: p.uuid,   // A列の生データ
-            name: p.name,    // C列の最新MCID（表示用）
+            rawId: p.uuid,
+            name: p.name,
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
@@ -668,7 +672,6 @@
       }, 1000);
     }
 
-    // エラー時にmc-headsからcrafatarへフォールバックするスキン処理関数
     function handleSkinError(img, player) {
       if (!img.dataset.fallbackTriggered) {
         img.dataset.fallbackTriggered = "true";
@@ -711,17 +714,11 @@
         tr.onclick = () => openModal(p, idx + 1);
 
         const rankNum = idx + 1;
-        let rankBadge = '';
+        let rankBoxClass = 'rank-normal-box';
         
-        if (rankNum === 1) {
-          rankBadge = `<div class="rank-banner rank-1">${rankNum}.</div>`;
-        } else if (rankNum === 2) {
-          rankBadge = `<div class="rank-banner rank-2">${rankNum}.</div>`;
-        } else if (rankNum === 3) {
-          rankBadge = `<div class="rank-banner rank-3">${rankNum}.</div>`;
-        } else {
-          rankBadge = `<div class="rank-banner rank-normal">${rankNum}.</div>`;
-        }
+        if (rankNum === 1) rankBoxClass = 'rank-1-box';
+        else if (rankNum === 2) rankBoxClass = 'rank-2-box';
+        else if (rankNum === 3) rankBoxClass = 'rank-3-box';
 
         let kitBadges = '';
         let subTierTextHtml = '';
@@ -733,7 +730,6 @@
             const imgTag = getKitImageTag(kit);
             kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
           }
-          subTierTextHtml = '';
         } else {
           const tier = p.kits[activeKitFilter];
           const colorClass = getTierColorClass(tier);
@@ -746,24 +742,23 @@
           }
         }
 
-        // 3D全身スキンURLを取得
         const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : p.name;
-        const bodyUrl = `https://mc-heads.net/body/${skinIdentifier}/100`;
+        const bodyUrl = `https://mc-heads.net/body/${skinIdentifier}/140`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
-          <td class="p-3 text-center">${rankBadge}</td>
-          <td class="p-3">
-            <div class="flex items-center gap-3">
-              <!-- 3D全身スキン枠：下ぴったりに固定し、上余白を確保 -->
-              <div class="w-8 h-10 border border-brand-border bg-brand-dark/90 rounded overflow-hidden flex items-end justify-center shrink-0 shadow p-0.5">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-full object-contain object-bottom" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
-              </div>
-              <div class="overflow-hidden">
-                <div class="font-bold text-white tracking-wide truncate">${p.name} ${editionTag}</div>
-                ${subTierTextHtml}
+          <!-- 💡 ランキングバナーの中に数字と「上半身中心（下半身少し）」の3Dスキンを収める -->
+          <td class="py-3 px-4 text-center">
+            <div class="rank-banner-box ${rankBoxClass} mx-auto">
+              <span>${rankNum}.</span>
+              <div class="h-16 w-10 overflow-hidden flex items-end justify-center relative shrink-0">
+                <img src="${bodyUrl}" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-3" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
+          </td>
+          <td class="p-3">
+            <div class="font-bold text-white tracking-wide text-sm truncate">${p.name} ${editionTag}</div>
+            ${subTierTextHtml}
           </td>
           <td class="p-3 text-center text-base">${p.country || ''}</td>
           <td class="p-3 text-right overflow-x-auto max-w-[200px] sm:max-w-none">${kitBadges}</td>
