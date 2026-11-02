@@ -109,7 +109,8 @@
       overflow: hidden;
     }
 
-    .rank-banner-box::after {
+    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されないように分離） */
+    .rank-shining::after {
       content: '';
       position: absolute;
       top: -50%;
@@ -143,13 +144,14 @@
       box-shadow: 0 0 16px rgba(209, 213, 219, 0.6);
       border: 1px solid rgba(243, 244, 246, 0.8);
     }
-    .rank-2-box::after { animation-delay: 0.5s; }
+    .rank-2-box.rank-shining::after { animation-delay: 0.5s; }
     .rank-3-box {
       background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
       box-shadow: 0 0 16px rgba(217, 119, 6, 0.6);
       border: 1px solid rgba(253, 186, 116, 0.8);
     }
-    .rank-3-box::after { animation-delay: 1s; }
+    .rank-3-box.rank-shining::after { animation-delay: 1s; }
+    
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
       box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
@@ -459,8 +461,7 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 ご要望のロジック:
-    // 1stステップ: A列のUUIDで取得を試みる (mc-heads)
+    // 💡 テーブルと詳細モーダルで完全に統一したスキン取得関数（UUID優先 → ダメならMCID）
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
         return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
@@ -470,10 +471,7 @@
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 取得エラー時（スティーブになってしまった場合など）の多段フォールバック
-    // ステップ1: 別方式のUUIDエンドポイント (Crafatar)
-    // ステップ2: それでもダメならC列のMCID（プレイヤー名）から取得
-    // ステップ3: 最終的にダメならデフォルトのSteve
+    // 💡 共通の多段フォールバック関数（UUID別形式 → MCID → スティーブ）
     function handleSkinError(img, player) {
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
@@ -488,7 +486,8 @@
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
         if (player && player.name) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${img.dataset.size || 140}.png`;
+          const sz = img.dataset.size || 140;
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${sz}.png`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
@@ -498,26 +497,7 @@
     }
 
     function handleModalSkinError(img) {
-      const step = img.dataset.fallbackStep || "0";
-      if (step === "0") {
-        img.dataset.fallbackStep = "1";
-        if (window.currentModalPlayer && isUuid(window.currentModalPlayer.rawId)) {
-          img.src = `https://crafatar.com/renders/body/${getCleanUuid(window.currentModalPlayer.rawId)}?scale=4&overlay=true`;
-        } else if (window.currentModalPlayer && window.currentModalPlayer.name) {
-          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(window.currentModalPlayer.name.trim())}?scale=4&overlay=true`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else if (step === "1") {
-        img.dataset.fallbackStep = "2";
-        if (window.currentModalPlayer && window.currentModalPlayer.name) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(window.currentModalPlayer.name.trim())}/150.png`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else {
-        img.src = DEFAULT_STEVE_BODY;
-      }
+      handleSkinError(img, window.currentModalPlayer);
     }
 
     function formatCountry(countryStr) {
@@ -762,10 +742,11 @@
 
         const rankNum = idx + 1;
         let rankBoxClass = 'rank-normal-box';
+        let shiningClass = '';
         
-        if (rankNum === 1) rankBoxClass = 'rank-1-box';
-        else if (rankNum === 2) rankBoxClass = 'rank-2-box';
-        else if (rankNum === 3) rankBoxClass = 'rank-3-box';
+        if (rankNum === 1) { rankBoxClass = 'rank-1-box'; shiningClass = 'rank-shining'; }
+        else if (rankNum === 2) { rankBoxClass = 'rank-2-box'; shiningClass = 'rank-shining'; }
+        else if (rankNum === 3) { rankBoxClass = 'rank-3-box'; shiningClass = 'rank-shining'; }
 
         let kitBadges = '';
         let subTierTextHtml = '';
@@ -794,9 +775,8 @@
 
         tr.innerHTML = `
           <td class="py-3 px-4 text-center">
-            <div class="rank-banner-box ${rankBoxClass} mx-auto">
+            <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
               <span>${rankNum}.</span>
-              <!-- スキンの位置をさらに左へ（-translate-x-2）、下半身を削って胸から上の表示（translate-y-8）に調整 -->
               <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
                 <img src="${bodyUrl}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
