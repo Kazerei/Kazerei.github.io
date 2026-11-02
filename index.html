@@ -448,7 +448,7 @@
     const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
     function isUuid(str) {
-      return str && /^[0-9a-fA-F]{32}$/.test(str.trim());
+      return str && /^[0-9a-fA-F]{32}$/.test(str.trim().replace(/-/g, ""));
     }
 
     function formatCountry(countryStr) {
@@ -540,7 +540,7 @@
 
     function toggleLangDropdown(e) {
       e.stopPropagation();
-      document.getElementById('lang-dropdown').classList.toggle('hidden');
+      document.getElementById('lang-dropdown').classList.add('hidden');
     }
 
     document.addEventListener('click', () => {
@@ -616,7 +616,7 @@
           return {
             ...p,
             rawId: p.uuid,   // A列のUUID（スキン取得用）
-            name: p.name,    // C列の最新MCID（表示用）
+            name: p.name,    // C列の最新MCID（表示用。空ならGAS側でUUIDがフォールバックされる）
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
@@ -728,7 +728,6 @@
           }
         }
 
-        // スキン取得にはJava版ならUUID、統合版なら名前を使用
         const skinIdentifier = p.isUuid ? p.rawId : p.name;
         const avatarUrl = `https://mc-heads.net/avatar/${skinIdentifier}/64`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
