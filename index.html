@@ -109,7 +109,7 @@
       overflow: hidden;
     }
 
-    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されないように分離） */
+    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されない） */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -461,7 +461,7 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 テーブルと詳細モーダルで完全に統一したスキン取得関数（UUID優先 → ダメならMCID）
+    // 💡 テーブル一覧用のメインスキン取得関数
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
         return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
@@ -471,11 +471,12 @@
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 共通の多段フォールバック関数（UUID別形式 → MCID → スティーブ）
+    // 💡 取得に失敗した場合（スティーブになった場合）、詳細側で使っている強力なAPI（Crafatar等）に切り替えるフォールバック関数
     function handleSkinError(img, player) {
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
+        // ステップ1: 詳細側（モーダル）でも成功しているCrafatar APIを使用
         if (player && isUuid(player.rawId)) {
           img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
         } else if (player && player.name) {
@@ -485,6 +486,7 @@
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
+        // ステップ2: 次にMinotar APIを使用
         if (player && player.name) {
           const sz = img.dataset.size || 140;
           img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${sz}.png`;
