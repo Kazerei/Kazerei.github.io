@@ -461,17 +461,17 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 詳細モーダル側で確実に表示できていた「Crafatar / Minotar」をベースにした確実なスキン取得関数
+    // 💡 1. 完全に確実なスキンURL生成関数（詳細モーダルと完全一致のロジック）
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
-        return `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
+        return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
       } else if (player && player.name) {
-        return `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${size}.png`;
+        return `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/${size}`;
       }
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 安全なデータ参照（data-indexを使って一覧と配列のズレ・エスケープミスを完全に防止）
+    // 💡 2. 失敗時のフォールバック関数（CrafatarのUUID方式やMinotarを正しく安全に順次試す）
     function handleSkinError(img) {
       const index = img.dataset.index;
       const player = (index !== undefined && playersData[index]) ? playersData[index] : null;
@@ -479,19 +479,19 @@
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // ステップ1: mc-heads を試す
+        // ステップ1: Crafatar (UUIDまたはMCID) を試す
         if (player && isUuid(player.rawId)) {
-          img.src = `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/140`;
+          img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
         } else if (player && player.name) {
-          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
-        // ステップ2: Crafatar (名前ベース) を試す
+        // ステップ2: Minotar を試す
         if (player && player.name) {
-          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
@@ -505,10 +505,8 @@
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        if (player && isUuid(player.rawId)) {
-          img.src = `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/150`;
-        } else if (player && player.name) {
-          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/150`;
+        if (player && player.name) {
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/150.png`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
@@ -787,7 +785,6 @@
           }
         }
 
-        // 💡 該当プレイヤーの元のインデックス（playersData内の位置）を特定して安全に紐付ける
         const originalIndex = playersData.findIndex(item => item.name === p.name && item.rawId === p.rawId);
         const bodyUrl = getSkinUrl(p, 140);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
