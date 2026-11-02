@@ -459,6 +459,14 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
+    // 💡 確実に正しいスキン識別子（UUIDならそれ、違えばMCID）を取得する共通関数
+    function getSkinIdentifier(player) {
+      if (player && isUuid(player.rawId)) {
+        return getCleanUuid(player.rawId);
+      }
+      return player && player.name ? encodeURIComponent(player.name.trim()) : "";
+    }
+
     function formatCountry(countryStr) {
       if (!countryStr) return '';
       const clean = countryStr.trim().toLowerCase();
@@ -668,12 +676,12 @@
       }, 1000);
     }
 
-    // テーブル行のスキン取得ロジック（詳細モーダルと完全同期し、Crafatar/mc-headsをフォールバックに利用）
+    // 多段フォールバック（mc-heads -> crafatar -> minotar -> Steve）
     function handleSkinError(img, player) {
       if (!img.dataset.fallbackStep) {
         img.dataset.fallbackStep = "1";
-        const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : encodeURIComponent(player.name);
-        img.src = `https://crafatar.com/renders/body/${skinIdentifier}?scale=4&overlay=true`;
+        const ident = getSkinIdentifier(player);
+        img.src = `https://crafatar.com/renders/body/${ident}?scale=4&overlay=true`;
       } else if (img.dataset.fallbackStep === "1") {
         img.dataset.fallbackStep = "2";
         img.src = `https://minotar.net/body/${encodeURIComponent(player.name)}/140.png`;
@@ -686,9 +694,8 @@
       if (!img.dataset.fallbackStep) {
         img.dataset.fallbackStep = "1";
         if (window.currentModalPlayer) {
-          const p = window.currentModalPlayer;
-          const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : encodeURIComponent(p.name);
-          img.src = `https://crafatar.com/renders/body/${skinIdentifier}?scale=4&overlay=true`;
+          const ident = getSkinIdentifier(window.currentModalPlayer);
+          img.src = `https://crafatar.com/renders/body/${ident}?scale=4&overlay=true`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
@@ -764,7 +771,7 @@
           }
         }
 
-        const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : encodeURIComponent(p.name);
+        const skinIdentifier = getSkinIdentifier(p);
         const bodyUrl = `https://mc-heads.net/body/${skinIdentifier}/140`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
@@ -772,9 +779,9 @@
           <td class="py-3 px-4 text-center">
             <div class="rank-banner-box ${rankBoxClass} mx-auto">
               <span>${rankNum}.</span>
-              <!-- スキンの位置をもう少し左（-translate-x-1）にし、下半身をさらに削って上半身・頭部メインに調整 -->
-              <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
-                <img src="${bodyUrl}" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-6" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+              <!-- スキンの位置をさらに左へ（-translate-x-1.5）、下半身を削って胸から上の表示（translate-y-7）に調整 -->
+              <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1.5">
+                <img src="${bodyUrl}" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7" onerror="handleSkinError(this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">
               </div>
             </div>
           </td>
@@ -791,7 +798,7 @@
 
     function openModal(player, currentRank) {
       window.currentModalPlayer = player;
-      const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : encodeURIComponent(player.name);
+      const skinIdentifier = getSkinIdentifier(player);
       const modalBody = document.getElementById('modal-fullbody');
       modalBody.dataset.fallbackStep = "";
       modalBody.src = `https://mc-heads.net/body/${skinIdentifier}/150`;
