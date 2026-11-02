@@ -109,7 +109,6 @@
       overflow: hidden;
     }
 
-    /* 💡 1位〜3位専用の光る演出（4位以降には絶対に適用されない） */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -461,8 +460,8 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 詳細モーダル側で大成功している「CrafatarのレンダリングAPI（名前 or UUID両対応）」をテーブル一覧でもメインに採用！
-    function getSkinUrl(player, size = 140) {
+    // 💡 詳細モーダルで確実に表示できているプライマリスキン取得URL生成 (Crafatar API / 名前 or UUID両対応)
+    function getSkinUrl(player) {
       if (player && isUuid(player.rawId)) {
         return `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
       } else if (player && player.name) {
@@ -471,12 +470,12 @@
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 一覧とモーダルで共通の超堅牢なフォールバック
+    // 💡 全体表示と詳細モーダルで完全に同じ「詳細側APIをフォールバックとして使う」仕組みを共有
     function handleSkinError(img, player) {
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // 次のフォールバックとして mc-heads の名前ベース / UUIDベースを試す
+        // まずmc-headsを試す
         if (player && isUuid(player.rawId)) {
           img.src = `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/140`;
         } else if (player && player.name) {
@@ -486,6 +485,7 @@
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
+        // 次にMinotarを試す
         if (player && player.name) {
           img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
         } else {
@@ -770,7 +770,7 @@
           }
         }
 
-        const bodyUrl = getSkinUrl(p, 140);
+        const bodyUrl = getSkinUrl(p);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
@@ -795,7 +795,7 @@
 
     function openModal(player, currentRank) {
       window.currentModalPlayer = player;
-      const bodyUrl = getSkinUrl(player, 150);
+      const bodyUrl = getSkinUrl(player);
       const modalBody = document.getElementById('modal-fullbody');
       modalBody.dataset.fallbackStep = "0";
       modalBody.src = bodyUrl;
