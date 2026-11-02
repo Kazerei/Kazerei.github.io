@@ -448,40 +448,7 @@
     const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
     function isUuid(str) {
-      return str && /^[0-9a-fA-F]{32}$/.test(str.trim().replace(/-/g, ""));
-    }
-
-    // チャッピー方式のPlayerDB APIを使ったUUID→MCID解決機構
-    const nameCache = {};
-
-    async function resolveMcidFromUuid(uuidOrName, fallbackName) {
-      const cleanId = uuidOrName.trim().replace(/-/g, "");
-      
-      // UUID形式でなければそのまま返す
-      if (!isUuid(cleanId)) {
-        return uuidOrName;
-      }
-
-      if (nameCache[cleanId]) {
-        return nameCache[cleanId];
-      }
-
-      try {
-        const res = await fetch("https://playerdb.co/api/player/minecraft/" + encodeURIComponent(cleanId));
-        if (!res.ok) throw new Error("API failed");
-        const json = await res.json();
-        
-        if (json.code === "player.found" && json.data?.player?.username) {
-          const username = json.data.player.username;
-          nameCache[cleanId] = username;
-          return username;
-        }
-      } catch (err) {
-        console.warn("Failed to fetch username for UUID:", cleanId, err);
-      }
-
-      // 取得失敗時はスプレッドシートC列（fallbackName）を使う
-      return fallbackName || uuidOrName;
+      return str && /^[0-9a-fA-F]{32}$/.test(str.trim());
     }
 
     function formatCountry(countryStr) {
@@ -501,6 +468,7 @@
       return map[clean] || countryStr;
     }
 
+    // MTランクを含む正確なTierスコア計算関数
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -635,7 +603,7 @@
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
 
-        playersData = await Promise.all(rawData.map(async (p) => {
+        playersData = rawData.map(p => {
           let normalizedKits = {};
           if (p.kits) {
             for (let [k, v] of Object.entries(p.kits)) {
@@ -643,19 +611,17 @@
             }
           }
 
-          // A列のUUIDからMCIDを特定する（失敗時はC列のp.nameをフォールバックとして使用）
-          const resolvedName = await resolveMcidFromUuid(p.uuid, p.name);
           const isJavaUuid = isUuid(p.uuid);
 
           return {
             ...p,
-            rawId: p.uuid,          // スキン取得用UUID (A列)
-            name: resolvedName,     // 解決されたMCID（失敗時はC列）
+            rawId: p.uuid,   // A列のUUID（スキン取得用）
+            name: p.name,    // C列の最新MCID（表示用）
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
           };
-        }));
+        });
 
         renderTable();
       } catch (error) {
@@ -762,6 +728,7 @@
           }
         }
 
+        // スキン取得にはJava版ならUUID、統合版なら名前を使用
         const skinIdentifier = p.isUuid ? p.rawId : p.name;
         const avatarUrl = `https://mc-heads.net/avatar/${skinIdentifier}/64`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
