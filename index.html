@@ -461,17 +461,18 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 1. 完全に確実なスキンURL生成関数（詳細モーダルと完全一致のロジック）
+    // 💡 1. 最初の取得：UUIDが本物ならUUIDでMC-Heads、ダメならMCID（名前）でMinotar・Crafatarを引く仕組みに統一
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
         return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
       } else if (player && player.name) {
-        return `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/${size}`;
+        // BedrockやUUIDがない場合はMCID（名前）ベースのMinotarを最初に使うとAlex化を防げます
+        return `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${size}.png`;
       }
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 2. 失敗時のフォールバック関数（CrafatarのUUID方式やMinotarを正しく安全に順次試す）
+    // 💡 2. 失敗時のフォールバック：UUID -> 名前(Minotar) -> 名前(Crafatar/MC-Heads) と段階的に自動切り替え
     function handleSkinError(img) {
       const index = img.dataset.index;
       const player = (index !== undefined && playersData[index]) ? playersData[index] : null;
@@ -479,19 +480,19 @@
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // ステップ1: Crafatar (UUIDまたはMCID) を試す
-        if (player && isUuid(player.rawId)) {
-          img.src = `https://crafatar.com/renders/body/${getCleanUuid(player.rawId)}?scale=4&overlay=true`;
-        } else if (player && player.name) {
+        // ステップ1: UUIDだった場合は名前(Minotar)に切り替え、名前だった場合はUUID/別APIに切り替え
+        if (player && isUuid(player.rawId) && player.name) {
           img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
+        } else if (player && player.name) {
+          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
-        // ステップ2: Minotar を試す
+        // ステップ2: MC-Headの名前ベースを試す
         if (player && player.name) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
+          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
         } else {
           img.src = DEFAULT_STEVE_BODY;
         }
