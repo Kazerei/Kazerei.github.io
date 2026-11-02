@@ -447,8 +447,17 @@
     const DEFAULT_STEVE_HEAD = "https://mc-heads.net/avatar/MHF_Steve/32";
     const DEFAULT_STEVE_BODY = "https://mc-heads.net/body/MHF_Steve/150";
 
+    // UUIDの判定：ハイフン有り無し両対応の32桁HEX判定
     function isUuid(str) {
-      return str && /^[0-9a-fA-F]{32}$/.test(str.trim().replace(/-/g, ""));
+      if (!str) return false;
+      const clean = str.trim().replace(/-/g, "");
+      return /^[0-9a-fA-F]{32}$/.test(clean);
+    }
+
+    // スキン取得用にUUIDをハイフンなしの32文字小文字に正規化する関数
+    function getCleanUuid(str) {
+      if (!str) return "";
+      return str.trim().replace(/-/g, "").toLowerCase();
     }
 
     function formatCountry(countryStr) {
@@ -468,7 +477,6 @@
       return map[clean] || countryStr;
     }
 
-    // MTランクを含む正確なTierスコア計算関数
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -540,7 +548,7 @@
 
     function toggleLangDropdown(e) {
       e.stopPropagation();
-      document.getElementById('lang-dropdown').classList.add('hidden');
+      document.getElementById('lang-dropdown').classList.toggle('hidden');
     }
 
     document.addEventListener('click', () => {
@@ -615,8 +623,8 @@
 
           return {
             ...p,
-            rawId: p.uuid,   // A列のUUID（スキン取得用）
-            name: p.name,    // C列の最新MCID（表示用。空ならGAS側でUUIDがフォールバックされる）
+            rawId: p.uuid,   // A列の生データ
+            name: p.name,    // C列の最新MCID（表示用）
             isUuid: isJavaUuid,
             country: formatCountry(p.country),
             kits: normalizedKits
@@ -728,7 +736,8 @@
           }
         }
 
-        const skinIdentifier = p.isUuid ? p.rawId : p.name;
+        // 💡 修正ポイント：Java版（UUID）なら必ずハイフンなしの綺麗に整えたUUIDをURLに渡し、統合版ならMCID名を使う
+        const skinIdentifier = p.isUuid ? getCleanUuid(p.rawId) : p.name;
         const avatarUrl = `https://mc-heads.net/avatar/${skinIdentifier}/64`;
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
@@ -751,7 +760,8 @@
     }
 
     function openModal(player, currentRank) {
-      const skinIdentifier = player.isUuid ? player.rawId : player.name;
+      // 💡 モーダル側でも同様に綺麗に整形したUUIDをスキンAPIに渡す
+      const skinIdentifier = player.isUuid ? getCleanUuid(player.rawId) : player.name;
       document.getElementById('modal-fullbody').src = `https://mc-heads.net/body/${skinIdentifier}/150`;
 
       document.getElementById('modal-name').innerText = player.name;
