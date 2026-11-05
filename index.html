@@ -143,7 +143,10 @@
       transform-style: preserve-3d;
     }
 
-    .rank-1-box:hover, .rank-2-box:hover, .rank-3-box:hover {
+    /* 💡 行全体にマウスを乗せたときに、トップ3バナーが3Dチルトするよう変更 */
+    #tier-tbody tr:hover .rank-1-box,
+    #tier-tbody tr:hover .rank-2-box,
+    #tier-tbody tr:hover .rank-3-box {
       transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
     }
 
@@ -195,7 +198,7 @@
       border: 1px solid rgba(96, 165, 250, 0.8);
       transition: transform 0.3s ease;
     }
-    .rank-normal-box:hover {
+    #tier-tbody tr:hover .rank-normal-box {
       transform: scale(1.05);
     }
 
@@ -246,16 +249,6 @@
       animation: scanWave 0.8s ease-in-out;
       pointer-events: none;
       z-index: 20;
-    }
-
-    @keyframes rowClickPulse {
-      0% { background-color: rgba(217, 70, 239, 0.5); transform: scale(0.99); }
-      50% { background-color: rgba(168, 85, 247, 0.4); box-shadow: 0 0 25px rgba(217, 70, 239, 0.7); }
-      100% { background-color: rgba(168, 85, 247, 0.18); transform: scale(1); }
-    }
-
-    .row-clicked {
-      animation: rowClickPulse 0.35s ease-out forwards;
     }
 
     #tier-tbody tr {
@@ -952,13 +945,14 @@
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
         
+        // 💡 クリック時にDOMが壊れて消えてしまうバグを完全に修正
         tr.onclick = (e) => {
           tr.classList.remove('row-clicked');
           void tr.offsetWidth;
           tr.classList.add('row-clicked');
           setTimeout(() => {
             openModal(p, idx + 1);
-          }, 150);
+          }, 120);
         };
 
         const rankNum = idx + 1;
