@@ -67,12 +67,19 @@
       z-index: 10;
     }
 
+    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
     .clytiers-gradient-logo {
-      background: linear-gradient(135deg, #d8b4fe 0%, #e879f9 40%, #c084fc 70%, #9333ea 100%);
+      background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
+      background-size: 400% 400%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 16px rgba(216, 180, 254, 0.6));
-      animation: logo-glow 3.5s ease-in-out infinite alternate;
+      animation: gradientFlow 8s ease infinite, logo-glow 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     @keyframes logo-glow {
@@ -930,7 +937,6 @@
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
         
-        // 💡 クリック時にバグる原因になっていた競合処理を完全に排除し、確実にモーダルを開く処理に統一
         tr.onclick = () => {
           openModal(p, idx + 1);
         };
