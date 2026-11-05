@@ -143,12 +143,14 @@
       transform-style: preserve-3d;
     }
 
+    /* 行全体にマウスを乗せたときの3Dチルト */
     #tier-tbody tr:hover .rank-1-box,
     #tier-tbody tr:hover .rank-2-box,
     #tier-tbody tr:hover .rank-3-box {
       transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
     }
 
+    /* ✨ 演出4：1〜3位のランク文字・バナー常時シャイン（輝き）エフェクト */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -159,7 +161,7 @@
       background: linear-gradient(
         to right,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.6) 50%,
+        rgba(255,255,255,0.65) 50%,
         rgba(255,255,255,0) 100%
       );
       transform: rotate(30deg);
@@ -220,14 +222,15 @@
       animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
+    /* ✨ 演出1：検索時や再配置時のなめらかなカード・行アニメーション */
     @keyframes rowCascadeIn {
-      0% { opacity: 0; transform: translateY(24px) scale(0.98); }
+      0% { opacity: 0; transform: translateY(18px) scale(0.97); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .tier-row-animated {
       opacity: 0;
-      animation: rowCascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: rowCascadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes scanWave {
@@ -250,13 +253,19 @@
       z-index: 20;
     }
 
+    /* ✨ 演出2：行ホバー時にスキンがフワッと浮き上がりネオンオーラを纏う */
     #tier-tbody tr {
       transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
     #tier-tbody tr:hover {
-      background-color: rgba(168, 85, 247, 0.18) !important;
-      transform: translateX(8px);
-      box-shadow: inset 5px 0 0 0 #e879f9, 0 6px 20px rgba(168, 85, 247, 0.3);
+      background-color: rgba(168, 85, 247, 0.2) !important;
+      transform: translateX(6px);
+      box-shadow: inset 5px 0 0 0 #e879f9, 0 8px 25px rgba(217, 70, 239, 0.35);
+    }
+
+    #tier-tbody tr:hover img[data-size="140"] {
+      transform: translateY(4px) scale(1.08);
+      filter: drop-shadow(0 0 12px rgba(232, 121, 249, 0.9));
     }
 
     #player-modal:not(.hidden) > div {
@@ -509,7 +518,7 @@
       </div>
 
       <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
-        <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown</span>
+        <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown & Points</span>
       </h4>
       <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
         <!-- Dynamic -->
@@ -713,9 +722,6 @@
       return map[clean] || countryStr;
     }
 
-    /* ========================================================
-       💡 改良版：LT4とHT4の差などをしっかり反映したポイント計算式
-       ======================================================== */
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -723,16 +729,11 @@
       if (match) {
         const type = match[1];
         const num = parseInt(match[2]);
-        
-        // Tier 1〜5の基本スコア（数字の壁を大きく設計：Tier1=500, Tier5=100 など）
         let baseScore = (6 - num) * 100;
-
-        // HT / MT / LT による明確な差（例: LTなら0, MTなら+15, HTなら+30）
         let modifier = 0;
         if (type === 'HT') modifier = 30;
         else if (type === 'MT') modifier = 15;
         else if (type === 'LT') modifier = 0;
-
         return baseScore + modifier;
       }
       return 10;
@@ -950,7 +951,7 @@
 
       filtered.forEach((p, idx) => {
         const tr = document.createElement('tr');
-        const delay = Math.min(idx * 0.05, 1.5);
+        const delay = Math.min(idx * 0.04, 1.2);
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
         
@@ -1003,7 +1004,7 @@
               <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
                 <span>${rankNum}.</span>
                 <div class="h-12 w-8 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-2">
-                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8" onerror="handleSkinError(this)">
+                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-32 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-8 transition-transform duration-300" onerror="handleSkinError(this)">
                 </div>
               </div>
             </div>
