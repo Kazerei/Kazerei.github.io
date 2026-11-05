@@ -124,22 +124,21 @@
       display: inline-block;
     }
 
-    /* 💡 バナー全体のサイズと枠線を整え、飛び出しを完全防止 */
     .rank-banner-box {
       position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 2px 6px 2px 10px;
+      padding: 4px 8px 4px 12px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
-      font-size: 18px;
+      font-size: 20px;
       color: #ffffff;
       clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      width: 120px;
-      height: 50px;
-      overflow: hidden !important;
+      width: 130px;
+      height: 56px;
+      overflow: hidden;
       transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
       transform-style: preserve-3d;
     }
@@ -147,10 +146,9 @@
     #tier-tbody tr:hover .rank-1-box,
     #tier-tbody tr:hover .rank-2-box,
     #tier-tbody tr:hover .rank-3-box {
-      transform: rotateX(10deg) rotateY(-10deg) scale(1.08);
+      transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
     }
 
-    /* ✨ 豪華なシャイン（輝き）エフェクト */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -161,41 +159,41 @@
       background: linear-gradient(
         to right,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.7) 50%,
+        rgba(255,255,255,0.6) 50%,
         rgba(255,255,255,0) 100%
       );
       transform: rotate(30deg);
-      animation: shine 2s infinite;
+      animation: shine 2.2s infinite;
       pointer-events: none;
     }
 
     @keyframes shine {
       0% { transform: translateX(-100%) rotate(30deg); }
-      35% { transform: translateX(100%) rotate(30deg); }
+      30% { transform: translateX(100%) rotate(30deg); }
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
     .rank-1-box {
       background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+      box-shadow: 0 0 22px rgba(245, 158, 11, 0.85);
       border: 1px solid rgba(253, 230, 138, 0.95);
     }
     .rank-2-box {
       background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-      box-shadow: 0 0 20px rgba(209, 213, 219, 0.7);
+      box-shadow: 0 0 22px rgba(209, 213, 219, 0.75);
       border: 1px solid rgba(243, 244, 246, 0.95);
     }
     .rank-2-box.rank-shining::after { animation-delay: 0.3s; }
     .rank-3-box {
       background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
-      box-shadow: 0 0 20px rgba(217, 119, 6, 0.7);
+      box-shadow: 0 0 22px rgba(217, 119, 6, 0.75);
       border: 1px solid rgba(253, 186, 116, 0.95);
     }
     .rank-3-box.rank-shining::after { animation-delay: 0.6s; }
     
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
       border: 1px solid rgba(96, 165, 250, 0.8);
       transition: transform 0.3s ease;
     }
@@ -223,13 +221,13 @@
     }
 
     @keyframes rowCascadeIn {
-      0% { opacity: 0; transform: translateY(18px) scale(0.97); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
     .tier-row-animated {
       opacity: 0;
-      animation: rowCascadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: rowCascadeIn 0.3s ease forwards;
     }
 
     @keyframes scanWave {
@@ -252,63 +250,31 @@
       z-index: 20;
     }
 
-    /* ✨ 行ホバー時・タップ時の演出をさらに目立つように強化 */
     #tier-tbody tr {
-      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
     #tier-tbody tr:hover {
-      background-color: rgba(168, 85, 247, 0.25) !important;
-      transform: translateX(6px) scale(1.01);
-      box-shadow: inset 6px 0 0 0 #e879f9, 0 10px 30px rgba(217, 70, 239, 0.45);
-    }
-
-    #tier-tbody tr:hover img.skin-render-img {
-      transform: translateY(2px) scale(1.12);
-      filter: drop-shadow(0 0 14px rgba(232, 121, 249, 0.95));
-    }
-
-    @keyframes rowClickPulse {
-      0% { background-color: rgba(217, 70, 239, 0.7); transform: scale(0.98); }
-      50% { background-color: rgba(168, 85, 247, 0.6); box-shadow: 0 0 30px rgba(217, 70, 239, 0.9); }
-      100% { background-color: rgba(168, 85, 247, 0.25); transform: scale(1); }
-    }
-
-    .row-clicked {
-      animation: rowClickPulse 0.4s ease-out forwards;
+      background-color: rgba(168, 85, 247, 0.15) !important;
     }
 
     #player-modal:not(.hidden) > div {
-      animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
     @keyframes modalPop {
-      0% { opacity: 0; transform: scale(0.7) translateY(30px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     button, .kit-tab {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
     }
     button:hover, .kit-tab:hover {
       filter: brightness(1.2);
-      box-shadow: 0 0 18px rgba(168, 85, 247, 0.5);
-      transform: translateY(-1px);
-    }
-    button:active, .kit-tab:active {
-      transform: scale(0.92);
     }
 
     .kit-tab.active {
-      box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
       border-color: #d8b4fe !important;
-      transform: scale(1.03);
-    }
-
-    #search-input {
-      transition: all 0.3s ease;
-    }
-    #search-input:focus {
-      box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-      border-color: #c084fc;
     }
   </style>
 </head>
@@ -960,17 +926,13 @@
 
       filtered.forEach((p, idx) => {
         const tr = document.createElement('tr');
-        const delay = Math.min(idx * 0.04, 1.2);
+        const delay = Math.min(idx * 0.03, 1.0);
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
         
-        tr.onclick = (e) => {
-          tr.classList.remove('row-clicked');
-          void tr.offsetWidth;
-          tr.classList.add('row-clicked');
-          setTimeout(() => {
-            openModal(p, idx + 1);
-          }, 140);
+        // 💡 クリック時にバグる原因になっていた競合処理を完全に排除し、確実にモーダルを開く処理に統一
+        tr.onclick = () => {
+          openModal(p, idx + 1);
         };
 
         const rankNum = idx + 1;
@@ -1013,7 +975,7 @@
               <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
                 <span>${rankNum}.</span>
                 <div class="h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
-                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="skin-render-img h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7 transition-transform duration-300" onerror="handleSkinError(this)">
+                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7" onerror="handleSkinError(this)">
                 </div>
               </div>
             </div>
