@@ -143,7 +143,6 @@
       transform-style: preserve-3d;
     }
 
-    /* 💡 行全体にマウスを乗せたときに、トップ3バナーが3Dチルトするよう変更 */
     #tier-tbody tr:hover .rank-1-box,
     #tier-tbody tr:hover .rank-2-box,
     #tier-tbody tr:hover .rank-3-box {
@@ -500,7 +499,8 @@
           </div>
         </div>
         <div class="text-left z-10 overflow-hidden mt-2">
-          <h3 id="modal-name" class="text-xl sm:text-2xl font-black font-orbitron text-white tracking-wide mb-2 truncate glow-text"></h3>
+          <h3 id="modal-name" class="text-xl sm:text-2xl font-black font-orbitron text-white tracking-wide mb-1 truncate glow-text"></h3>
+          <div class="text-xs font-mono text-brand-lightPurple font-bold mb-2" id="modal-total-score">Total: 0 pts</div>
           <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-2.5 py-1 rounded-lg border border-brand-border">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-[10px] sm:text-[11px] font-mono text-gray-300" id="modal-edition-badge">Verified Player</span>
@@ -511,7 +511,7 @@
       <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
         <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown</span>
       </h4>
-      <div id="modal-kits" class="grid grid-cols-2 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
+      <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
         <!-- Dynamic -->
       </div>
     </div>
@@ -601,7 +601,7 @@
         th_player: "PLAYER",
         th_country: "国",
         th_kits: "獲得KIT TIER",
-        modal_kit_breakdown: "Kit別詳細 Tier"
+        modal_kit_breakdown: "Kit別詳細 Tier & ポイント"
       },
       en: {
         hero_desc: "Welcome to clytiers! Take tier tests in our official Discord server and climb the leaderboard.",
@@ -624,7 +624,7 @@
         th_player: "PLAYER",
         th_country: "COUNTRY",
         th_kits: "CONTRIBUTING KITS",
-        modal_kit_breakdown: "Kit Tier Breakdown"
+        modal_kit_breakdown: "Kit Tier Breakdown & Points"
       }
     };
 
@@ -713,6 +713,9 @@
       return map[clean] || countryStr;
     }
 
+    /* ========================================================
+       💡 改良版：LT4とHT4の差などをしっかり反映したポイント計算式
+       ======================================================== */
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
@@ -720,13 +723,19 @@
       if (match) {
         const type = match[1];
         const num = parseInt(match[2]);
-        let baseScore = (7 - num) * 30;
-        if (type === 'HT') baseScore += 3;
-        else if (type === 'MT') baseScore += 2;
-        else if (type === 'LT') baseScore += 1;
-        return baseScore;
+        
+        // Tier 1〜5の基本スコア（数字の壁を大きく設計：Tier1=500, Tier5=100 など）
+        let baseScore = (6 - num) * 100;
+
+        // HT / MT / LT による明確な差（例: LTなら0, MTなら+15, HTなら+30）
+        let modifier = 0;
+        if (type === 'HT') modifier = 30;
+        else if (type === 'MT') modifier = 15;
+        else if (type === 'LT') modifier = 0;
+
+        return baseScore + modifier;
       }
-      return 1;
+      return 10;
     }
 
     function formatTierFullTitle(tierStr) {
@@ -945,7 +954,6 @@
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
         
-        // 💡 クリック時にDOMが壊れて消えてしまうバグを完全に修正
         tr.onclick = (e) => {
           tr.classList.remove('row-clicked');
           void tr.offsetWidth;
@@ -1021,6 +1029,9 @@
 
       document.getElementById('modal-name').innerText = player.name;
       document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
+      
+      const totalScore = calculatePlayerOverallScore(player);
+      document.getElementById('modal-total-score').innerText = `Total Score: ${totalScore} pts`;
 
       const kitsContainer = document.getElementById('modal-kits');
       kitsContainer.innerHTML = '';
@@ -1029,10 +1040,14 @@
           if (!tier) continue;
           const colorClass = getTierColorClass(tier);
           const imgTag = getKitImageTag(kit);
+          const kitScore = getTierScoreValue(tier);
           kitsContainer.innerHTML += `
             <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
               <span class="text-gray-300 font-orbitron text-xs flex items-center gap-1.5">${imgTag} ${kit}</span>
-              <span class="tier-badge ${colorClass}">${tier}</span>
+              <div class="flex items-center gap-3">
+                <span class="text-[11px] font-mono text-brand-lightPurple font-bold">+${kitScore} pts</span>
+                <span class="tier-badge ${colorClass}">${tier}</span>
+              </div>
             </div>
           `;
         }
