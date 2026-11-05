@@ -46,32 +46,20 @@
       background-color: #07030d;
       color: #e2e8f0;
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.28) 0%, transparent 55%),
         radial-gradient(circle at 85% 85%, rgba(217, 70, 239, 0.15) 0%, transparent 45%),
-        radial-gradient(circle at 15% 90%, rgba(139, 92, 246, 0.2) 0%, transparent 55%);
+        radial-gradient(circle at 15% 90%, rgba(139, 92, 246, 0.22) 0%, transparent 55%);
       background-attachment: fixed;
       overflow-x: hidden;
     }
 
-    /* 🟣 ネザーの紫粒子・浮遊エフェクト */
-    body::before {
-      content: '';
+    /* 🟣 ネザーの紫粒子の描画用キャンバス */
+    #nether-particles {
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: 
-        radial-gradient(rgba(216, 180, 254, 0.6) 1.5px, transparent 1.5px),
-        radial-gradient(rgba(168, 85, 247, 0.4) 1px, transparent 1px);
-      background-size: 48px 48px, 24px 24px;
-      background-position: 0 0, 12px 12px;
-      animation: particleFloat 20s linear infinite;
-      opacity: 0.35;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       pointer-events: none;
-      z-index: 0;
-    }
-
-    @keyframes particleFloat {
-      0% { background-position: 0 0, 12px 12px; }
-      100% { background-position: 0 48px, 12px 60px; }
+      z-index: 1;
     }
 
     header, main, footer {
@@ -211,10 +199,6 @@
     ::-webkit-scrollbar-thumb { background: #3b1f6d; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
 
-    /* ========================================================
-       ✨ タブ切り替え＆カスケード＆スキャン演出
-       ======================================================== */
-
     @keyframes contentFadeIn {
       0% { opacity: 0; transform: translateY(14px) scale(0.97); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -223,7 +207,6 @@
       animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* ランキング行の「上から順にスライドイン」カスケード */
     @keyframes rowCascadeIn {
       0% { opacity: 0; transform: translateY(24px) scale(0.98); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -234,7 +217,6 @@
       animation: rowCascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* 🟣 LOAD完了時のサイバースキャン波動エフェクト */
     @keyframes scanWave {
       0% { background-position: 0 -100vh; }
       100% { background-position: 0 100vh; }
@@ -255,7 +237,6 @@
       z-index: 20;
     }
 
-    /* テーブル行ホバー時 */
     #tier-tbody tr {
       transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
@@ -265,7 +246,6 @@
       box-shadow: inset 5px 0 0 0 #e879f9, 0 6px 20px rgba(168, 85, 247, 0.3);
     }
 
-    /* モーダルポップアップ */
     #player-modal:not(.hidden) > div {
       animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
@@ -274,7 +254,6 @@
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    /* ボタン・タブのバウンス＆光彩 */
     button, .kit-tab {
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -293,7 +272,6 @@
       transform: scale(1.03);
     }
 
-    /* 検索インプットフォーカス演出 */
     #search-input {
       transition: all 0.3s ease;
     }
@@ -304,6 +282,9 @@
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
+
+  <!-- 🟣 ネザーの紫粒子エフェクト用キャンバス -->
+  <canvas id="nether-particles"></canvas>
 
   <!-- Header -->
   <header class="sticky top-0 z-50 glass-nav">
@@ -527,6 +508,65 @@
   </footer>
 
   <script>
+    /* ========================================================
+       🟣 ネザーの紫粒子（ふわふわ浮遊エフェクト・上限50個）
+       ======================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('nether-particles');
+      const ctx = canvas.getContext('2d');
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      const particles = [];
+      const particleCount = 45; // 約50個の上限
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2.5 + 1,       // 細かい粒のサイズ
+          speedX: (Math.random() - 0.5) * 0.4, // 緩やかな横移動
+          speedY: -Math.random() * 0.6 - 0.2,  // 上へフワフワ昇る
+          opacity: Math.random() * 0.6 + 0.2,  // 透過度
+          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7' // 紫系のグラデーションカラー
+        });
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.opacity;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = '#c084fc'; // ネザーパープルの発光
+          ctx.fill();
+
+          // 動きの更新
+          p.x += p.speedX;
+          p.y += p.speedY;
+
+          // 画面外に出たら下部から再出現
+          if (p.y < -10) {
+            p.y = canvas.height + 10;
+            p.x = Math.random() * canvas.width;
+          }
+          if (p.x < -10) p.x = canvas.width + 10;
+          if (p.x > canvas.width + 10) p.x = -10;
+        });
+
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+    });
+
     const i18nData = {
       ja: {
         hero_desc: "clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。",
@@ -789,10 +829,9 @@
 
       if (loadIcon) loadIcon.classList.add('fa-spin');
 
-      // 🟣 LOAD時にサイバースキャン波動エフェクトを発動
       if (container) {
         container.classList.remove('scan-effect');
-        void container.offsetWidth; // 1回リフローさせてアニメーションを再トリガー
+        void container.offsetWidth;
         container.classList.add('scan-effect');
       }
 
@@ -890,7 +929,6 @@
 
       filtered.forEach((p, idx) => {
         const tr = document.createElement('tr');
-        // 💡 上から順に1つずつ綺麗にカスケード出現する遅延 (上限1.5秒)
         const delay = Math.min(idx * 0.05, 1.5);
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
