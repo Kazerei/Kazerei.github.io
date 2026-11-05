@@ -168,6 +168,58 @@
     ::-webkit-scrollbar-track { background: #07030d; }
     ::-webkit-scrollbar-thumb { background: #2a164f; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+    /* ==========================================
+       ✨ 追加した4つのリッチなアニメーション演出
+       ========================================== */
+
+    /* 1. タブ切り替え・セクション表示時のふんわりフェードイン */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    section:not(.hidden) {
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* 2. テーブル行ホバー時の浮き上がり＆左側発光アクセント */
+    #tier-tbody tr {
+      transition: all 0.25s ease;
+    }
+    #tier-tbody tr:hover {
+      background-color: rgba(139, 92, 246, 0.12) !important;
+      transform: translateX(4px);
+      box-shadow: inset 4px 0 0 0 #a855f7;
+    }
+
+    /* 3. モーダル表示時のポップアップアニメーション */
+    #player-modal:not(.hidden) > div {
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes modalPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* 4. ボタン・キットタブの軽やかなクリック感（押し込み） */
+    button, .kit-tab {
+      transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:active, .kit-tab:active {
+      transform: scale(0.96);
+    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -461,18 +513,15 @@
       return str.trim().replace(/-/g, "").toLowerCase();
     }
 
-    // 💡 1. 最初の取得：UUIDが本物ならUUIDでMC-Heads、ダメならMCID（名前）でMinotar・Crafatarを引く仕組みに統一
     function getSkinUrl(player, size = 140) {
       if (player && isUuid(player.rawId)) {
         return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
       } else if (player && player.name) {
-        // BedrockやUUIDがない場合はMCID（名前）ベースのMinotarを最初に使うとAlex化を防げます
         return `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${size}.png`;
       }
       return DEFAULT_STEVE_BODY;
     }
 
-    // 💡 2. 失敗時のフォールバック：UUID -> 名前(Minotar) -> 名前(Crafatar/MC-Heads) と段階的に自動切り替え
     function handleSkinError(img) {
       const index = img.dataset.index;
       const player = (index !== undefined && playersData[index]) ? playersData[index] : null;
@@ -480,7 +529,6 @@
       const step = img.dataset.fallbackStep || "0";
       if (step === "0") {
         img.dataset.fallbackStep = "1";
-        // ステップ1: UUIDだった場合は名前(Minotar)に切り替え、名前だった場合はUUID/別APIに切り替え
         if (player && isUuid(player.rawId) && player.name) {
           img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
         } else if (player && player.name) {
@@ -490,7 +538,6 @@
         }
       } else if (step === "1") {
         img.dataset.fallbackStep = "2";
-        // ステップ2: MC-Headの名前ベースを試す
         if (player && player.name) {
           img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
         } else {
