@@ -119,9 +119,6 @@
     .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 12px rgba(217, 119, 6, 0.5); }
     .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 12px rgba(59, 130, 246, 0.5); }
 
-    /* ========================================================
-       ✨ 演出3：トップ3プレイヤーの「3Dトレーディングカード風傾きエフェクト」
-       ======================================================== */
     .rank-banner-container {
       perspective: 800px;
       display: inline-block;
@@ -146,7 +143,6 @@
       transform-style: preserve-3d;
     }
 
-    /* 1〜3位のバナーにマウスを乗せたときに3D立体チルト＆反射 */
     .rank-1-box:hover, .rank-2-box:hover, .rank-3-box:hover {
       transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
     }
@@ -252,9 +248,6 @@
       z-index: 20;
     }
 
-    /* ========================================================
-       ✨ 演出1：プレイヤー行クリック時の「ネオンパルス（波紋）インパクト演出」
-       ======================================================== */
     @keyframes rowClickPulse {
       0% { background-color: rgba(217, 70, 239, 0.5); transform: scale(0.99); }
       50% { background-color: rgba(168, 85, 247, 0.4); box-shadow: 0 0 25px rgba(217, 70, 239, 0.7); }
@@ -496,7 +489,7 @@
   </main>
 
   <!-- Player Detail Modal -->
-  <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleModalBgClick(event)">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-md w-full p-5 sm:p-6 relative glow-box overflow-hidden shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
         <i class="fa-solid fa-xmark"></i>
@@ -959,7 +952,6 @@
         tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
         tr.style.animationDelay = `${delay}s`;
         
-        // 💡 演出1：クリック時にパルス（波紋）アニメーションを発動させてからモーダルを開く
         tr.onclick = (e) => {
           tr.classList.remove('row-clicked');
           void tr.offsetWidth;
@@ -1058,6 +1050,12 @@
     function closeModal() {
       document.getElementById('player-modal').classList.add('hidden');
       window.currentModalPlayer = null;
+    }
+
+    function handleModalBgClick(event) {
+      if (event.target.id === 'player-modal') {
+        closeModal();
+      }
     }
   </script>
 </body>
