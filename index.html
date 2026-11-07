@@ -150,14 +150,13 @@
       transform-style: preserve-3d;
     }
 
-    /* ✨ 3Dホログラムホバーエフェクト強化 */
     #tier-tbody tr:hover .rank-1-box,
     #tier-tbody tr:hover .rank-2-box,
     #tier-tbody tr:hover .rank-3-box {
-      transform: rotateX(15deg) rotateY(-15deg) scale(1.12);
-      box-shadow: 0 10px 30px rgba(217, 70, 239, 0.6);
+      transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
     }
 
+    /* ✨ 演出4：1〜3位の豪華なシャイン（輝き）エフェクト強化 */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -168,34 +167,34 @@
       background: linear-gradient(
         to right,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.6) 50%,
+        rgba(255,255,255,0.8) 50%,
         rgba(255,255,255,0) 100%
       );
       transform: rotate(30deg);
-      animation: shine 2.2s infinite;
+      animation: shine 1.8s infinite;
       pointer-events: none;
     }
 
     @keyframes shine {
       0% { transform: translateX(-100%) rotate(30deg); }
-      30% { transform: translateX(100%) rotate(30deg); }
+      40% { transform: translateX(100%) rotate(30deg); }
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
     .rank-1-box {
       background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
-      box-shadow: 0 0 22px rgba(245, 158, 11, 0.85);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
       border: 1px solid rgba(253, 230, 138, 0.95);
     }
     .rank-2-box {
       background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-      box-shadow: 0 0 22px rgba(209, 213, 219, 0.75);
+      box-shadow: 0 0 25px rgba(209, 213, 219, 0.8);
       border: 1px solid rgba(243, 244, 246, 0.95);
     }
     .rank-2-box.rank-shining::after { animation-delay: 0.3s; }
     .rank-3-box {
       background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
-      box-shadow: 0 0 22px rgba(217, 119, 6, 0.75);
+      box-shadow: 0 0 25px rgba(217, 119, 6, 0.8);
       border: 1px solid rgba(253, 186, 116, 0.95);
     }
     .rank-3-box.rank-shining::after { animation-delay: 0.6s; }
@@ -239,11 +238,10 @@
       animation: rowCascadeIn 0.3s ease forwards;
     }
 
-    /* ✨ サイバー・スキャン・ウェーブ演出 */
+    /* ✨ 演出2：サイバー・スキャン・グリッチ風波ウェーブエフェクト */
     @keyframes scanWave {
-      0% { background-position: 0 -100vh; opacity: 0.8; }
-      50% { opacity: 1; }
-      100% { background-position: 0 100vh; opacity: 0; }
+      0% { background-position: 0 -100vh; }
+      100% { background-position: 0 100vh; }
     }
 
     .scan-effect {
@@ -254,18 +252,26 @@
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
-      background-size: 100% 250px;
+      background-size: 100% 200px;
       background-repeat: no-repeat;
-      animation: scanWave 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: scanWave 0.7s ease-in-out;
       pointer-events: none;
       z-index: 20;
     }
 
+    /* ✨ 演出3：行ホバー時のスキン浮き上がり＆ネオンオーラ強化 */
     #tier-tbody tr {
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
     #tier-tbody tr:hover {
-      background-color: rgba(168, 85, 247, 0.15) !important;
+      background-color: rgba(168, 85, 247, 0.22) !important;
+      transform: translateX(6px);
+      box-shadow: inset 5px 0 0 0 #e879f9, 0 8px 25px rgba(217, 70, 239, 0.35);
+    }
+    #tier-tbody tr:hover img {
+      transform: translateY(2px) scale(1.08);
+      filter: drop-shadow(0 0 12px rgba(232, 121, 249, 0.9));
+      transition: transform 0.3s ease, filter 0.3s ease;
     }
 
     #player-modal:not(.hidden) > div {
@@ -286,6 +292,24 @@
     .kit-tab.active {
       box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
       border-color: #d8b4fe !important;
+    }
+
+    /* ✨ 追加機能：どこをタップしても広がる波紋エフェクト */
+    .click-ripple {
+      position: fixed;
+      border-radius: 50%;
+      transform: scale(0);
+      background: radial-gradient(circle, rgba(232,121,249,0.7) 0%, rgba(139,92,246,0.3) 60%, transparent 100%);
+      pointer-events: none;
+      animation: rippleEffect 0.6s cubic-bezier(0, 0.8, 0.2, 1) forwards;
+      z-index: 9999;
+    }
+
+    @keyframes rippleEffect {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -518,7 +542,25 @@
 
   <script>
     /* ========================================================
-       🟣 インタラクティブ・ネザー粒子エフェクト（マウス引き寄せ）
+       🟣 どこをタップしても広がる波紋エフェクトのグローバル処理
+       ======================================================== */
+    window.addEventListener('click', (e) => {
+      // 入力欄やボタン等の操作を邪魔しないよう全体に波紋を生成
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      
+      const size = Math.max(window.innerWidth, window.innerHeight) * 0.25;
+      ripple.style.width = size + 'px';
+      ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - size / 2) + 'px';
+      ripple.style.top = (e.clientY - size / 2) + 'px';
+      
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+
+    /* ========================================================
+       🟣 ネザーの紫粒子（ふわふわ浮遊エフェクト・上限50個）
        ======================================================== */
     window.addEventListener('DOMContentLoaded', () => {
       const canvas = document.getElementById('nether-particles');
@@ -531,22 +573,14 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
-      let mouseX = -1000;
-      let mouseY = -1000;
-
-      window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-      });
-
       const particles = [];
-      const particleCount = 50;
+      const particleCount = 45;
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          size: Math.random() * 2.8 + 1,
+          size: Math.random() * 2.5 + 1,
           speedX: (Math.random() - 0.5) * 0.4,
           speedY: -Math.random() * 0.6 - 0.2,
           opacity: Math.random() * 0.6 + 0.2,
@@ -558,20 +592,11 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         particles.forEach(p => {
-          // マウスカーソルとの距離に応じたふんわり引き寄せ効果
-          const dx = mouseX - p.x;
-          const dy = mouseY - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150) {
-            p.x += dx * 0.02;
-            p.y += dy * 0.02;
-          }
-
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fillStyle = p.color;
           ctx.globalAlpha = p.opacity;
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 8;
           ctx.shadowColor = '#c084fc';
           ctx.fill();
 
@@ -844,26 +869,21 @@
         }
       });
 
-      // タブ切り替え時にもサイバー・スキャン演出を走らせる
-      triggerScanEffect();
       renderTable();
-    }
-
-    function triggerScanEffect() {
-      const container = document.getElementById('table-container');
-      if (container) {
-        container.classList.remove('scan-effect');
-        void container.offsetWidth;
-        container.classList.add('scan-effect');
-      }
     }
 
     async function fetchSpreadsheetData() {
       const tbody = document.getElementById('tier-tbody');
       const loadIcon = document.getElementById('load-icon');
+      const container = document.getElementById('table-container');
 
       if (loadIcon) loadIcon.classList.add('fa-spin');
-      triggerScanEffect();
+
+      if (container) {
+        container.classList.remove('scan-effect');
+        void container.offsetWidth;
+        container.classList.add('scan-effect');
+      }
 
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
