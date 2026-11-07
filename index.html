@@ -294,8 +294,8 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ 水面の一滴をイメージした繊細な複数リング波紋エフェクト */
-    .water-ripple-outer, .water-ripple-inner {
+    /* ✨ 水面の一滴＋紫の霧（フォグ）エフェクト */
+    .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
       position: fixed;
       border-radius: 50%;
       pointer-events: none;
@@ -303,15 +303,28 @@
       z-index: 9999;
     }
 
+    /* 周りに広がる紫色の霧（フォグ） */
+    .water-ripple-fog {
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(217, 70, 239, 0.25) 45%, transparent 75%);
+      filter: blur(8px);
+      animation: waterRippleFogAnim 0.85s cubic-bezier(0, 0.4, 0.2, 1) forwards;
+    }
+
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.75);
-      background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
+      border: 1.5px solid rgba(217, 70, 239, 0.85);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
       animation: waterRippleOuterAnim 0.75s cubic-bezier(0, 0.6, 0.2, 1) forwards;
     }
 
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.9);
+      border: 1px solid rgba(232, 121, 249, 0.95);
+      box-shadow: 0 0 6px rgba(232, 121, 249, 0.8);
       animation: waterRippleInnerAnim 0.6s cubic-bezier(0, 0.5, 0.3, 1) forwards;
+    }
+
+    @keyframes waterRippleFogAnim {
+      0% { transform: scale(0.1); opacity: 0.8; }
+      100% { transform: scale(2.2); opacity: 0; }
     }
 
     @keyframes waterRippleOuterAnim {
@@ -554,19 +567,28 @@
 
   <script>
     /* ========================================================
-       🟣 水面の一滴をイメージした複数リング波紋エフェクト
+       🟣 水面の一滴＋紫の霧（フォグ）エフェクトの生成
        ======================================================== */
     window.addEventListener('click', (e) => {
-      // 外側の波紋リング
+      // 1. 周りにボワッと広がる紫色の霧（フォグ）
+      const fog = document.createElement('div');
+      fog.className = 'water-ripple-fog';
+      const fogSize = 90;
+      fog.style.width = fogSize + 'px';
+      fog.style.height = fogSize + 'px';
+      fog.style.left = (e.clientX - fogSize / 2) + 'px';
+      fog.style.top = (e.clientY - fogSize / 2) + 'px';
+
+      // 2. 外側の波紋リング
       const outerRipple = document.createElement('div');
       outerRipple.className = 'water-ripple-outer';
-      const outerSize = 80; // 小さめのサイズ感
+      const outerSize = 80;
       outerRipple.style.width = outerSize + 'px';
       outerRipple.style.height = outerSize + 'px';
       outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
       outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
       
-      // 内側の波紋リング（少し遅れて広がる水滴感）
+      // 3. 内側の波紋リング
       const innerRipple = document.createElement('div');
       innerRipple.className = 'water-ripple-inner';
       const innerSize = 40;
@@ -575,9 +597,11 @@
       innerRipple.style.left = (e.clientX - innerSize / 2) + 'px';
       innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
       
+      document.body.appendChild(fog);
       document.body.appendChild(outerRipple);
       document.body.appendChild(innerRipple);
       
+      setTimeout(() => fog.remove(), 850);
       setTimeout(() => outerRipple.remove(), 750);
       setTimeout(() => innerRipple.remove(), 600);
     });
