@@ -294,22 +294,34 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ 追加機能：どこをタップしても広がる波紋エフェクト */
-    .click-ripple {
+    /* ✨ 水面の一滴をイメージした繊細な複数リング波紋エフェクト */
+    .water-ripple-outer, .water-ripple-inner {
       position: fixed;
       border-radius: 50%;
-      transform: scale(0);
-      background: radial-gradient(circle, rgba(232,121,249,0.7) 0%, rgba(139,92,246,0.3) 60%, transparent 100%);
       pointer-events: none;
-      animation: rippleEffect 0.6s cubic-bezier(0, 0.8, 0.2, 1) forwards;
+      transform: scale(0);
       z-index: 9999;
     }
 
-    @keyframes rippleEffect {
-      to {
-        transform: scale(4);
-        opacity: 0;
-      }
+    .water-ripple-outer {
+      border: 1.5px solid rgba(217, 70, 239, 0.75);
+      background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%);
+      animation: waterRippleOuterAnim 0.75s cubic-bezier(0, 0.6, 0.2, 1) forwards;
+    }
+
+    .water-ripple-inner {
+      border: 1px solid rgba(232, 121, 249, 0.9);
+      animation: waterRippleInnerAnim 0.6s cubic-bezier(0, 0.5, 0.3, 1) forwards;
+    }
+
+    @keyframes waterRippleOuterAnim {
+      0% { transform: scale(0.1); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    @keyframes waterRippleInnerAnim {
+      0% { transform: scale(0.05); opacity: 0.9; }
+      100% { transform: scale(1.1); opacity: 0; }
     }
   </style>
 </head>
@@ -542,21 +554,32 @@
 
   <script>
     /* ========================================================
-       🟣 どこをタップしても広がる波紋エフェクトのグローバル処理
+       🟣 水面の一滴をイメージした複数リング波紋エフェクト
        ======================================================== */
     window.addEventListener('click', (e) => {
-      // 入力欄やボタン等の操作を邪魔しないよう全体に波紋を生成
-      const ripple = document.createElement('div');
-      ripple.className = 'click-ripple';
+      // 外側の波紋リング
+      const outerRipple = document.createElement('div');
+      outerRipple.className = 'water-ripple-outer';
+      const outerSize = 80; // 小さめのサイズ感
+      outerRipple.style.width = outerSize + 'px';
+      outerRipple.style.height = outerSize + 'px';
+      outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
+      outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
       
-      const size = Math.max(window.innerWidth, window.innerHeight) * 0.25;
-      ripple.style.width = size + 'px';
-      ripple.style.height = size + 'px';
-      ripple.style.left = (e.clientX - size / 2) + 'px';
-      ripple.style.top = (e.clientY - size / 2) + 'px';
+      // 内側の波紋リング（少し遅れて広がる水滴感）
+      const innerRipple = document.createElement('div');
+      innerRipple.className = 'water-ripple-inner';
+      const innerSize = 40;
+      innerRipple.style.width = innerSize + 'px';
+      innerRipple.style.height = innerSize + 'px';
+      innerRipple.style.left = (e.clientX - innerSize / 2) + 'px';
+      innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
       
-      document.body.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
+      document.body.appendChild(outerRipple);
+      document.body.appendChild(innerRipple);
+      
+      setTimeout(() => outerRipple.remove(), 750);
+      setTimeout(() => innerRipple.remove(), 600);
     });
 
     /* ========================================================
