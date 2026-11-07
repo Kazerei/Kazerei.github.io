@@ -291,46 +291,46 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ クリック時の波紋＆紫霧エフェクト（最前面 z-index: 99999 ＆ 7秒かけて消える設定） */
+    /* ✨ 水面の一滴＋紫の霧（従来通りの素早い波紋スピード） */
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
       position: fixed;
       border-radius: 50%;
       pointer-events: none;
       transform: scale(0);
-      z-index: 99999;
+      z-index: 9999;
     }
 
     .water-ripple-fog {
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(217, 70, 239, 0.25) 50%, transparent 80%);
-      filter: blur(7px);
-      animation: waterRippleFogAnim 7s cubic-bezier(0.1, 0.5, 0.3, 1) forwards;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
+      filter: blur(6px);
+      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
     }
 
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.9);
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
-      animation: waterRippleOuterAnim 7s cubic-bezier(0.1, 0.5, 0.3, 1) forwards;
+      border: 1.5px solid rgba(217, 70, 239, 0.8);
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+      animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
     }
 
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 1);
-      box-shadow: 0 0 8px rgba(232, 121, 249, 0.9);
-      animation: waterRippleInnerAnim 7s cubic-bezier(0.1, 0.5, 0.3, 1) forwards;
+      border: 1px solid rgba(232, 121, 249, 0.95);
+      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
+      animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
     }
 
     @keyframes waterRippleFogAnim {
-      0% { transform: scale(0.1); opacity: 0.9; }
-      100% { transform: scale(3.5); opacity: 0; }
+      0% { transform: scale(0.1); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
     }
 
     @keyframes waterRippleOuterAnim {
       0% { transform: scale(0.1); opacity: 1; }
-      100% { transform: scale(2.8); opacity: 0; }
+      100% { transform: scale(1.3); opacity: 0; }
     }
 
     @keyframes waterRippleInnerAnim {
-      0% { transform: scale(0.05); opacity: 0.95; }
-      100% { transform: scale(1.8); opacity: 0; }
+      0% { transform: scale(0.05); opacity: 0.9; }
+      100% { transform: scale(0.8); opacity: 0; }
     }
   </style>
 </head>
@@ -563,7 +563,7 @@
 
   <script>
     /* ========================================================
-       🟣 クリック時：最前面に約7秒かけて消えていく波紋＆紫霧エフェクト
+       🟣 クリック時：サクッと消える波紋エフェクト ＆ ランダムに飛び散り7秒かけて消えるネザー粒子
        ======================================================== */
     window.addEventListener('click', (e) => {
       // 1. 周りにボワッと広がる紫色の霧（フォグ）
@@ -597,15 +597,38 @@
       document.body.appendChild(outerRipple);
       document.body.appendChild(innerRipple);
       
-      // 7秒（7000ミリ秒）かけてゆっくり完全に消えてから要素を削除
-      setTimeout(() => fog.remove(), 7000);
-      setTimeout(() => outerRipple.remove(), 7000);
-      setTimeout(() => innerRipple.remove(), 7000);
+      // 波紋は約0.75秒で消去
+      setTimeout(() => fog.remove(), 750);
+      setTimeout(() => outerRipple.remove(), 650);
+      setTimeout(() => innerRipple.remove(), 500);
+
+      // 4. タップした位置からランダムな方向に飛び散り、7秒かけて消えるネザー粒子（5個）
+      const clickCanvas = document.getElementById('nether-particles');
+      const clickCtx = clickCanvas.getContext('2d');
+      
+      // クリック粒子専用の管理配列（既存の背景ループとは別管理、または背景配列に追加してもOKですが今回は一時的な発生オブジェクトとして処理）
+      for (let i = 0; i < 5; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 2.5 + 1; // 飛び散る勢い
+        clickParticles.push({
+          x: e.clientX,
+          y: e.clientY,
+          size: Math.random() * 3 + 1.5,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 0.5, // わずかに上方向に浮き上がるバイアス
+          alpha: 1.0,
+          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
+          life: 0,
+          maxLife: 420 // 60fpsで約7秒 (420フレーム)
+        });
+      }
     });
 
     /* ========================================================
-       🟣 ネザーの紫粒子（ふわふわ浮遊エフェクト・Canvas描画）
+       🟣 ネザーの紫粒子（背景浮遊 ＆ クリック時飛び散り統合アニメーション）
        ======================================================== */
+    const clickParticles = [];
+
     window.addEventListener('DOMContentLoaded', () => {
       const canvas = document.getElementById('nether-particles');
       const ctx = canvas.getContext('2d');
@@ -617,11 +640,11 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
-      const particles = [];
+      const backgroundParticles = [];
       const particleCount = 45;
 
       for (let i = 0; i < particleCount; i++) {
-        particles.push({
+        backgroundParticles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           size: Math.random() * 2.5 + 1,
@@ -635,7 +658,8 @@
       function animateParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        particles.forEach(p => {
+        // 1. 通常の背景用ネザー粒子描画
+        backgroundParticles.forEach(p => {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fillStyle = p.color;
@@ -654,6 +678,33 @@
           if (p.x < -10) p.x = canvas.width + 10;
           if (p.x > canvas.width + 10) p.x = -10;
         });
+
+        // 2. クリック時に飛び散るネザー粒子描画（7秒かけてフェードアウト）
+        for (let i = clickParticles.length - 1; i >= 0; i--) {
+          const cp = clickParticles[i];
+          cp.life++;
+          // 経過フレームに応じて透明度を1.0から0へ
+          cp.alpha = Math.max(0, 1.0 - (cp.life / cp.maxLife));
+
+          ctx.beginPath();
+          ctx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
+          ctx.fillStyle = cp.color;
+          ctx.globalAlpha = cp.alpha;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = '#e879f9';
+          ctx.fill();
+
+          // 移動と減速（空気抵抗）
+          cp.x += cp.vx;
+          cp.y += cp.vy;
+          cp.vx *= 0.96;
+          cp.vy *= 0.96;
+
+          // 寿命が尽きたら配列から削除
+          if (cp.life >= cp.maxLife) {
+            clickParticles.splice(i, 1);
+          }
+        }
 
         requestAnimationFrame(animateParticles);
       }
