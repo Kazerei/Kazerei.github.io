@@ -53,13 +53,22 @@
       overflow-x: hidden;
     }
 
-    /* 🟣 ネザーの紫粒子描画用キャンバス */
+    /* 🟣 背景用ネザー粒子描画キャンバス */
     #nether-particles {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       pointer-events: none;
       z-index: 10;
+    }
+
+    /* 🟣 タップ時専用・最前面（一番上）に描画するキャンバス */
+    #click-particles-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 99999;
     }
 
     header, main, footer {
@@ -291,13 +300,13 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ 水面の一滴＋紫の霧（従来通りの素早い波紋スピード） */
+    /* ✨ 水面の一滴＋紫の霧（サクッと消えるスピード） */
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
       position: fixed;
       border-radius: 50%;
       pointer-events: none;
       transform: scale(0);
-      z-index: 9999;
+      z-index: 99998;
     }
 
     .water-ripple-fog {
@@ -336,8 +345,10 @@
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- 🟣 ネザーの紫粒子エフェクト用キャンバス -->
+  <!-- 🟣 背景の通常ネザー粒子用キャンバス -->
   <canvas id="nether-particles"></canvas>
+  <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
+  <canvas id="click-particles-canvas"></canvas>
 
   <!-- Header -->
   <header class="sticky top-0 z-20 glass-nav">
@@ -563,8 +574,10 @@
 
   <script>
     /* ========================================================
-       🟣 クリック時：サクッと消える波紋エフェクト ＆ ランダムに飛び散り7秒かけて消えるネザー粒子
+       🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
        ======================================================== */
+    const clickParticles = [];
+
     window.addEventListener('click', (e) => {
       // 1. 周りにボワッと広がる紫色の霧（フォグ）
       const fog = document.createElement('div');
@@ -602,51 +615,53 @@
       setTimeout(() => outerRipple.remove(), 650);
       setTimeout(() => innerRipple.remove(), 500);
 
-      // 4. タップした位置からランダムな方向に飛び散り、7秒かけて消えるネザー粒子（5個）
-      const clickCanvas = document.getElementById('nether-particles');
-      const clickCtx = clickCanvas.getContext('2d');
-      
-      // クリック粒子専用の管理配列（既存の背景ループとは別管理、または背景配列に追加してもOKですが今回は一時的な発生オブジェクトとして処理）
+      // 4. タップした位置からランダムな方向に飛び散り、約0.7秒（42フレーム）で消えるネザー粒子（5個）を最前面に追加
       for (let i = 0; i < 5; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 2.5 + 1; // 飛び散る勢い
+        const speed = Math.random() * 2.8 + 1.2;
         clickParticles.push({
           x: e.clientX,
           y: e.clientY,
-          size: Math.random() * 3 + 1.5,
+          size: Math.random() * 2.8 + 1.5,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 0.5, // わずかに上方向に浮き上がるバイアス
+          vy: Math.sin(angle) * speed - 0.4,
           alpha: 1.0,
           color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
           life: 0,
-          maxLife: 420 // 60fpsで約7秒 (420フレーム)
+          maxLife: 42 // 60fpsで約0.7秒
         });
       }
     });
 
     /* ========================================================
-       🟣 ネザーの紫粒子（背景浮遊 ＆ クリック時飛び散り統合アニメーション）
+       🟣 ネザーの紫粒子（背景浮遊 ＆ 最前面クリック時飛び散りアニメーション）
        ======================================================== */
-    const clickParticles = [];
-
     window.addEventListener('DOMContentLoaded', () => {
-      const canvas = document.getElementById('nether-particles');
-      const ctx = canvas.getContext('2d');
+      // 背景用キャンバス
+      const bgCanvas = document.getElementById('nether-particles');
+      const bgCtx = bgCanvas.getContext('2d');
 
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+      // 最前面クリック粒子用キャンバス
+      const clickCanvas = document.getElementById('click-particles-canvas');
+      const clickCtx = clickCanvas.getContext('2d');
+
+      function resizeCanvases() {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+        clickCanvas.width = window.innerWidth;
+        clickCanvas.height = window.innerHeight;
       }
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
+      resizeCanvases();
+      window.addEventListener('resize', resizeCanvases);
 
+      // 背景用粒子データの初期化
       const backgroundParticles = [];
       const particleCount = 45;
 
       for (let i = 0; i < particleCount; i++) {
         backgroundParticles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
           size: Math.random() * 2.5 + 1,
           speedX: (Math.random() - 0.5) * 0.4,
           speedY: -Math.random() * 0.6 - 0.2,
@@ -655,60 +670,57 @@
         });
       }
 
-      function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // 1. 通常の背景用ネザー粒子描画
+      function animate() {
+        // --- 1. 背景キャンバスの描画 ---
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
         backgroundParticles.forEach(p => {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = p.opacity;
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = '#c084fc';
-          ctx.fill();
+          bgCtx.beginPath();
+          bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          bgCtx.fillStyle = p.color;
+          bgCtx.globalAlpha = p.opacity;
+          bgCtx.shadowBlur = 8;
+          bgCtx.shadowColor = '#c084fc';
+          bgCtx.fill();
 
           p.x += p.speedX;
           p.y += p.speedY;
 
           if (p.y < -10) {
-            p.y = canvas.height + 10;
-            p.x = Math.random() * canvas.width;
+            p.y = bgCanvas.height + 10;
+            p.x = Math.random() * bgCanvas.width;
           }
-          if (p.x < -10) p.x = canvas.width + 10;
-          if (p.x > canvas.width + 10) p.x = -10;
+          if (p.x < -10) p.x = bgCanvas.width + 10;
+          if (p.x > bgCanvas.width + 10) p.x = -10;
         });
 
-        // 2. クリック時に飛び散るネザー粒子描画（7秒かけてフェードアウト）
+        // --- 2. 最前面（一番上）クリック粒子の描画 ---
+        clickCtx.clearRect(0, 0, clickCanvas.width, clickCanvas.height);
         for (let i = clickParticles.length - 1; i >= 0; i--) {
           const cp = clickParticles[i];
           cp.life++;
-          // 経過フレームに応じて透明度を1.0から0へ
           cp.alpha = Math.max(0, 1.0 - (cp.life / cp.maxLife));
 
-          ctx.beginPath();
-          ctx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
-          ctx.fillStyle = cp.color;
-          ctx.globalAlpha = cp.alpha;
-          ctx.shadowBlur = 10;
-          ctx.shadowColor = '#e879f9';
-          ctx.fill();
+          clickCtx.beginPath();
+          clickCtx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
+          clickCtx.fillStyle = cp.color;
+          clickCtx.globalAlpha = cp.alpha;
+          clickCtx.shadowBlur = 12;
+          clickCtx.shadowColor = '#e879f9';
+          clickCtx.fill();
 
-          // 移動と減速（空気抵抗）
           cp.x += cp.vx;
           cp.y += cp.vy;
-          cp.vx *= 0.96;
-          cp.vy *= 0.96;
+          cp.vx *= 0.94;
+          cp.vy *= 0.94;
 
-          // 寿命が尽きたら配列から削除
           if (cp.life >= cp.maxLife) {
             clickParticles.splice(i, 1);
           }
         }
 
-        requestAnimationFrame(animateParticles);
+        requestAnimationFrame(animate);
       }
-      animateParticles();
+      animate();
     });
 
     const i18nData = {
