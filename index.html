@@ -150,10 +150,12 @@
       transform-style: preserve-3d;
     }
 
+    /* ✨ 3Dホログラムホバーエフェクト強化 */
     #tier-tbody tr:hover .rank-1-box,
     #tier-tbody tr:hover .rank-2-box,
     #tier-tbody tr:hover .rank-3-box {
-      transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
+      transform: rotateX(15deg) rotateY(-15deg) scale(1.12);
+      box-shadow: 0 10px 30px rgba(217, 70, 239, 0.6);
     }
 
     .rank-shining::after {
@@ -237,9 +239,11 @@
       animation: rowCascadeIn 0.3s ease forwards;
     }
 
+    /* ✨ サイバー・スキャン・ウェーブ演出 */
     @keyframes scanWave {
-      0% { background-position: 0 -100vh; }
-      100% { background-position: 0 100vh; }
+      0% { background-position: 0 -100vh; opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { background-position: 0 100vh; opacity: 0; }
     }
 
     .scan-effect {
@@ -249,10 +253,10 @@
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.15) 50%, transparent 100%);
-      background-size: 100% 200px;
+      background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
+      background-size: 100% 250px;
       background-repeat: no-repeat;
-      animation: scanWave 0.8s ease-in-out;
+      animation: scanWave 0.9s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
       z-index: 20;
     }
@@ -514,7 +518,7 @@
 
   <script>
     /* ========================================================
-       🟣 ネザーの紫粒子（ふわふわ浮遊エフェクト・上限50個）
+       🟣 インタラクティブ・ネザー粒子エフェクト（マウス引き寄せ）
        ======================================================== */
     window.addEventListener('DOMContentLoaded', () => {
       const canvas = document.getElementById('nether-particles');
@@ -527,14 +531,22 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
+      let mouseX = -1000;
+      let mouseY = -1000;
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
       const particles = [];
-      const particleCount = 45;
+      const particleCount = 50;
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          size: Math.random() * 2.5 + 1,
+          size: Math.random() * 2.8 + 1,
           speedX: (Math.random() - 0.5) * 0.4,
           speedY: -Math.random() * 0.6 - 0.2,
           opacity: Math.random() * 0.6 + 0.2,
@@ -546,11 +558,20 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         particles.forEach(p => {
+          // マウスカーソルとの距離に応じたふんわり引き寄せ効果
+          const dx = mouseX - p.x;
+          const dy = mouseY - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            p.x += dx * 0.02;
+            p.y += dy * 0.02;
+          }
+
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fillStyle = p.color;
           ctx.globalAlpha = p.opacity;
-          ctx.shadowBlur = 8;
+          ctx.shadowBlur = 10;
           ctx.shadowColor = '#c084fc';
           ctx.fill();
 
@@ -823,21 +844,26 @@
         }
       });
 
+      // タブ切り替え時にもサイバー・スキャン演出を走らせる
+      triggerScanEffect();
       renderTable();
     }
 
-    async function fetchSpreadsheetData() {
-      const tbody = document.getElementById('tier-tbody');
-      const loadIcon = document.getElementById('load-icon');
+    function triggerScanEffect() {
       const container = document.getElementById('table-container');
-
-      if (loadIcon) loadIcon.classList.add('fa-spin');
-
       if (container) {
         container.classList.remove('scan-effect');
         void container.offsetWidth;
         container.classList.add('scan-effect');
       }
+    }
+
+    async function fetchSpreadsheetData() {
+      const tbody = document.getElementById('tier-tbody');
+      const loadIcon = document.getElementById('load-icon');
+
+      if (loadIcon) loadIcon.classList.add('fa-spin');
+      triggerScanEffect();
 
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
