@@ -59,12 +59,12 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       pointer-events: none;
-      z-index: 1;
+      z-index: 10;
     }
 
     header, main, footer {
       position: relative;
-      z-index: 10;
+      z-index: 20;
     }
 
     /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
@@ -156,7 +156,6 @@
       transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
     }
 
-    /* ✨ 演出4：1〜3位の豪華なシャイン（輝き）エフェクト強化 */
     .rank-shining::after {
       content: '';
       position: absolute;
@@ -238,7 +237,6 @@
       animation: rowCascadeIn 0.3s ease forwards;
     }
 
-    /* ✨ 演出2：サイバー・スキャン・グリッチ風波ウェーブエフェクト */
     @keyframes scanWave {
       0% { background-position: 0 -100vh; }
       100% { background-position: 0 100vh; }
@@ -259,7 +257,6 @@
       z-index: 20;
     }
 
-    /* ✨ 演出3：行ホバー時のスキン浮き上がり＆ネオンオーラ強化 */
     #tier-tbody tr {
       transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
@@ -294,46 +291,46 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ 水面の一滴をイメージした繊細な複数リング＋紫の霧（フォグ）エフェクト */
+    /* ✨ クリック時の波紋＆紫霧エフェクト（最前面 z-index: 99999 ＆ 7秒かけて消える設定） */
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
       position: fixed;
       border-radius: 50%;
       pointer-events: none;
       transform: scale(0);
-      z-index: 9999;
+      z-index: 99999;
     }
 
     .water-ripple-fog {
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
-      filter: blur(6px);
-      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(217, 70, 239, 0.25) 50%, transparent 80%);
+      filter: blur(7px);
+      animation: waterRippleFogAnim 7s cubic-bezier(0.1, 0.5, 0.3, 1) forwards;
     }
 
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.8);
-      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
-      animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
+      border: 1.5px solid rgba(217, 70, 239, 0.9);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+      animation: waterRippleOuterAnim 7s cubic-bezier(0.1, 0.5, 0.3, 1) forwards;
     }
 
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.95);
-      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
-      animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
+      border: 1px solid rgba(232, 121, 249, 1);
+      box-shadow: 0 0 8px rgba(232, 121, 249, 0.9);
+      animation: waterRippleInnerAnim 7s cubic-bezier(0.1, 0.5, 0.3, 1) forwards;
     }
 
     @keyframes waterRippleFogAnim {
-      0% { transform: scale(0.1); opacity: 0.8; }
-      100% { transform: scale(1.6); opacity: 0; }
+      0% { transform: scale(0.1); opacity: 0.9; }
+      100% { transform: scale(3.5); opacity: 0; }
     }
 
     @keyframes waterRippleOuterAnim {
       0% { transform: scale(0.1); opacity: 1; }
-      100% { transform: scale(1.3); opacity: 0; }
+      100% { transform: scale(2.8); opacity: 0; }
     }
 
     @keyframes waterRippleInnerAnim {
-      0% { transform: scale(0.05); opacity: 0.9; }
-      100% { transform: scale(0.8); opacity: 0; }
+      0% { transform: scale(0.05); opacity: 0.95; }
+      100% { transform: scale(1.8); opacity: 0; }
     }
   </style>
 </head>
@@ -343,7 +340,7 @@
   <canvas id="nether-particles"></canvas>
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 glass-nav">
+  <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
         <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
@@ -566,7 +563,7 @@
 
   <script>
     /* ========================================================
-       🟣 水面の一滴＋紫の霧（フォグ）エフェクトの生成（コンパクトなサイズ）
+       🟣 クリック時：最前面に約7秒かけて消えていく波紋＆紫霧エフェクト
        ======================================================== */
     window.addEventListener('click', (e) => {
       // 1. 周りにボワッと広がる紫色の霧（フォグ）
@@ -600,13 +597,14 @@
       document.body.appendChild(outerRipple);
       document.body.appendChild(innerRipple);
       
-      setTimeout(() => fog.remove(), 750);
-      setTimeout(() => outerRipple.remove(), 650);
-      setTimeout(() => innerRipple.remove(), 500);
+      // 7秒（7000ミリ秒）かけてゆっくり完全に消えてから要素を削除
+      setTimeout(() => fog.remove(), 7000);
+      setTimeout(() => outerRipple.remove(), 7000);
+      setTimeout(() => innerRipple.remove(), 7000);
     });
 
     /* ========================================================
-       🟣 ネザーの紫粒子（ふわふわ浮遊エフェクト・上限50個）
+       🟣 ネザーの紫粒子（ふわふわ浮遊エフェクト・Canvas描画）
        ======================================================== */
     window.addEventListener('DOMContentLoaded', () => {
       const canvas = document.getElementById('nether-particles');
