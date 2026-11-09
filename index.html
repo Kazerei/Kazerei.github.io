@@ -275,12 +275,12 @@
   <canvas id="nether-particles"></canvas>
   <canvas id="click-particles-canvas"></canvas>
 
-  <!-- Header : 画像の理想通りの配置（左: Home/Tiers, 中央: CLYTIERS, 右: Discord/Login） -->
+  <!-- Header : 画像通りの理想の配置（左側に Home, Tiers, CLYTIERS が綺麗に並ぶ形） -->
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm whitespace-nowrap">
         
-        <!-- 左側：Home と Tiers -->
+        <!-- 左側グループ：Home, Tiers, そして CLYTIERS ロゴを横一列に並べる -->
         <div class="flex items-center gap-4 sm:gap-6">
           <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
@@ -289,11 +289,9 @@
           <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300" id="nav-tiers">
             <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
           </button>
-        </div>
 
-        <!-- 中央：CLYTIERS ロゴ -->
-        <div class="absolute left-1/2 -translate-x-1/2">
-          <a href="#" onclick="switchTab('home')" class="font-black text-sm sm:text-xl md:text-2xl tracking-wider clytiers-gradient-logo">
+          <!-- 画像と同じく、メニューのすぐ隣に配置されるCLYTIERSロゴ -->
+          <a href="#" onclick="switchTab('home')" class="font-black text-sm sm:text-xl tracking-wider clytiers-gradient-logo ml-2">
             CLYTIERS
           </a>
         </div>
