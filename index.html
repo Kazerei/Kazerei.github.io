@@ -280,7 +280,8 @@
       transition: transform 0.3s ease, filter 0.3s ease;
     }
 
-    #player-modal:not(.hidden) > div {
+    #player-modal:not(.hidden) > div,
+    #login-modal:not(.hidden) > div {
       animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
     @keyframes modalPop {
@@ -354,38 +355,48 @@
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
-        <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
-          <i class="fa-solid fa-house text-xs"></i><span>Home</span>
-        </button>
+        <div class="flex items-center gap-1 sm:gap-3">
+          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
+            <i class="fa-solid fa-house text-xs"></i><span>Home</span>
+          </button>
 
-        <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
-          <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
-        </button>
+          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
+            <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
+          </button>
+        </div>
 
-        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
+        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-2">
           CLYTIERS
         </a>
 
-        <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
-          <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
-        </a>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-2 py-1 flex items-center gap-1 text-gray-300">
+            <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span class="hidden sm:inline">Discord</span>
+          </a>
 
-        <!-- Language Dropdown -->
-        <div class="relative inline-block text-left">
-          <button onclick="toggleLangDropdown(event)" class="bg-brand-card border border-brand-border px-2 py-1 rounded text-xs flex items-center gap-1 hover:border-brand-purple">
-            <i class="fa-solid fa-globe text-brand-purple"></i>
-            <span id="current-lang-text">JA</span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+          <!-- Login Button -->
+          <button onclick="openLoginModal()" class="bg-brand-purple/20 hover:bg-brand-purple/40 border border-brand-purple/50 text-brand-lightPurple px-2.5 py-1 rounded-lg text-xs flex items-center gap-1.5 transition-all">
+            <i class="fa-solid fa-right-to-bracket text-xs"></i>
+            <span id="login-btn-text">Login</span>
           </button>
-          
-          <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-brand-card border border-brand-border ring-1 ring-black ring-opacity-5 z-50">
-            <div class="py-1">
-              <button onclick="changeLanguage('ja')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
-                日本語 <span class="text-[10px] text-brand-purple font-bold">JA</span>
-              </button>
-              <button onclick="changeLanguage('en')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
-                English <span class="text-[10px] text-brand-purple font-bold">EN</span>
-              </button>
+
+          <!-- Language Dropdown -->
+          <div class="relative inline-block text-left">
+            <button onclick="toggleLangDropdown(event)" class="bg-brand-card border border-brand-border px-2 py-1 rounded text-xs flex items-center gap-1 hover:border-brand-purple">
+              <i class="fa-solid fa-globe text-brand-purple"></i>
+              <span id="current-lang-text">JA</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+            </button>
+            
+            <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-brand-card border border-brand-border ring-1 ring-black ring-opacity-5 z-50">
+              <div class="py-1">
+                <button onclick="changeLanguage('ja')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
+                  日本語 <span class="text-[10px] text-brand-purple font-bold">JA</span>
+                </button>
+                <button onclick="changeLanguage('en')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
+                  English <span class="text-[10px] text-brand-purple font-bold">EN</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -568,11 +579,101 @@
     </div>
   </div>
 
+  <!-- Login Modal -->
+  <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleLoginModalBgClick(event)">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box overflow-hidden shadow-2xl">
+      <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center mx-auto mb-3 text-brand-lightPurple text-xl">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-lg font-black font-orbitron text-white">PLAYER LOGIN</h3>
+        <p class="text-xs text-gray-400 mt-1">プレイヤー認証</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">MCID / UUID</label>
+          <input type="text" id="login-mcid" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <div>
+          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">PASSWORD</label>
+          <input type="password" id="login-password" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <button onclick="handleLoginSubmit()" id="login-submit-btn" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white font-orbitron font-bold py-3 rounded-lg text-xs shadow-lg shadow-purple-600/40 transition-all mt-2">
+          LOGIN
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="border-t border-brand-border/40 bg-brand-dark py-4 text-center text-xs text-gray-500 font-mono">
     &copy; 2026 clytiers. All rights reserved. Not affiliated with Mojang AB.
   </footer>
 
   <script>
+    // 新しいGASのウェブアプリURL
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby6WXkKi5Mwe2phOOt-4muzVzArna1HU_aDcrkGgV4ogpTrdm-_l5dTB710-g7TQeMnmA/exec";
+
+    /* ========================================================
+       🟣 ログインモーダル制御用関数
+       ======================================================== */
+    function openLoginModal() {
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+      document.getElementById('login-mcid').value = '';
+      document.getElementById('login-password').value = '';
+    }
+
+    function handleLoginModalBgClick(event) {
+      if (event.target.id === 'login-modal') {
+        closeLoginModal();
+      }
+    }
+
+    async function handleLoginSubmit() {
+      const mcidInput = document.getElementById('login-mcid').value.trim();
+      const passwordInput = document.getElementById('login-password').value;
+      const submitBtn = document.getElementById('login-submit-btn');
+
+      if (!mcidInput || !passwordInput) {
+        alert('MCIDとパスワードを入力してください。');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
+
+      try {
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ mcid: mcidInput, password: passwordInput })
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          alert('ログインに成功しました！');
+          document.getElementById('login-btn-text').innerText = mcidInput;
+          closeLoginModal();
+        } else {
+          alert('ログインに失敗しました：MCIDまたはパスワードが間違っています。');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('通信エラーが発生しました。');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'LOGIN';
+      }
+    }
+
     /* ========================================================
        🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
        ======================================================== */
@@ -995,7 +1096,7 @@
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbybXABVRz47h-EpEwjnfmsyUEGz2_BokIuHZDpB7vh6rOrXVsQMF8muCnLQk0mrFRG6dg/exec?t=" + new Date().getTime();
+        const webAppUrl = GAS_WEB_APP_URL + "?t=" + new Date().getTime();
         
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
