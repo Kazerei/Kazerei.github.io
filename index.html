@@ -271,54 +271,37 @@
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- 🟣 背景の通常ネザー粒子用キャンバス -->
+  <!-- 背景用ネザー粒子 -->
   <canvas id="nether-particles"></canvas>
-  <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
   <canvas id="click-particles-canvas"></canvas>
 
   <!-- Header -->
   <header class="sticky top-0 z-20 glass-nav">
-    <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
-        <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
-          <i class="fa-solid fa-house text-xs"></i><span>Home</span>
-        </button>
+        <div class="flex items-center gap-4 sm:gap-6">
+          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
+            <i class="fa-solid fa-house text-xs"></i><span>Home</span>
+          </button>
 
-        <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
-          <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
-        </button>
+          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
+            <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
+          </button>
+        </div>
 
-        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
+        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-2">
           CLYTIERS
         </a>
 
-        <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
-          <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
-        </a>
+        <div class="flex items-center gap-4 sm:gap-6">
+          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 py-1 flex items-center gap-1 text-gray-300">
+            <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
+          </a>
 
-        <!-- 🟣 ヘッダーに追加したログインボタン -->
-        <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
-          <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
-        </button>
-
-        <!-- Language Dropdown -->
-        <div class="relative inline-block text-left">
-          <button onclick="toggleLangDropdown(event)" class="bg-brand-card border border-brand-border px-2 py-1 rounded text-xs flex items-center gap-1 hover:border-brand-purple">
-            <i class="fa-solid fa-globe text-brand-purple"></i>
-            <span id="current-lang-text">JA</span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+          <!-- ログインボタン -->
+          <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple px-1 py-1 flex items-center gap-1 text-gray-300">
+            <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
           </button>
-          
-          <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-brand-card border border-brand-border ring-1 ring-black ring-opacity-5 z-50">
-            <div class="py-1">
-              <button onclick="changeLanguage('ja')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
-                日本語 <span class="text-[10px] text-brand-purple font-bold">JA</span>
-              </button>
-              <button onclick="changeLanguage('en')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
-                English <span class="text-[10px] text-brand-purple font-bold">EN</span>
-              </button>
-            </div>
-          </div>
         </div>
       </nav>
     </div>
@@ -337,12 +320,12 @@
         <h1 class="text-2xl sm:text-5xl font-black font-orbitron text-white tracking-wide mb-4">
           COMPETITIVE MINECRAFT PVP TIERS
         </h1>
-        <p class="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base mb-6 leading-relaxed" data-i18n="hero_desc">
+        <p class="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base mb-6 leading-relaxed">
           clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。
         </p>
         <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold font-orbitron px-8 py-3.5 rounded-xl shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
           <i class="fa-brands fa-discord text-xl"></i>
-          <span data-i18n="join_server">DISCORD サーバーに参加</span>
+          <span>DISCORD サーバーに参加</span>
         </a>
       </div>
 
@@ -353,15 +336,15 @@
               <img src="./IMG_8237.png" alt="Shield" class="w-full h-full object-contain">
             </div>
             <div>
-              <h2 class="text-xl font-bold font-orbitron text-white" data-i18n="title_server_rules">SERVER RULES</h2>
-              <p class="text-xs text-gray-400" data-i18n="sub_server_rules">サーバー利用規約</p>
+              <h2 class="text-xl font-bold font-orbitron text-white">SERVER RULES</h2>
+              <p class="text-xs text-gray-400">サーバー利用規約</p>
             </div>
           </div>
           <ul class="space-y-3 text-sm text-gray-300">
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">1.</span><span data-i18n="rule_1">他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">2.</span><span data-i18n="rule_2">荒らし行為は理由を問わず即Ban対象となります。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span data-i18n="rule_3">Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">4.</span><span data-i18n="rule_4">その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">1.</span><span>他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">2.</span><span>荒らし行為は理由を問わず即Ban対象となります。</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span>Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">4.</span><span>その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。</span></li>
           </ul>
         </div>
 
@@ -371,15 +354,15 @@
               <img src="./IMG_8232.png" alt="Crystal" class="w-full h-full object-contain">
             </div>
             <div>
-              <h2 class="text-xl font-bold font-orbitron text-white" data-i18n="title_test_rules">TIER TEST RULES</h2>
-              <p class="text-xs text-gray-400" data-i18n="sub_test_rules">テスト規定</p>
+              <h2 class="text-xl font-bold font-orbitron text-white">TIER TEST RULES</h2>
+              <p class="text-xs text-gray-400">テスト規定</p>
             </div>
           </div>
           <ul class="space-y-3 text-sm text-gray-300">
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">1.</span><span data-i18n="test_rule_1">TestはFirst to 4 (FT4)で行います。使用サーバーはDiscord内の test-server チャンネルをご確認ください。</span></li>
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">2.</span><span data-i18n="test_rule_2">クールダウンはありませんが、1日に受けられるTestは最大2回までです。</span></li>
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">3.</span><span data-i18n="test_rule_3">使用KitはLT3まではVanilla Kitであれば自由です。HT3からはDrain Kitを使用します。</span></li>
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">4.</span><span data-i18n="test_rule_4">チート・マクロの使用禁止。キーボード2個使いも禁止です。</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">1.</span><span>TestはFirst to 4 (FT4)で行います。使用サーバーはDiscord内の test-server チャンネルをご確認ください。</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">2.</span><span>クールダウンはありませんが、1日に受けられるTestは最大2回までです。</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">3.</span><span>使用KitはLT3まではVanilla Kitであれば自由です。HT3からはDrain Kitを使用します。</span></li>
+            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">4.</span><span>チート・マクロの使用禁止。キーボード2個使いも禁止です。</span></li>
           </ul>
         </div>
       </div>
@@ -424,7 +407,7 @@
         <div class="flex flex-col items-end shrink-0 mb-2">
           <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
           <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
-            <i class="fa-solid fa-rotate" id="load-icon"></i> <span data-i18n="btn_load">LOAD</span>
+            <i class="fa-solid fa-rotate" id="load-icon"></i> <span>LOAD</span>
           </button>
         </div>
       </div>
@@ -435,7 +418,7 @@
           <input type="text" id="search-input" onkeyup="renderTable()" placeholder="Search MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg pl-9 pr-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
         </div>
         <div class="text-xs text-gray-400 font-mono">
-          <span data-i18n="click_player_hint">※ プレイヤー行をクリックで詳細プロフィールを表示</span>
+          <span>※ プレイヤー行をクリックで詳細プロフィールを表示</span>
         </div>
       </div>
 
@@ -443,10 +426,10 @@
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
             <tr class="border-b border-brand-border bg-brand-dark/50 text-[11px] font-orbitron text-gray-400 uppercase">
-              <th class="p-3 text-center w-36" data-i18n="th_rank">RANK</th>
-              <th class="p-3" data-i18n="th_player">PLAYER</th>
-              <th class="p-3 text-center" data-i18n="th_country">COUNTRY</th>
-              <th class="p-3 text-right" data-i18n="th_kits">CONTRIBUTING KITS</th>
+              <th class="p-3 text-center w-36">RANK</th>
+              <th class="p-3">PLAYER</th>
+              <th class="p-3 text-center">COUNTRY</th>
+              <th class="p-3 text-right">CONTRIBUTING KITS</th>
             </tr>
           </thead>
           <tbody id="tier-tbody" class="divide-y divide-brand-border/40 text-xs font-mono">
@@ -485,7 +468,7 @@
       </div>
 
       <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
-        <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown & Points</span>
+        <i class="fa-solid fa-layer-group text-brand-purple"></i> <span>Kit Tier Breakdown & Points</span>
       </h4>
       <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
         <!-- Dynamic -->
@@ -493,7 +476,7 @@
     </div>
   </div>
 
-  <!-- 🟣 ログインモーダル（ヘッダーのLoginボタンから開く用） -->
+  <!-- プレイヤーログインモーダル -->
   <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleLoginModalBgClick(event)">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box shadow-2xl">
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
@@ -501,15 +484,22 @@
       </button>
       <div class="text-center mb-4">
         <div class="inline-block p-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple mb-2">
-          <i class="fa-solid fa-lock text-xl"></i>
+          <i class="fa-solid fa-user-lock text-xl"></i>
         </div>
-        <h3 class="text-lg font-bold font-orbitron text-white">ADMIN LOGIN</h3>
-        <p class="text-xs text-gray-400 mt-1">管理者ログイン</p>
+        <h3 class="text-lg font-bold font-orbitron text-white">PLAYER LOGIN</h3>
+        <p class="text-xs text-gray-400 mt-1">プレイヤーログイン</p>
       </div>
       <div class="space-y-3">
-        <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        <button onclick="handleLoginSubmit()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all">ログイン</button>
-        <div id="login-error-msg" class="text-[11px] text-red-400 text-center hidden">パスワードが違います。</div>
+        <div>
+          <label class="block text-[11px] font-mono text-gray-400 mb-1">MCID / UUID</label>
+          <input type="text" id="login-mcid-input" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <div>
+          <label class="block text-[11px] font-mono text-gray-400 mb-1">Password</label>
+          <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <button onclick="handleLoginSubmit()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
+        <div id="login-error-msg" class="text-[11px] text-red-400 text-center hidden">MCIDまたはパスワードが違います。</div>
       </div>
     </div>
   </div>
@@ -624,56 +614,6 @@
       animate();
     });
 
-    const i18nData = {
-      ja: {
-        hero_desc: "clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。",
-        join_server: "DISCORD サーバーに参加",
-        title_server_rules: "SERVER RULES",
-        sub_server_rules: "サーバー利用規約",
-        rule_1: "他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。",
-        rule_2: "荒らし行為は理由を問わず即Ban対象となります。",
-        rule_3: "Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。",
-        rule_4: "その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。",
-        title_test_rules: "TIER TEST RULES",
-        sub_test_rules: "テスト規定",
-        test_rule_1: "TestはFirst to 4 (FT4)で行います。使用サーバーはDiscord内の test-server チャンネルをご確認ください。",
-        test_rule_2: "クールダウンはありませんが、1日に受けられるTestは最大2回までです。",
-        test_rule_3: "使用KitはLT3まではVanilla Kitであれば自由です。HT3からはDrain Kitを使用します。",
-        test_rule_4: "チート・マクロの使用禁止。キーボード2個使いも禁止です。",
-        btn_load: "LOAD",
-        click_player_hint: "※ プレイヤー行をクリックで詳細プロフィールを表示",
-        th_rank: "RANK",
-        th_player: "PLAYER",
-        th_country: "国",
-        th_kits: "獲得KIT TIER",
-        modal_kit_breakdown: "Kit別詳細 Tier & ポイント"
-      },
-      en: {
-        hero_desc: "Welcome to clytiers! Take tier tests in our official Discord server and climb the leaderboard.",
-        join_server: "JOIN DISCORD SERVER",
-        title_server_rules: "SERVER RULES",
-        sub_server_rules: "Community Guidelines",
-        rule_1: "No insulting or disrespecting others. Treat everyone with respect.",
-        rule_2: "Griefing/Trolling will result in an immediate Ban without exception.",
-        rule_3: "Liquid usage during Tier tests is strictly prohibited. No macros or cheats. Testers and candidates must respect each other.",
-        rule_4: "Any actions deemed inappropriate by admins are forbidden. Follow common sense.",
-        title_test_rules: "TIER TEST RULES",
-        sub_test_rules: "Testing Protocol",
-        test_rule_1: "Tests are played in First to 4 (FT4) format. Check the #test-server channel in Discord for server details.",
-        test_rule_2: "No cooldowns, but you can take a maximum of 2 tests per day.",
-        test_rule_3: "Kits up to LT3 are free for Vanilla Kits. HT3 and above require Drain Kit.",
-        test_rule_4: "No cheats or macros! Dual keyboard usage is strictly forbidden.",
-        btn_load: "LOAD",
-        click_player_hint: "* Click on any player row to view detailed profile",
-        th_rank: "RANK",
-        th_player: "PLAYER",
-        th_country: "COUNTRY",
-        th_kits: "CONTRIBUTING KITS",
-        modal_kit_breakdown: "Kit Tier Breakdown & Points"
-      }
-    };
-
-    let currentLang = 'ja';
     let activeKitFilter = 'OVERALL';
     let playersData = [];
     let cooldownTimer = null;
@@ -826,29 +766,6 @@
       if (upper.includes('2')) return 'tier-silver';
       if (upper.includes('3')) return 'tier-bronze';
       return 'tier-blue';
-    }
-
-    function toggleLangDropdown(e) {
-      e.stopPropagation();
-      document.getElementById('lang-dropdown').classList.toggle('hidden');
-    }
-
-    document.addEventListener('click', () => {
-      const dropdown = document.getElementById('lang-dropdown');
-      if (dropdown) dropdown.classList.add('hidden');
-    });
-
-    function changeLanguage(lang) {
-      currentLang = lang;
-      document.getElementById('current-lang-text').innerText = lang.toUpperCase();
-      
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (i18nData[lang][key]) {
-          el.innerText = i18nData[lang][key];
-        }
-      });
-      document.getElementById('lang-dropdown').classList.add('hidden');
     }
 
     function switchTab(tabName) {
@@ -1099,8 +1016,9 @@
       }
     }
 
-    // 🟣 ログインモーダルの開閉用関数
+    // プレイヤーログインモーダルの開閉用関数
     function openLoginModal() {
+      document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
       document.getElementById('login-error-msg').classList.add('hidden');
       document.getElementById('login-modal').classList.remove('hidden');
@@ -1117,14 +1035,25 @@
     }
 
     function handleLoginSubmit() {
+      const mcid = document.getElementById('login-mcid-input').value.trim();
       const pass = document.getElementById('login-password-input').value;
       const errorMsg = document.getElementById('login-error-msg');
       
-      // 仮のパスワード判定（必要に応じて書き換えてください）
-      if (pass === "admin123") {
-        alert("ログインに成功しました！");
+      if (!mcid || !pass) {
+        errorMsg.innerText = "MCIDとパスワードを入力してください。";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      const targetPlayer = playersData.find(p => 
+        p.name.toLowerCase() === mcid.toLowerCase() || p.rawId.toLowerCase() === mcid.toLowerCase()
+      );
+
+      if (targetPlayer) {
+        alert(`${targetPlayer.name} としてログイン成功！`);
         closeLoginModal();
       } else {
+        errorMsg.innerText = "該当するプレイヤーが見つかりません。";
         errorMsg.classList.remove('hidden');
       }
     }
