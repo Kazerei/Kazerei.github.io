@@ -53,6 +53,7 @@
       overflow-x: hidden;
     }
 
+    /* 🟣 背景用ネザー粒子描画キャンバス */
     #nether-particles {
       position: fixed;
       top: 0; left: 0;
@@ -61,6 +62,7 @@
       z-index: 10;
     }
 
+    /* 🟣 タップ時専用・最前面（一番上）に描画するキャンバス */
     #click-particles-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -74,6 +76,7 @@
       z-index: 20;
     }
 
+    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
     .clytiers-gradient-logo {
       background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
       background-size: 400% 400%;
@@ -165,9 +168,16 @@
     .rank-shining::after {
       content: '';
       position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.8) 50%,
+        rgba(255,255,255,0) 100%
+      );
       transform: rotate(30deg);
       animation: shine 1.8s infinite;
       pointer-events: none;
@@ -179,9 +189,23 @@
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
-    .rank-1-box { background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%); box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); border: 1px solid rgba(253, 230, 138, 0.95); }
-    .rank-2-box { background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%); box-shadow: 0 0 25px rgba(209, 213, 219, 0.8); border: 1px solid rgba(243, 244, 246, 0.95); }
-    .rank-3-box { background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%); box-shadow: 0 0 25px rgba(217, 119, 6, 0.8); border: 1px solid rgba(253, 186, 116, 0.95); }
+    .rank-1-box {
+      background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
+      border: 1px solid rgba(253, 230, 138, 0.95);
+    }
+    .rank-2-box {
+      background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
+      box-shadow: 0 0 25px rgba(209, 213, 219, 0.8);
+      border: 1px solid rgba(243, 244, 246, 0.95);
+    }
+    .rank-2-box.rank-shining::after { animation-delay: 0.3s; }
+    .rank-3-box {
+      background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
+      box-shadow: 0 0 25px rgba(217, 119, 6, 0.8);
+      border: 1px solid rgba(253, 186, 116, 0.95);
+    }
+    .rank-3-box.rank-shining::after { animation-delay: 0.6s; }
     
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -189,7 +213,9 @@
       border: 1px solid rgba(96, 165, 250, 0.8);
       transition: transform 0.3s ease;
     }
-    #tier-tbody tr:hover .rank-normal-box { transform: scale(1.05); }
+    #tier-tbody tr:hover .rank-normal-box {
+      transform: scale(1.05);
+    }
 
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(7, 3, 13, 0.96) 85%);
@@ -206,28 +232,43 @@
       0% { opacity: 0; transform: translateY(14px) scale(0.97); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-    section:not(.hidden) { animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    section:not(.hidden) {
+      animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
     @keyframes rowCascadeIn {
       0% { opacity: 0; transform: translateY(15px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .tier-row-animated { opacity: 0; animation: rowCascadeIn 0.3s ease forwards; }
+
+    .tier-row-animated {
+      opacity: 0;
+      animation: rowCascadeIn 0.3s ease forwards;
+    }
 
     @keyframes scanWave {
       0% { background-position: 0 -100vh; }
       100% { background-position: 0 100vh; }
     }
-    .scan-effect { position: relative; }
+
+    .scan-effect {
+      position: relative;
+    }
     .scan-effect::after {
       content: '';
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
-      background-size: 100% 200px; background-repeat: no-repeat;
-      animation: scanWave 0.7s ease-in-out; pointer-events: none; z-index: 20;
+      background-size: 100% 200px;
+      background-repeat: no-repeat;
+      animation: scanWave 0.7s ease-in-out;
+      pointer-events: none;
+      z-index: 20;
     }
 
-    #tier-tbody tr { transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+    #tier-tbody tr {
+      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
     #tier-tbody tr:hover {
       background-color: rgba(168, 85, 247, 0.22) !important;
       transform: translateX(6px);
@@ -239,69 +280,103 @@
       transition: transform 0.3s ease, filter 0.3s ease;
     }
 
-    #player-modal:not(.hidden) > div { animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    #player-modal:not(.hidden) > div {
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
     @keyframes modalPop {
       0% { opacity: 0; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    button, .kit-tab { transition: all 0.2s ease; }
-    button:hover, .kit-tab:hover { filter: brightness(1.2); }
-    .kit-tab.active { box-shadow: 0 0 15px rgba(168, 85, 247, 0.6); border-color: #d8b4fe !important; }
-
-    .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
-      position: fixed; border-radius: 50%; pointer-events: none; transform: scale(0); z-index: 99998;
+    button, .kit-tab {
+      transition: all 0.2s ease;
     }
+    button:hover, .kit-tab:hover {
+      filter: brightness(1.2);
+    }
+
+    .kit-tab.active {
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+      border-color: #d8b4fe !important;
+    }
+
+    /* ✨ 水面の一滴＋紫の霧（サクッと消えるスピード） */
+    .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: scale(0);
+      z-index: 99998;
+    }
+
     .water-ripple-fog {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
-      filter: blur(6px); animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
+      filter: blur(6px);
+      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
     }
+
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.8); box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+      border: 1.5px solid rgba(217, 70, 239, 0.8);
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
       animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
     }
+
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.95); box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
+      border: 1px solid rgba(232, 121, 249, 0.95);
+      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
       animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
     }
-    @keyframes waterRippleFogAnim { 0% { transform: scale(0.1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
-    @keyframes waterRippleOuterAnim { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
-    @keyframes waterRippleInnerAnim { 0% { transform: scale(0.05); opacity: 0.9; } 100% { transform: scale(0.8); opacity: 0; } }
+
+    @keyframes waterRippleFogAnim {
+      0% { transform: scale(0.1); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    @keyframes waterRippleOuterAnim {
+      0% { transform: scale(0.1); opacity: 1; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+
+    @keyframes waterRippleInnerAnim {
+      0% { transform: scale(0.05); opacity: 0.9; }
+      100% { transform: scale(0.8); opacity: 0; }
+    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- 背景用ネザー粒子 -->
+  <!-- 🟣 背景の通常ネザー粒子用キャンバス -->
   <canvas id="nether-particles"></canvas>
+  <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
   <canvas id="click-particles-canvas"></canvas>
 
-  <!-- Header : 左側にHome、Tiers、CLYTIERSロゴ / 右側にDiscord、Login -->
+  <!-- Header : 左側に Home, Tiers, ロゴ / 右側に Discord, Login -->
   <header class="sticky top-0 z-20 glass-nav">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
         
-        <!-- 左側：Home, Tiers, CLYTIERSロゴ -->
+        <!-- 左側グループ：Home, Tiers, ロゴ -->
         <div class="flex items-center gap-4 sm:gap-6">
-          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
+          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
           </button>
 
-          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300" id="nav-tiers">
+          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
             <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
           </button>
 
-          <a href="#" onclick="switchTab('home')" class="font-black text-base sm:text-xl tracking-wider clytiers-gradient-logo ml-2">
+          <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
             CLYTIERS
           </a>
         </div>
 
-        <!-- 右側：Discord と Login -->
+        <!-- 右側グループ：Discord と Loginボタン -->
         <div class="flex items-center gap-4 sm:gap-6">
-          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
+          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
             <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
           </a>
 
-          <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
+          <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
             <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
           </button>
         </div>
@@ -373,7 +448,9 @@
 
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
+      <!-- Kit Tabs & Load Button Container -->
       <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Kit Tabs -->
         <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
           <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
             <i class="fa-solid fa-trophy"></i> OVERALL
@@ -407,6 +484,7 @@
           </button>
         </div>
 
+        <!-- Load Button & CoolDown Display -->
         <div class="flex flex-col items-end shrink-0 mb-2">
           <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
           <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
@@ -415,6 +493,7 @@
         </div>
       </div>
 
+      <!-- Search & Filters -->
       <div class="flex flex-wrap items-center justify-between gap-4 bg-brand-card p-4 rounded-xl border border-brand-border">
         <div class="relative flex-1 min-w-[200px]">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
@@ -425,6 +504,7 @@
         </div>
       </div>
 
+      <!-- Tiers Table -->
       <div id="table-container" class="overflow-x-auto rounded-xl border border-brand-border bg-brand-card">
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
@@ -450,6 +530,7 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
+      <!-- Profile Header -->
       <div class="skin-showcase-bg rounded-xl p-4 sm:p-5 mb-4 border border-brand-border flex items-center gap-4 sm:gap-6 relative">
         <div class="absolute top-2 left-3 text-[9px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
@@ -479,7 +560,7 @@
     </div>
   </div>
 
-  <!-- プレイヤーログインモーダル -->
+  <!-- Login Modal -->
   <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleLoginModalBgClick(event)">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box shadow-2xl">
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
@@ -512,6 +593,9 @@
   </footer>
 
   <script>
+    /* ========================================================
+       🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
+       ======================================================== */
     const clickParticles = [];
 
     window.addEventListener('click', (e) => {
@@ -1047,6 +1131,9 @@
       }
     }
 
+    /* ========================================================
+       🟣 ログインモーダル用の独立した安全な制御関数
+       ======================================================== */
     function openLoginModal() {
       document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
