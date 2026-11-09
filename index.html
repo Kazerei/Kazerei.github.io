@@ -275,12 +275,12 @@
   <canvas id="nether-particles"></canvas>
   <canvas id="click-particles-canvas"></canvas>
 
-  <!-- Header : 画像通りの理想の配置（左側に Home, Tiers, CLYTIERS が綺麗に並ぶ形） -->
+  <!-- Header : 左側にメニューとロゴ、右側にDiscordとLogin -->
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm whitespace-nowrap">
+      <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
         
-        <!-- 左側グループ：Home, Tiers, そして CLYTIERS ロゴを横一列に並べる -->
+        <!-- 左側：Home, Tiers, CLYTIERS ロゴ -->
         <div class="flex items-center gap-4 sm:gap-6">
           <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
@@ -290,13 +290,12 @@
             <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
           </button>
 
-          <!-- 画像と同じく、メニューのすぐ隣に配置されるCLYTIERSロゴ -->
-          <a href="#" onclick="switchTab('home')" class="font-black text-sm sm:text-xl tracking-wider clytiers-gradient-logo ml-2">
+          <a href="#" onclick="switchTab('home')" class="font-black text-base sm:text-xl tracking-wider clytiers-gradient-logo ml-2">
             CLYTIERS
           </a>
         </div>
 
-        <!-- 右側：Discord と Login -->
+        <!-- 右側：Discord と ログインボタン -->
         <div class="flex items-center gap-4 sm:gap-6">
           <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
             <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
@@ -1048,6 +1047,7 @@
       }
     }
 
+    // ログインモーダルの制御
     function openLoginModal() {
       document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
