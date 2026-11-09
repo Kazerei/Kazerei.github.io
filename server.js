@@ -1,3 +1,25 @@
+const express = require('express');
+const cors = require('cors');
+const crypto = require('crypto');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const app = express();
+app.use(express.json({ limit: '15mb' })); // 画像データ受け取り用
+app.use(cors());
+
+const PORT = process.env.PORT || 3000;
+const GAS_URL = process.env.GAS_URL;
+
+// SHA-256 ハッシュ化関数
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+// ヘルスチェック
+app.get('/', (req, res) => {
+  res.send('Clytiers Secure Backend is running!');
+});
+
 // 新規登録エンドポイント（画像AI検証 ＋ パスワード保存）
 app.post('/api/register', async (req, res) => {
   try {
@@ -39,7 +61,7 @@ app.post('/api/register', async (req, res) => {
     const prompt = `
       あなたはマインクラフトのサーバー運営者です。送られた画像が「本人のマインクラフトのプレイ画面、または本人確認用の正当なスクリーンショット」であるかを判定してください。
       他人の拾い画、無関係な画像、テキストが全くない真っ黒な画像、または不適切と判断される画像の場合は不合格にしてください。
-      回答は必ず以下のJSONフォーマットのみで行ってください（Markdownのバッククォートなどは使uvad純粋なJSON文字列で）。
+      回答は必ず以下のJSONフォーマットのみで行ってください（Markdownのバッククォートなどは使わず純粋なJSON文字列で）。
       {"result": "pass"} または {"result": "fail", "reason": "理由"}
     `;
 
@@ -64,18 +86,17 @@ app.post('/api/register', async (req, res) => {
 
           if (jsonRes.result === 'pass') {
             aiPassed = true;
-            break; // 成功したらループを抜ける
+            break; 
           } else {
             aiErrorMsg = jsonRes.reason || 'AI検証により不合格と判定されました。';
           }
         } catch (err) {
           console.warn(`Model ${modelName} with Key [${keyIdx + 1}] failed:`, err.message);
           aiErrorMsg = err.message;
-          // エラーが出たら次のモデル（または次のキー）へ継続
         }
       }
 
-      if (aiPassed) break; // 成功していればキーのループも抜ける
+      if (aiPassed) break; 
     }
 
     if (!aiPassed) {
@@ -85,7 +106,7 @@ app.post('/api/register', async (req, res) => {
     // パスワードのハッシュ化
     const passwordHash = hashPassword(password);
 
-    // GASへデータを転送してスプレッドシートに書き込み
+    // GASへデータを転送（Node.js標準の fetch を使用）
     const gasResponse = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -108,4 +129,8 @@ app.post('/api/register', async (req, res) => {
     console.error('Registration error:', error);
     res.status(500).json({ status: 'error', message: 'サーバー内部エラーが発生しました。' });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Secure Backend is running on port ${PORT}`);
 });
