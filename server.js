@@ -1,4 +1,19 @@
 const express = require('express');
+const path = require('path'); // 追加
+const cors = require('cors');
+const crypto = require('crypto');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const app = express();
+app.use(express.json({ limit: '15mb' }));
+app.use(cors());
+
+const PORT = process.env.PORT || 3000;
+const GAS_URL = process.env.GAS_URL;
+
+// 🟣 ここを追加：同じフォルダ内にあるファイル（HTMLや画像）を外部に公開する
+app.use(express.static(path.join(__dirname)));
+const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
