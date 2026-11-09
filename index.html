@@ -275,12 +275,12 @@
   <canvas id="nether-particles"></canvas>
   <canvas id="click-particles-canvas"></canvas>
 
-  <!-- Header : 左側にメニューとロゴ、右側にDiscordとLogin -->
+  <!-- Header : 左側にHome、Tiers、CLYTIERSロゴ / 右側にDiscord、Login -->
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
         
-        <!-- 左側：Home, Tiers, CLYTIERS ロゴ -->
+        <!-- 左側：Home, Tiers, CLYTIERSロゴ -->
         <div class="flex items-center gap-4 sm:gap-6">
           <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
@@ -295,7 +295,7 @@
           </a>
         </div>
 
-        <!-- 右側：Discord と ログインボタン -->
+        <!-- 右側：Discord と Login -->
         <div class="flex items-center gap-4 sm:gap-6">
           <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
             <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
@@ -1047,7 +1047,6 @@
       }
     }
 
-    // ログインモーダルの制御
     function openLoginModal() {
       document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
