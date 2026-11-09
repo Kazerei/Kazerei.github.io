@@ -274,10 +274,11 @@
       transform: translateX(6px);
       box-shadow: inset 5px 0 0 0 #e879f9, 0 8px 25px rgba(217, 70, 239, 0.35);
     }
+    
+    /* 🟣 【修正ポイント】ホバー時に位置（translateY）を動かさず、初期位置のまま綺麗に表示・発光のみ変化させる */
     #tier-tbody tr:hover img {
-      transform: scale(1.08);
       filter: drop-shadow(0 0 12px rgba(232, 121, 249, 0.9));
-      transition: transform 0.3s ease, filter 0.3s ease;
+      transition: filter 0.3s ease;
     }
 
     #player-modal:not(.hidden) > div {
@@ -1054,14 +1055,13 @@
         const bodyUrl = getSkinUrl(p, 140);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
-        /* 修正：translate-yを5にして、頭が切れず下も空きすぎない丁度良い位置に調整 */
         tr.innerHTML = `
           <td class="py-3 px-4 text-center">
             <div class="rank-banner-container">
               <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
                 <span>${rankNum}.</span>
                 <div class="h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
-                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-5" onerror="handleSkinError(this)">
+                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7" onerror="handleSkinError(this)">
                 </div>
               </div>
             </div>
