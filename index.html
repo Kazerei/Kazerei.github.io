@@ -275,14 +275,13 @@
   <canvas id="nether-particles"></canvas>
   <canvas id="click-particles-canvas"></canvas>
 
-  <!-- Header -->
+  <!-- Header : 画像の理想通りの配置（左: Home/Tiers, 中央: CLYTIERS, 右: Discord/Login） -->
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <!-- 横幅が狭い場合でも絶対に折り返さず、1行で美しく均等配置させるためのクラス構成 -->
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm whitespace-nowrap">
         
         <!-- 左側：Home と Tiers -->
-        <div class="flex items-center gap-4 sm:gap-8">
+        <div class="flex items-center gap-4 sm:gap-6">
           <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
           </button>
@@ -1051,7 +1050,6 @@
       }
     }
 
-    // プレイヤーログインモーダルの開閉用関数
     function openLoginModal() {
       document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
