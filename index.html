@@ -468,35 +468,36 @@
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
-          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
+        <!-- 🟣 スマホでもきれいに折り返すように修正したキットタブコンテナ -->
+        <div class="flex flex-wrap gap-2 pb-2 flex-1" id="kit-tabs-container">
+          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
             <i class="fa-solid fa-trophy"></i> OVERALL
           </button>
-          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
+          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
             <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
           </button>
-          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
+          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
             <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
           </button>
-          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
+          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
             <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
           </button>
-          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
+          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
             <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
           </button>
-          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
+          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
             <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
           </button>
-          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
+          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
             <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
           </button>
-          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
+          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
             <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
           </button>
-          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
+          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
             <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
           </button>
-          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
+          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
             <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
           </button>
         </div>
@@ -599,7 +600,6 @@
           LOGIN
         </button>
 
-        <!-- 🟣 ログイン画面の下に配置したアカウント作成への切り替えリンク -->
         <div class="text-center pt-2">
           <button onclick="switchToRegisterModal()" class="text-xs text-brand-lightPurple hover:underline font-mono">
             アカウントを作成
@@ -609,7 +609,7 @@
     </div>
   </div>
 
-  <!-- Register Modal (新規登録画面：MCID、パスワード、確認用、画像ファイル添付) -->
+  <!-- Register Modal -->
   <div id="register-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleRegisterModalBgClick(event)">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box overflow-hidden shadow-2xl">
       <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
@@ -661,9 +661,6 @@
   </footer>
 
   <script>
-    // 🟣 Render側のバックエンドサーバーURL（ここに置き換えました）
-    const RENDER_API_URL = "https://あなたのRenderサービス名.onrender.com"; // ←あとでご自身のRenderのURLに書き換えてください
-
     /* ========================================================
        🟣 ログイン・新規登録モーダル切替制御
        ======================================================== */
@@ -708,7 +705,7 @@
       document.getElementById('login-modal').classList.remove('hidden');
     }
 
-    // ログイン処理（Render経由）
+    // ログイン処理（同一サーバーの /api/login へ相対パスで通信）
     async function handleLoginSubmit() {
       const mcidInput = document.getElementById('login-mcid').value.trim();
       const passwordInput = document.getElementById('login-password').value;
@@ -723,7 +720,7 @@
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
 
       try {
-        const response = await fetch(`${RENDER_API_URL}/api/login`, {
+        const response = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mcid: mcidInput, password: passwordInput })
@@ -746,7 +743,7 @@
       }
     }
 
-    // 新規登録処理（画像ファイルをBase64にしてRenderへ送信 ➔ Gemini AI検証 ➔ パスワードハッシュ保存）
+    // 新規登録処理（同一サーバーの /api/register へ相対パスで通信）
     async function handleRegisterSubmit() {
       const mcid = document.getElementById('reg-mcid').value.trim();
       const password = document.getElementById('reg-password').value;
@@ -768,13 +765,12 @@
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> AI検証中...';
 
       try {
-        // 画像をBase64に変換
         const reader = new FileReader();
         reader.readAsDataURL(imageFile);
         reader.onload = async () => {
           const imageBase64 = reader.result;
 
-          const response = await fetch(`${RENDER_API_URL}/api/register`, {
+          const response = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1196,9 +1192,9 @@
       
       document.querySelectorAll('.kit-tab').forEach(btn => {
         if (btn.getAttribute('data-kit') === kit) {
-          btn.className = "kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
+          btn.className = "kit-tab active bg-brand-purple text-white px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
         } else {
-          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
+          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
         }
       });
 
@@ -1221,8 +1217,8 @@
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        // リーダーボードデータの取得もRender経由（またはGAS直叩き回避）にする場合
-        const response = await fetch(`${RENDER_API_URL}/api/players`);
+        // 🟣 同一サーバー上のAPIから取得（相対パス）
+        const response = await fetch('/api/players');
         const rawData = await response.json();
 
         playersData = rawData.map(p => {
