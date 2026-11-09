@@ -1,0 +1,111 @@
+// 新規登録エンドポイント（画像AI検証 ＋ パスワード保存）
+app.post('/api/register', async (req, res) => {
+  try {
+    const { mcid, password, imageBase64, mimeType } = req.body;
+
+    if (!mcid || !password || !imageBase64) {
+      return res.status(400).json({ status: 'error', message: '必須パラメータが不足しています。' });
+    }
+
+    // 試すモデルのリスト
+    const modelNames = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.6-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3.6-flash'
+    ];
+
+    // 使用するAPIキーのリスト（GEMINI_API_1 と GEMINI_API_2）
+    const apiKeys = [
+      process.env.GEMINI_API_1,
+      process.env.GEMINI_API_2
+    ].filter(Boolean);
+
+    if (apiKeys.length === 0) {
+      return res.status(500).json({ status: 'error', message: 'Gemini API keys are not configured.' });
+    }
+
+    let aiPassed = false;
+    let aiErrorMsg = '';
+
+    // Base64データをGemini形式に変換
+    const imagePart = {
+      inlineData: {
+        data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+        mimeType: mimeType || 'image/jpeg'
+      }
+    };
+
+    const prompt = `
+      あなたはマインクラフトのサーバー運営者です。送られた画像が「本人のマインクラフトのプレイ画面、または本人確認用の正当なスクリーンショット」であるかを判定してください。
+      他人の拾い画、無関係な画像、テキストが全くない真っ黒な画像、または不適切と判断される画像の場合は不合格にしてください。
+      回答は必ず以下のJSONフォーマットのみで行ってください（Markdownのバッククォートなどは使uvad純粋なJSON文字列で）。
+      {"result": "pass"} または {"result": "fail", "reason": "理由"}
+    `;
+
+    // 1. APIキーごとにループ
+    for (let keyIdx = 0; keyIdx < apiKeys.length; keyIdx++) {
+      const currentApiKey = apiKeys[keyIdx];
+      const genAI = new GoogleGenerativeAI(currentApiKey);
+
+      // 2. モデルごとに順番にループ
+      for (let modelIdx = 0; modelIdx < modelNames.length; modelIdx++) {
+        const modelName = modelNames[modelIdx];
+        try {
+          console.log(`Trying API Key [${keyIdx + 1}] with model: ${modelName}`);
+          const model = genAI.getGenerativeModel({ model: modelName });
+
+          const result = await model.generateContent([prompt, imagePart]);
+          const responseText = await result.response.text();
+          
+          // JSONの抽出とパース
+          const cleanJsonStr = responseText.replace(/```json|```/g, '').trim();
+          const jsonRes = JSON.parse(cleanJsonStr);
+
+          if (jsonRes.result === 'pass') {
+            aiPassed = true;
+            break; // 成功したらループを抜ける
+          } else {
+            aiErrorMsg = jsonRes.reason || 'AI検証により不合格と判定されました。';
+          }
+        } catch (err) {
+          console.warn(`Model ${modelName} with Key [${keyIdx + 1}] failed:`, err.message);
+          aiErrorMsg = err.message;
+          // エラーが出たら次のモデル（または次のキー）へ継続
+        }
+      }
+
+      if (aiPassed) break; // 成功していればキーのループも抜ける
+    }
+
+    if (!aiPassed) {
+      return res.status(400).json({ status: 'fail', message: `AI画像検証に失敗しました: ${aiErrorMsg}` });
+    }
+
+    // パスワードのハッシュ化
+    const passwordHash = hashPassword(password);
+
+    // GASへデータを転送してスプレッドシートに書き込み
+    const gasResponse = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'register',
+        mcid: mcid,
+        passwordHash: passwordHash
+      })
+    });
+
+    const gasResult = await gasResponse.json();
+
+    if (gasResult.status === 'success') {
+      return res.json({ status: 'success', message: 'アカウントが正常に作成されました！' });
+    } else {
+      return res.status(400).json({ status: 'error', message: gasResult.message || 'スプレッドシートへの保存に失敗しました。' });
+    }
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ status: 'error', message: 'サーバー内部エラーが発生しました。' });
+  }
+});
