@@ -20,7 +20,21 @@ app.get('/', (req, res) => {
   res.send('Clytiers Secure Backend is running!');
 });
 
-// 新規登録エンドポイント（画像AI検証 ＋ パスワード保存）
+// 1. スプレッドシートからプレイヤーデータを取得するエンドポイント
+app.get('/api/players', async (req, res) => {
+  try {
+    const gasResponse = await fetch(GAS_URL + "?action=getPlayers", {
+      method: 'GET'
+    });
+    const data = await gasResponse.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Failed to fetch players from GAS:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to fetch players' });
+  }
+});
+
+// 2. 新規登録エンドポイント（画像AI検証 ＋ パスワード保存）
 app.post('/api/register', async (req, res) => {
   try {
     const { mcid, password, imageBase64, mimeType } = req.body;
@@ -65,12 +79,12 @@ app.post('/api/register', async (req, res) => {
       {"result": "pass"} または {"result": "fail", "reason": "理由"}
     `;
 
-    // 1. APIキーごとにループ
+    // APIキーごとにループ
     for (let keyIdx = 0; keyIdx < apiKeys.length; keyIdx++) {
       const currentApiKey = apiKeys[keyIdx];
       const genAI = new GoogleGenerativeAI(currentApiKey);
 
-      // 2. モデルごとに順番にループ
+      // モデルごとに順番にループ
       for (let modelIdx = 0; modelIdx < modelNames.length; modelIdx++) {
         const modelName = modelNames[modelIdx];
         try {
@@ -80,7 +94,6 @@ app.post('/api/register', async (req, res) => {
           const result = await model.generateContent([prompt, imagePart]);
           const responseText = await result.response.text();
           
-          // JSONの抽出とパース
           const cleanJsonStr = responseText.replace(/```json|```/g, '').trim();
           const jsonRes = JSON.parse(cleanJsonStr);
 
@@ -106,7 +119,7 @@ app.post('/api/register', async (req, res) => {
     // パスワードのハッシュ化
     const passwordHash = hashPassword(password);
 
-    // GASへデータを転送（Node.js標準の fetch を使用）
+    // GASへデータを転送
     const gasResponse = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
