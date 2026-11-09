@@ -53,7 +53,6 @@
       overflow-x: hidden;
     }
 
-    /* 🟣 背景用ネザー粒子描画キャンバス */
     #nether-particles {
       position: fixed;
       top: 0; left: 0;
@@ -62,7 +61,6 @@
       z-index: 10;
     }
 
-    /* 🟣 タップ時専用・最前面（一番上）に描画するキャンバス */
     #click-particles-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -76,7 +74,6 @@
       z-index: 20;
     }
 
-    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
     .clytiers-gradient-logo {
       background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
       background-size: 400% 400%;
@@ -168,16 +165,9 @@
     .rank-shining::after {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to right,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.8) 50%,
-        rgba(255,255,255,0) 100%
-      );
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
       transform: rotate(30deg);
       animation: shine 1.8s infinite;
       pointer-events: none;
@@ -189,23 +179,9 @@
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
-    .rank-1-box {
-      background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
-      border: 1px solid rgba(253, 230, 138, 0.95);
-    }
-    .rank-2-box {
-      background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-      box-shadow: 0 0 25px rgba(209, 213, 219, 0.8);
-      border: 1px solid rgba(243, 244, 246, 0.95);
-    }
-    .rank-2-box.rank-shining::after { animation-delay: 0.3s; }
-    .rank-3-box {
-      background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
-      box-shadow: 0 0 25px rgba(217, 119, 6, 0.8);
-      border: 1px solid rgba(253, 186, 116, 0.95);
-    }
-    .rank-3-box.rank-shining::after { animation-delay: 0.6s; }
+    .rank-1-box { background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%); box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); border: 1px solid rgba(253, 230, 138, 0.95); }
+    .rank-2-box { background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%); box-shadow: 0 0 25px rgba(209, 213, 219, 0.8); border: 1px solid rgba(243, 244, 246, 0.95); }
+    .rank-3-box { background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%); box-shadow: 0 0 25px rgba(217, 119, 6, 0.8); border: 1px solid rgba(253, 186, 116, 0.95); }
     
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -213,9 +189,7 @@
       border: 1px solid rgba(96, 165, 250, 0.8);
       transition: transform 0.3s ease;
     }
-    #tier-tbody tr:hover .rank-normal-box {
-      transform: scale(1.05);
-    }
+    #tier-tbody tr:hover .rank-normal-box { transform: scale(1.05); }
 
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(7, 3, 13, 0.96) 85%);
@@ -232,43 +206,28 @@
       0% { opacity: 0; transform: translateY(14px) scale(0.97); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-    section:not(.hidden) {
-      animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
+    section:not(.hidden) { animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     @keyframes rowCascadeIn {
       0% { opacity: 0; transform: translateY(15px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-
-    .tier-row-animated {
-      opacity: 0;
-      animation: rowCascadeIn 0.3s ease forwards;
-    }
+    .tier-row-animated { opacity: 0; animation: rowCascadeIn 0.3s ease forwards; }
 
     @keyframes scanWave {
       0% { background-position: 0 -100vh; }
       100% { background-position: 0 100vh; }
     }
-
-    .scan-effect {
-      position: relative;
-    }
+    .scan-effect { position: relative; }
     .scan-effect::after {
       content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
-      background-size: 100% 200px;
-      background-repeat: no-repeat;
-      animation: scanWave 0.7s ease-in-out;
-      pointer-events: none;
-      z-index: 20;
+      background-size: 100% 200px; background-repeat: no-repeat;
+      animation: scanWave 0.7s ease-in-out; pointer-events: none; z-index: 20;
     }
 
-    #tier-tbody tr {
-      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-    }
+    #tier-tbody tr { transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
     #tier-tbody tr:hover {
       background-color: rgba(168, 85, 247, 0.22) !important;
       transform: translateX(6px);
@@ -280,68 +239,34 @@
       transition: transform 0.3s ease, filter 0.3s ease;
     }
 
-    #player-modal:not(.hidden) > div,
-    #login-modal:not(.hidden) > div,
-    #register-modal:not(.hidden) > div {
-      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
+    #player-modal:not(.hidden) > div { animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     @keyframes modalPop {
       0% { opacity: 0; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    button, .kit-tab {
-      transition: all 0.2s ease;
-    }
-    button:hover, .kit-tab:hover {
-      filter: brightness(1.2);
-    }
-
-    .kit-tab.active {
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
-      border-color: #d8b4fe !important;
-    }
+    button, .kit-tab { transition: all 0.2s ease; }
+    button:hover, .kit-tab:hover { filter: brightness(1.2); }
+    .kit-tab.active { box-shadow: 0 0 15px rgba(168, 85, 247, 0.6); border-color: #d8b4fe !important; }
 
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: scale(0);
-      z-index: 99998;
+      position: fixed; border-radius: 50%; pointer-events: none; transform: scale(0); z-index: 99998;
     }
-
     .water-ripple-fog {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
-      filter: blur(6px);
-      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
+      filter: blur(6px); animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
     }
-
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.8);
-      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+      border: 1.5px solid rgba(217, 70, 239, 0.8); box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
       animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
     }
-
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.95);
-      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
+      border: 1px solid rgba(232, 121, 249, 0.95); box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
       animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
     }
-
-    @keyframes waterRippleFogAnim {
-      0% { transform: scale(0.1); opacity: 0.8; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-
-    @keyframes waterRippleOuterAnim {
-      0% { transform: scale(0.1); opacity: 1; }
-      100% { transform: scale(1.3); opacity: 0; }
-    }
-
-    @keyframes waterRippleInnerAnim {
-      0% { transform: scale(0.05); opacity: 0.9; }
-      100% { transform: scale(0.8); opacity: 0; }
-    }
+    @keyframes waterRippleFogAnim { 0% { transform: scale(0.1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+    @keyframes waterRippleOuterAnim { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+    @keyframes waterRippleInnerAnim { 0% { transform: scale(0.05); opacity: 0.9; } 100% { transform: scale(0.8); opacity: 0; } }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -355,48 +280,43 @@
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
-        <div class="flex items-center gap-1 sm:gap-3">
-          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
-            <i class="fa-solid fa-house text-xs"></i><span>Home</span>
-          </button>
+        <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
+          <i class="fa-solid fa-house text-xs"></i><span>Home</span>
+        </button>
 
-          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
-            <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
-          </button>
-        </div>
+        <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
+          <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
+        </button>
 
-        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-2">
+        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
           CLYTIERS
         </a>
 
-        <div class="flex items-center gap-2 sm:gap-3">
-          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-2 py-1 flex items-center gap-1 text-gray-300">
-            <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span class="hidden sm:inline">Discord</span>
-          </a>
+        <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
+          <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
+        </a>
 
-          <!-- Login Button -->
-          <button onclick="openLoginModal()" class="bg-brand-purple/20 hover:bg-brand-purple/40 border border-brand-purple/50 text-brand-lightPurple px-2.5 py-1 rounded-lg text-xs flex items-center gap-1.5 transition-all">
-            <i class="fa-solid fa-right-to-bracket text-xs"></i>
-            <span id="login-btn-text">Login</span>
+        <!-- 🟣 ヘッダーに追加したログインボタン -->
+        <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
+          <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
+        </button>
+
+        <!-- Language Dropdown -->
+        <div class="relative inline-block text-left">
+          <button onclick="toggleLangDropdown(event)" class="bg-brand-card border border-brand-border px-2 py-1 rounded text-xs flex items-center gap-1 hover:border-brand-purple">
+            <i class="fa-solid fa-globe text-brand-purple"></i>
+            <span id="current-lang-text">JA</span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
           </button>
-
-          <!-- Language Dropdown -->
-          <div class="relative inline-block text-left">
-            <button onclick="toggleLangDropdown(event)" class="bg-brand-card border border-brand-border px-2 py-1 rounded text-xs flex items-center gap-1 hover:border-brand-purple">
-              <i class="fa-solid fa-globe text-brand-purple"></i>
-              <span id="current-lang-text">JA</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
-            </button>
-            
-            <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-brand-card border border-brand-border ring-1 ring-black ring-opacity-5 z-50">
-              <div class="py-1">
-                <button onclick="changeLanguage('ja')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
-                  日本語 <span class="text-[10px] text-brand-purple font-bold">JA</span>
-                </button>
-                <button onclick="changeLanguage('en')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
-                  English <span class="text-[10px] text-brand-purple font-bold">EN</span>
-                </button>
-              </div>
+          
+          <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-24 rounded-md shadow-lg bg-brand-card border border-brand-border ring-1 ring-black ring-opacity-5 z-50">
+            <div class="py-1">
+              <button onclick="changeLanguage('ja')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
+                日本語 <span class="text-[10px] text-brand-purple font-bold">JA</span>
+              </button>
+              <button onclick="changeLanguage('en')" class="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-brand-purple/20 flex items-center justify-between">
+                English <span class="text-[10px] text-brand-purple font-bold">EN</span>
+              </button>
             </div>
           </div>
         </div>
@@ -468,36 +388,35 @@
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- 🟣 スマホでもきれいに折り返すように修正したキットタブコンテナ -->
-        <div class="flex flex-wrap gap-2 pb-2 flex-1" id="kit-tabs-container">
-          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
+        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
+          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
             <i class="fa-solid fa-trophy"></i> OVERALL
           </button>
-          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
+          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
             <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
           </button>
-          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
+          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
             <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
           </button>
-          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
+          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
             <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
           </button>
-          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
+          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
             <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
           </button>
-          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
+          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
             <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
           </button>
-          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
+          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
             <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
           </button>
-          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
+          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
             <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
           </button>
-          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
+          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
             <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
           </button>
-          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
+          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
             <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
           </button>
         </div>
@@ -531,6 +450,7 @@
             </tr>
           </thead>
           <tbody id="tier-tbody" class="divide-y divide-brand-border/40 text-xs font-mono">
+            <!-- Dynamic JS Output -->
           </tbody>
         </table>
       </div>
@@ -568,90 +488,28 @@
         <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown & Points</span>
       </h4>
       <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
+        <!-- Dynamic -->
       </div>
     </div>
   </div>
 
-  <!-- Login Modal -->
+  <!-- 🟣 ログインモーダル（ヘッダーのLoginボタンから開く用） -->
   <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleLoginModalBgClick(event)">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box overflow-hidden shadow-2xl">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box shadow-2xl">
       <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
         <i class="fa-solid fa-xmark"></i>
       </button>
-
-      <div class="text-center mb-6">
-        <div class="w-12 h-12 rounded-xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center mx-auto mb-3 text-brand-lightPurple text-xl">
-          <i class="fa-solid fa-lock"></i>
+      <div class="text-center mb-4">
+        <div class="inline-block p-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple mb-2">
+          <i class="fa-solid fa-lock text-xl"></i>
         </div>
-        <h3 class="text-lg font-black font-orbitron text-white">PLAYER LOGIN</h3>
-        <p class="text-xs text-gray-400 mt-1">プレイヤー認証</p>
+        <h3 class="text-lg font-bold font-orbitron text-white">ADMIN LOGIN</h3>
+        <p class="text-xs text-gray-400 mt-1">管理者ログイン</p>
       </div>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">MCID / UUID</label>
-          <input type="text" id="login-mcid" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div>
-          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">PASSWORD</label>
-          <input type="password" id="login-password" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <button onclick="handleLoginSubmit()" id="login-submit-btn" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white font-orbitron font-bold py-3 rounded-lg text-xs shadow-lg shadow-purple-600/40 transition-all mt-2">
-          LOGIN
-        </button>
-
-        <div class="text-center pt-2">
-          <button onclick="switchToRegisterModal()" class="text-xs text-brand-lightPurple hover:underline font-mono">
-            アカウントを作成
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Register Modal -->
-  <div id="register-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleRegisterModalBgClick(event)">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box overflow-hidden shadow-2xl">
-      <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="text-center mb-5">
-        <div class="w-12 h-12 rounded-xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center mx-auto mb-3 text-brand-lightPurple text-xl">
-          <i class="fa-solid fa-user-plus"></i>
-        </div>
-        <h3 class="text-lg font-black font-orbitron text-white">CREATE ACCOUNT</h3>
-        <p class="text-xs text-gray-400 mt-1">新規アカウント登録 ＆ AI本人確認</p>
-      </div>
-
-      <div class="space-y-3.5 max-h-[70vh] overflow-y-auto pr-1">
-        <div>
-          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">MCID (Java/Bedrock)</label>
-          <input type="text" id="reg-mcid" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div>
-          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">PASSWORD</label>
-          <input type="password" id="reg-password" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div>
-          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">CONFIRM PASSWORD</label>
-          <input type="password" id="reg-password-confirm" placeholder="Re-enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div>
-          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">本人確認用スクリーンショット画像</label>
-          <input type="file" id="reg-image" accept="image/*" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs text-gray-300 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-brand-purple file:text-white hover:file:bg-brand-lightPurple">
-          <p class="text-[10px] text-gray-400 mt-1">※マイクラのプレイ画面や本人とわかる写真を添付してください（AIが自動判定します）</p>
-        </div>
-
-        <button onclick="handleRegisterSubmit()" id="reg-submit-btn" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white font-orbitron font-bold py-3 rounded-lg text-xs shadow-lg shadow-purple-600/40 transition-all mt-2">
-          アカウントを作成
-        </button>
-
-        <div class="text-center pt-2">
-          <button onclick="switchToLoginModal()" class="text-xs text-brand-lightPurple hover:underline font-mono">
-            すでにアカウントをお持ちですか？ ログイン
-          </button>
-        </div>
+      <div class="space-y-3">
+        <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        <button onclick="handleLoginSubmit()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all">ログイン</button>
+        <div id="login-error-msg" class="text-[11px] text-red-400 text-center hidden">パスワードが違います。</div>
       </div>
     </div>
   </div>
@@ -661,182 +519,26 @@
   </footer>
 
   <script>
-    /* ========================================================
-       🟣 ログイン・新規登録モーダル切替制御
-       ======================================================== */
-    function openLoginModal() {
-      document.getElementById('register-modal').classList.add('hidden');
-      document.getElementById('login-modal').classList.remove('hidden');
-    }
-
-    function closeLoginModal() {
-      document.getElementById('login-modal').classList.add('hidden');
-      document.getElementById('login-mcid').value = '';
-      document.getElementById('login-password').value = '';
-    }
-
-    function handleLoginModalBgClick(event) {
-      if (event.target.id === 'login-modal') {
-        closeLoginModal();
-      }
-    }
-
-    function switchToRegisterModal() {
-      document.getElementById('login-modal').classList.add('hidden');
-      document.getElementById('register-modal').classList.remove('hidden');
-    }
-
-    function closeRegisterModal() {
-      document.getElementById('register-modal').classList.add('hidden');
-      document.getElementById('reg-mcid').value = '';
-      document.getElementById('reg-password').value = '';
-      document.getElementById('reg-password-confirm').value = '';
-      document.getElementById('reg-image').value = '';
-    }
-
-    function handleRegisterModalBgClick(event) {
-      if (event.target.id === 'register-modal') {
-        closeRegisterModal();
-      }
-    }
-
-    function switchToLoginModal() {
-      document.getElementById('register-modal').classList.add('hidden');
-      document.getElementById('login-modal').classList.remove('hidden');
-    }
-
-    // ログイン処理（同一サーバーの /api/login へ相対パスで通信）
-    async function handleLoginSubmit() {
-      const mcidInput = document.getElementById('login-mcid').value.trim();
-      const passwordInput = document.getElementById('login-password').value;
-      const submitBtn = document.getElementById('login-submit-btn');
-
-      if (!mcidInput || !passwordInput) {
-        alert('MCIDとパスワードを入力してください。');
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
-
-      try {
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mcid: mcidInput, password: passwordInput })
-        });
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          alert('ログインに成功しました！');
-          document.getElementById('login-btn-text').innerText = mcidInput;
-          closeLoginModal();
-        } else {
-          alert('ログインに失敗しました：' + (result.message || 'MCIDまたはパスワードが間違っています。'));
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        alert('通信エラーが発生しました。');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'LOGIN';
-      }
-    }
-
-    // 新規登録処理（同一サーバーの /api/register へ相対パスで通信）
-    async function handleRegisterSubmit() {
-      const mcid = document.getElementById('reg-mcid').value.trim();
-      const password = document.getElementById('reg-password').value;
-      const passwordConfirm = document.getElementById('reg-password-confirm').value;
-      const imageFile = document.getElementById('reg-image').files[0];
-      const submitBtn = document.getElementById('reg-submit-btn');
-
-      if (!mcid || !password || !passwordConfirm || !imageFile) {
-        alert('すべての項目を入力し、証明用の画像を添付してください。');
-        return;
-      }
-
-      if (password !== passwordConfirm) {
-        alert('パスワードが一致しません。');
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> AI検証中...';
-
-      try {
-        const reader = new FileReader();
-        reader.readAsDataURL(imageFile);
-        reader.onload = async () => {
-          const imageBase64 = reader.result;
-
-          const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              mcid: mcid,
-              password: password,
-              imageBase64: imageBase64,
-              mimeType: imageFile.type
-            })
-          });
-
-          const result = await response.json();
-
-          if (result.status === 'success') {
-            alert('アカウントの作成とAI本人確認に成功しました！');
-            closeRegisterModal();
-            openLoginModal();
-          } else {
-            alert('登録失敗: ' + (result.message || 'AIによる検証で不合格となりました。'));
-          }
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'アカウントを作成';
-        };
-
-        reader.onerror = () => {
-          alert('画像の読み込みに失敗しました。');
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'アカウントを作成';
-        };
-
-      } catch (error) {
-        console.error('Registration error:', error);
-        alert('通信エラーが発生しました。');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'アカウントを作成';
-      }
-    }
-
-    /* ========================================================
-       🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
-       ======================================================== */
     const clickParticles = [];
 
     window.addEventListener('click', (e) => {
       const fog = document.createElement('div');
       fog.className = 'water-ripple-fog';
       const fogSize = 65;
-      fog.style.width = fogSize + 'px';
-      fog.style.height = fogSize + 'px';
-      fog.style.left = (e.clientX - fogSize / 2) + 'px';
-      fog.style.top = (e.clientY - fogSize / 2) + 'px';
+      fog.style.width = fogSize + 'px'; fog.style.height = fogSize + 'px';
+      fog.style.left = (e.clientX - fogSize / 2) + 'px'; fog.style.top = (e.clientY - fogSize / 2) + 'px';
 
       const outerRipple = document.createElement('div');
       outerRipple.className = 'water-ripple-outer';
       const outerSize = 55;
-      outerRipple.style.width = outerSize + 'px';
-      outerRipple.style.height = outerSize + 'px';
-      outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
-      outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
+      outerRipple.style.width = outerSize + 'px'; outerRipple.style.height = outerSize + 'px';
+      outerRipple.style.left = (e.clientX - outerSize / 2) + 'px'; outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
       
       const innerRipple = document.createElement('div');
       innerRipple.className = 'water-ripple-inner';
       const innerSize = 25;
-      innerRipple.style.width = innerSize + 'px';
-      innerRipple.style.height = innerSize + 'px';
-      innerRipple.style.left = (e.clientX - innerSize / 2) + 'px';
-      innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
+      innerRipple.style.width = innerSize + 'px'; innerRipple.style.height = innerSize + 'px';
+      innerRipple.style.left = (e.clientX - innerSize / 2) + 'px'; innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
       
       document.body.appendChild(fog);
       document.body.appendChild(outerRipple);
@@ -850,15 +552,11 @@
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 2.8 + 1.2;
         clickParticles.push({
-          x: e.clientX,
-          y: e.clientY,
+          x: e.clientX, y: e.clientY,
           size: Math.random() * 2.8 + 1.5,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 0.4,
-          alpha: 1.0,
-          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
-          life: 0,
-          maxLife: 42
+          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 0.4,
+          alpha: 1.0, color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
+          life: 0, maxLife: 42
         });
       }
     });
@@ -866,15 +564,12 @@
     window.addEventListener('DOMContentLoaded', () => {
       const bgCanvas = document.getElementById('nether-particles');
       const bgCtx = bgCanvas.getContext('2d');
-
       const clickCanvas = document.getElementById('click-particles-canvas');
       const clickCtx = clickCanvas.getContext('2d');
 
       function resizeCanvases() {
-        bgCanvas.width = window.innerWidth;
-        bgCanvas.height = window.innerHeight;
-        clickCanvas.width = window.innerWidth;
-        clickCanvas.height = window.innerHeight;
+        bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+        clickCanvas.width = window.innerWidth; clickCanvas.height = window.innerHeight;
       }
       resizeCanvases();
       window.addEventListener('resize', resizeCanvases);
@@ -884,13 +579,10 @@
 
       for (let i = 0; i < particleCount; i++) {
         backgroundParticles.push({
-          x: Math.random() * bgCanvas.width,
-          y: Math.random() * bgCanvas.height,
+          x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
           size: Math.random() * 2.5 + 1,
-          speedX: (Math.random() - 0.5) * 0.4,
-          speedY: -Math.random() * 0.6 - 0.2,
-          opacity: Math.random() * 0.6 + 0.2,
-          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7'
+          speedX: (Math.random() - 0.5) * 0.4, speedY: -Math.random() * 0.6 - 0.2,
+          opacity: Math.random() * 0.6 + 0.2, color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7'
         });
       }
 
@@ -899,19 +591,12 @@
         backgroundParticles.forEach(p => {
           bgCtx.beginPath();
           bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          bgCtx.fillStyle = p.color;
-          bgCtx.globalAlpha = p.opacity;
-          bgCtx.shadowBlur = 8;
-          bgCtx.shadowColor = '#c084fc';
+          bgCtx.fillStyle = p.color; bgCtx.globalAlpha = p.opacity;
+          bgCtx.shadowBlur = 8; bgCtx.shadowColor = '#c084fc';
           bgCtx.fill();
 
-          p.x += p.speedX;
-          p.y += p.speedY;
-
-          if (p.y < -10) {
-            p.y = bgCanvas.height + 10;
-            p.x = Math.random() * bgCanvas.width;
-          }
+          p.x += p.speedX; p.y += p.speedY;
+          if (p.y < -10) { p.y = bgCanvas.height + 10; p.x = Math.random() * bgCanvas.width; }
           if (p.x < -10) p.x = bgCanvas.width + 10;
           if (p.x > bgCanvas.width + 10) p.x = -10;
         });
@@ -924,20 +609,14 @@
 
           clickCtx.beginPath();
           clickCtx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
-          clickCtx.fillStyle = cp.color;
-          clickCtx.globalAlpha = cp.alpha;
-          clickCtx.shadowBlur = 12;
-          clickCtx.shadowColor = '#e879f9';
+          clickCtx.fillStyle = cp.color; clickCtx.globalAlpha = cp.alpha;
+          clickCtx.shadowBlur = 12; clickCtx.shadowColor = '#e879f9';
           clickCtx.fill();
 
-          cp.x += cp.vx;
-          cp.y += cp.vy;
-          cp.vx *= 0.94;
-          cp.vy *= 0.94;
+          cp.x += cp.vx; cp.y += cp.vy;
+          cp.vx *= 0.94; cp.vy *= 0.94;
 
-          if (cp.life >= cp.maxLife) {
-            clickParticles.splice(i, 1);
-          }
+          if (cp.life >= cp.maxLife) clickParticles.splice(i, 1);
         }
 
         requestAnimationFrame(animate);
@@ -1192,9 +871,9 @@
       
       document.querySelectorAll('.kit-tab').forEach(btn => {
         if (btn.getAttribute('data-kit') === kit) {
-          btn.className = "kit-tab active bg-brand-purple text-white px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
+          btn.className = "kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
         } else {
-          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 py-1.5 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
+          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
         }
       });
 
@@ -1217,8 +896,9 @@
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        // 🟣 同一サーバー上のAPIから取得（相対パス）
-        const response = await fetch('/api/players');
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbybXABVRz47h-EpEwjnfmsyUEGz2_BokIuHZDpB7vh6rOrXVsQMF8muCnLQk0mrFRG6dg/exec?t=" + new Date().getTime();
+        
+        const response = await fetch(webAppUrl);
         const rawData = await response.json();
 
         playersData = rawData.map(p => {
@@ -1416,6 +1096,36 @@
     function handleModalBgClick(event) {
       if (event.target.id === 'player-modal') {
         closeModal();
+      }
+    }
+
+    // 🟣 ログインモーダルの開閉用関数
+    function openLoginModal() {
+      document.getElementById('login-password-input').value = '';
+      document.getElementById('login-error-msg').classList.add('hidden');
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    function handleLoginModalBgClick(event) {
+      if (event.target.id === 'login-modal') {
+        closeLoginModal();
+      }
+    }
+
+    function handleLoginSubmit() {
+      const pass = document.getElementById('login-password-input').value;
+      const errorMsg = document.getElementById('login-error-msg');
+      
+      // 仮のパスワード判定（必要に応じて書き換えてください）
+      if (pass === "admin123") {
+        alert("ログインに成功しました！");
+        closeLoginModal();
+      } else {
+        errorMsg.classList.remove('hidden');
       }
     }
   </script>
