@@ -281,7 +281,8 @@
     }
 
     #player-modal:not(.hidden) > div,
-    #login-modal:not(.hidden) > div {
+    #login-modal:not(.hidden) > div,
+    #register-modal:not(.hidden) > div {
       animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
     @keyframes modalPop {
@@ -301,7 +302,6 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ 水面の一滴＋紫の霧（サクッと消えるスピード） */
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
       position: fixed;
       border-radius: 50%;
@@ -467,9 +467,7 @@
 
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
-      <!-- Kit Tabs & Load Button Container -->
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- Kit Tabs -->
         <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
           <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
             <i class="fa-solid fa-trophy"></i> OVERALL
@@ -503,7 +501,6 @@
           </button>
         </div>
 
-        <!-- Load Button & CoolDown Display -->
         <div class="flex flex-col items-end shrink-0 mb-2">
           <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
           <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
@@ -512,7 +509,6 @@
         </div>
       </div>
 
-      <!-- Search & Filters -->
       <div class="flex flex-wrap items-center justify-between gap-4 bg-brand-card p-4 rounded-xl border border-brand-border">
         <div class="relative flex-1 min-w-[200px]">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
@@ -523,7 +519,6 @@
         </div>
       </div>
 
-      <!-- Tiers Table -->
       <div id="table-container" class="overflow-x-auto rounded-xl border border-brand-border bg-brand-card">
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
@@ -535,7 +530,6 @@
             </tr>
           </thead>
           <tbody id="tier-tbody" class="divide-y divide-brand-border/40 text-xs font-mono">
-            <!-- Dynamic JS Output -->
           </tbody>
         </table>
       </div>
@@ -549,7 +543,6 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- Profile Header -->
       <div class="skin-showcase-bg rounded-xl p-4 sm:p-5 mb-4 border border-brand-border flex items-center gap-4 sm:gap-6 relative">
         <div class="absolute top-2 left-3 text-[9px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
@@ -574,7 +567,6 @@
         <i class="fa-solid fa-layer-group text-brand-purple"></i> <span data-i18n="modal_kit_breakdown">Kit Tier Breakdown & Points</span>
       </h4>
       <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
-        <!-- Dynamic -->
       </div>
     </div>
   </div>
@@ -606,6 +598,60 @@
         <button onclick="handleLoginSubmit()" id="login-submit-btn" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white font-orbitron font-bold py-3 rounded-lg text-xs shadow-lg shadow-purple-600/40 transition-all mt-2">
           LOGIN
         </button>
+
+        <!-- 🟣 ログイン画面の下に配置したアカウント作成への切り替えリンク -->
+        <div class="text-center pt-2">
+          <button onclick="switchToRegisterModal()" class="text-xs text-brand-lightPurple hover:underline font-mono">
+            アカウントを作成
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal (新規登録画面：MCID、パスワード、確認用、画像ファイル添付) -->
+  <div id="register-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleRegisterModalBgClick(event)">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box overflow-hidden shadow-2xl">
+      <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 rounded-xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center mx-auto mb-3 text-brand-lightPurple text-xl">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h3 class="text-lg font-black font-orbitron text-white">CREATE ACCOUNT</h3>
+        <p class="text-xs text-gray-400 mt-1">新規アカウント登録 ＆ AI本人確認</p>
+      </div>
+
+      <div class="space-y-3.5 max-h-[70vh] overflow-y-auto pr-1">
+        <div>
+          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">MCID (Java/Bedrock)</label>
+          <input type="text" id="reg-mcid" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <div>
+          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">PASSWORD</label>
+          <input type="password" id="reg-password" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <div>
+          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">CONFIRM PASSWORD</label>
+          <input type="password" id="reg-password-confirm" placeholder="Re-enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
+        </div>
+        <div>
+          <label class="block text-[11px] font-orbitron text-gray-300 mb-1">本人確認用スクリーンショット画像</label>
+          <input type="file" id="reg-image" accept="image/*" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs text-gray-300 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-brand-purple file:text-white hover:file:bg-brand-lightPurple">
+          <p class="text-[10px] text-gray-400 mt-1">※マイクラのプレイ画面や本人とわかる写真を添付してください（AIが自動判定します）</p>
+        </div>
+
+        <button onclick="handleRegisterSubmit()" id="reg-submit-btn" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white font-orbitron font-bold py-3 rounded-lg text-xs shadow-lg shadow-purple-600/40 transition-all mt-2">
+          アカウントを作成
+        </button>
+
+        <div class="text-center pt-2">
+          <button onclick="switchToLoginModal()" class="text-xs text-brand-lightPurple hover:underline font-mono">
+            すでにアカウントをお持ちですか？ ログイン
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -615,13 +661,14 @@
   </footer>
 
   <script>
-    // 新しいGASのウェブアプリURL
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby6WXkKi5Mwe2phOOt-4muzVzArna1HU_aDcrkGgV4ogpTrdm-_l5dTB710-g7TQeMnmA/exec";
+    // 🟣 Render側のバックエンドサーバーURL（ここに置き換えました）
+    const RENDER_API_URL = "https://あなたのRenderサービス名.onrender.com"; // ←あとでご自身のRenderのURLに書き換えてください
 
     /* ========================================================
-       🟣 ログインモーダル制御用関数
+       🟣 ログイン・新規登録モーダル切替制御
        ======================================================== */
     function openLoginModal() {
+      document.getElementById('register-modal').classList.add('hidden');
       document.getElementById('login-modal').classList.remove('hidden');
     }
 
@@ -637,6 +684,31 @@
       }
     }
 
+    function switchToRegisterModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+      document.getElementById('register-modal').classList.remove('hidden');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('register-modal').classList.add('hidden');
+      document.getElementById('reg-mcid').value = '';
+      document.getElementById('reg-password').value = '';
+      document.getElementById('reg-password-confirm').value = '';
+      document.getElementById('reg-image').value = '';
+    }
+
+    function handleRegisterModalBgClick(event) {
+      if (event.target.id === 'register-modal') {
+        closeRegisterModal();
+      }
+    }
+
+    function switchToLoginModal() {
+      document.getElementById('register-modal').classList.add('hidden');
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+
+    // ログイン処理（Render経由）
     async function handleLoginSubmit() {
       const mcidInput = document.getElementById('login-mcid').value.trim();
       const passwordInput = document.getElementById('login-password').value;
@@ -651,9 +723,9 @@
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
 
       try {
-        const response = await fetch(GAS_WEB_APP_URL, {
+        const response = await fetch(`${RENDER_API_URL}/api/login`, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mcid: mcidInput, password: passwordInput })
         });
         const result = await response.json();
@@ -663,7 +735,7 @@
           document.getElementById('login-btn-text').innerText = mcidInput;
           closeLoginModal();
         } else {
-          alert('ログインに失敗しました：MCIDまたはパスワードが間違っています。');
+          alert('ログインに失敗しました：' + (result.message || 'MCIDまたはパスワードが間違っています。'));
         }
       } catch (error) {
         console.error('Login error:', error);
@@ -674,13 +746,78 @@
       }
     }
 
+    // 新規登録処理（画像ファイルをBase64にしてRenderへ送信 ➔ Gemini AI検証 ➔ パスワードハッシュ保存）
+    async function handleRegisterSubmit() {
+      const mcid = document.getElementById('reg-mcid').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const passwordConfirm = document.getElementById('reg-password-confirm').value;
+      const imageFile = document.getElementById('reg-image').files[0];
+      const submitBtn = document.getElementById('reg-submit-btn');
+
+      if (!mcid || !password || !passwordConfirm || !imageFile) {
+        alert('すべての項目を入力し、証明用の画像を添付してください。');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        alert('パスワードが一致しません。');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> AI検証中...';
+
+      try {
+        // 画像をBase64に変換
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        reader.onload = async () => {
+          const imageBase64 = reader.result;
+
+          const response = await fetch(`${RENDER_API_URL}/api/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mcid: mcid,
+              password: password,
+              imageBase64: imageBase64,
+              mimeType: imageFile.type
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+            alert('アカウントの作成とAI本人確認に成功しました！');
+            closeRegisterModal();
+            openLoginModal();
+          } else {
+            alert('登録失敗: ' + (result.message || 'AIによる検証で不合格となりました。'));
+          }
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'アカウントを作成';
+        };
+
+        reader.onerror = () => {
+          alert('画像の読み込みに失敗しました。');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'アカウントを作成';
+        };
+
+      } catch (error) {
+        console.error('Registration error:', error);
+        alert('通信エラーが発生しました。');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'アカウントを作成';
+      }
+    }
+
     /* ========================================================
        🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
        ======================================================== */
     const clickParticles = [];
 
     window.addEventListener('click', (e) => {
-      // 1. 周りにボワッと広がる紫色の霧（フォグ）
       const fog = document.createElement('div');
       fog.className = 'water-ripple-fog';
       const fogSize = 65;
@@ -689,7 +826,6 @@
       fog.style.left = (e.clientX - fogSize / 2) + 'px';
       fog.style.top = (e.clientY - fogSize / 2) + 'px';
 
-      // 2. 外側の波紋リング
       const outerRipple = document.createElement('div');
       outerRipple.className = 'water-ripple-outer';
       const outerSize = 55;
@@ -698,7 +834,6 @@
       outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
       outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
       
-      // 3. 内側の波紋リング
       const innerRipple = document.createElement('div');
       innerRipple.className = 'water-ripple-inner';
       const innerSize = 25;
@@ -711,12 +846,10 @@
       document.body.appendChild(outerRipple);
       document.body.appendChild(innerRipple);
       
-      // 波紋は約0.75秒で消去
       setTimeout(() => fog.remove(), 750);
       setTimeout(() => outerRipple.remove(), 650);
       setTimeout(() => innerRipple.remove(), 500);
 
-      // 4. タップした位置からランダムな方向に飛び散り、約0.7秒（42フレーム）で消えるネザー粒子（5個）を最前面に追加
       for (let i = 0; i < 5; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 2.8 + 1.2;
@@ -729,20 +862,15 @@
           alpha: 1.0,
           color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
           life: 0,
-          maxLife: 42 // 60fpsで約0.7秒
+          maxLife: 42
         });
       }
     });
 
-    /* ========================================================
-       🟣 ネザーの紫粒子（背景浮遊 ＆ 最前面クリック時飛び散りアニメーション）
-       ======================================================== */
     window.addEventListener('DOMContentLoaded', () => {
-      // 背景用キャンバス
       const bgCanvas = document.getElementById('nether-particles');
       const bgCtx = bgCanvas.getContext('2d');
 
-      // 最前面クリック粒子用キャンバス
       const clickCanvas = document.getElementById('click-particles-canvas');
       const clickCtx = clickCanvas.getContext('2d');
 
@@ -755,7 +883,6 @@
       resizeCanvases();
       window.addEventListener('resize', resizeCanvases);
 
-      // 背景用粒子データの初期化
       const backgroundParticles = [];
       const particleCount = 45;
 
@@ -772,7 +899,6 @@
       }
 
       function animate() {
-        // --- 1. 背景キャンバスの描画 ---
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
         backgroundParticles.forEach(p => {
           bgCtx.beginPath();
@@ -794,7 +920,6 @@
           if (p.x > bgCanvas.width + 10) p.x = -10;
         });
 
-        // --- 2. 最前面（一番上）クリック粒子の描画 ---
         clickCtx.clearRect(0, 0, clickCanvas.width, clickCanvas.height);
         for (let i = clickParticles.length - 1; i >= 0; i--) {
           const cp = clickParticles[i];
@@ -1096,9 +1221,8 @@
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        const webAppUrl = GAS_WEB_APP_URL + "?t=" + new Date().getTime();
-        
-        const response = await fetch(webAppUrl);
+        // リーダーボードデータの取得もRender経由（またはGAS直叩き回避）にする場合
+        const response = await fetch(`${RENDER_API_URL}/api/players`);
         const rawData = await response.json();
 
         playersData = rawData.map(p => {
