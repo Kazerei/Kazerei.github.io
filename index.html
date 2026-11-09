@@ -53,6 +53,7 @@
       overflow-x: hidden;
     }
 
+    /* 🟣 背景用ネザー粒子描画キャンバス */
     #nether-particles {
       position: fixed;
       top: 0; left: 0;
@@ -61,6 +62,7 @@
       z-index: 10;
     }
 
+    /* 🟣 タップ時専用・最前面に描画するキャンバス */
     #click-particles-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -74,6 +76,7 @@
       z-index: 20;
     }
 
+    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
     .clytiers-gradient-logo {
       background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
       background-size: 400% 400%;
@@ -165,9 +168,16 @@
     .rank-shining::after {
       content: '';
       position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.8) 50%,
+        rgba(255,255,255,0) 100%
+      );
       transform: rotate(30deg);
       animation: shine 1.8s infinite;
       pointer-events: none;
@@ -179,9 +189,21 @@
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
-    .rank-1-box { background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%); box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); border: 1px solid rgba(253, 230, 138, 0.95); }
-    .rank-2-box { background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%); box-shadow: 0 0 25px rgba(209, 213, 219, 0.8); border: 1px solid rgba(243, 244, 246, 0.95); }
-    .rank-3-box { background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%); box-shadow: 0 0 25px rgba(217, 119, 6, 0.8); border: 1px solid rgba(253, 186, 116, 0.95); }
+    .rank-1-box {
+      background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
+      border: 1px solid rgba(253, 230, 138, 0.95);
+    }
+    .rank-2-box {
+      background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
+      box-shadow: 0 0 25px rgba(209, 213, 219, 0.8);
+      border: 1px solid rgba(243, 244, 246, 0.95);
+    }
+    .rank-3-box {
+      background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
+      box-shadow: 0 0 25px rgba(217, 119, 6, 0.8);
+      border: 1px solid rgba(253, 186, 116, 0.95);
+    }
     
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -189,7 +211,9 @@
       border: 1px solid rgba(96, 165, 250, 0.8);
       transition: transform 0.3s ease;
     }
-    #tier-tbody tr:hover .rank-normal-box { transform: scale(1.05); }
+    #tier-tbody tr:hover .rank-normal-box {
+      transform: scale(1.05);
+    }
 
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(7, 3, 13, 0.96) 85%);
@@ -206,28 +230,43 @@
       0% { opacity: 0; transform: translateY(14px) scale(0.97); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-    section:not(.hidden) { animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    section:not(.hidden) {
+      animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
     @keyframes rowCascadeIn {
       0% { opacity: 0; transform: translateY(15px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .tier-row-animated { opacity: 0; animation: rowCascadeIn 0.3s ease forwards; }
+
+    .tier-row-animated {
+      opacity: 0;
+      animation: rowCascadeIn 0.3s ease forwards;
+    }
 
     @keyframes scanWave {
       0% { background-position: 0 -100vh; }
       100% { background-position: 0 100vh; }
     }
-    .scan-effect { position: relative; }
+
+    .scan-effect {
+      position: relative;
+    }
     .scan-effect::after {
       content: '';
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
-      background-size: 100% 200px; background-repeat: no-repeat;
-      animation: scanWave 0.7s ease-in-out; pointer-events: none; z-index: 20;
+      background-size: 100% 200px;
+      background-repeat: no-repeat;
+      animation: scanWave 0.7s ease-in-out;
+      pointer-events: none;
+      z-index: 20;
     }
 
-    #tier-tbody tr { transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+    #tier-tbody tr {
+      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
     #tier-tbody tr:hover {
       background-color: rgba(168, 85, 247, 0.22) !important;
       transform: translateX(6px);
@@ -239,40 +278,74 @@
       transition: transform 0.3s ease, filter 0.3s ease;
     }
 
-    #player-modal:not(.hidden) > div { animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    #player-modal:not(.hidden) > div {
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
     @keyframes modalPop {
       0% { opacity: 0; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    button, .kit-tab { transition: all 0.2s ease; }
-    button:hover, .kit-tab:hover { filter: brightness(1.2); }
-    .kit-tab.active { box-shadow: 0 0 15px rgba(168, 85, 247, 0.6); border-color: #d8b4fe !important; }
-
-    .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
-      position: fixed; border-radius: 50%; pointer-events: none; transform: scale(0); z-index: 99998;
+    button, .kit-tab {
+      transition: all 0.2s ease;
     }
+    button:hover, .kit-tab:hover {
+      filter: brightness(1.2);
+    }
+
+    .kit-tab.active {
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+      border-color: #d8b4fe !important;
+    }
+
+    /* ✨ 水面の一滴＋紫の霧 */
+    .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: scale(0);
+      z-index: 99998;
+    }
+
     .water-ripple-fog {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
-      filter: blur(6px); animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
+      filter: blur(6px);
+      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
     }
+
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.8); box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+      border: 1.5px solid rgba(217, 70, 239, 0.8);
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
       animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
     }
+
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.95); box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
+      border: 1px solid rgba(232, 121, 249, 0.95);
+      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
       animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
     }
-    @keyframes waterRippleFogAnim { 0% { transform: scale(0.1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
-    @keyframes waterRippleOuterAnim { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
-    @keyframes waterRippleInnerAnim { 0% { transform: scale(0.05); opacity: 0.9; } 100% { transform: scale(0.8); opacity: 0; } }
+
+    @keyframes waterRippleFogAnim {
+      0% { transform: scale(0.1); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    @keyframes waterRippleOuterAnim {
+      0% { transform: scale(0.1); opacity: 1; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+
+    @keyframes waterRippleInnerAnim {
+      0% { transform: scale(0.05); opacity: 0.9; }
+      100% { transform: scale(0.8); opacity: 0; }
+    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- 背景用ネザー粒子 -->
+  <!-- 🟣 背景の通常ネザー粒子用キャンバス -->
   <canvas id="nether-particles"></canvas>
+  <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
   <canvas id="click-particles-canvas"></canvas>
 
   <!-- Header -->
@@ -280,8 +353,8 @@
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
         
-        <!-- 左側・中央：Home, Tiers, CLYTIERS を均等間隔に配置 -->
-        <div class="flex items-center justify-start flex-1 gap-4 sm:gap-10">
+        <!-- 左側〜中央：Home, Tiers, CLYTIERS を均等な間隔で配置 -->
+        <div class="flex items-center gap-6 sm:gap-10">
           <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
           </button>
@@ -301,6 +374,7 @@
             <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
           </a>
 
+          <!-- ログインボタン -->
           <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
             <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
           </button>
@@ -373,43 +447,43 @@
 
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
-      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1 w-full" id="kit-tabs-container">
-          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
+          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
             <i class="fa-solid fa-trophy"></i> OVERALL
           </button>
-          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
+          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
             <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
           </button>
-          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
+          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
             <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
           </button>
-          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
+          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
             <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
           </button>
-          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
+          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
             <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
           </button>
-          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
+          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
             <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
           </button>
-          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
+          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
             <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
           </button>
-          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
+          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
             <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
           </button>
-          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
+          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
             <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
           </button>
-          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
+          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
             <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
           </button>
         </div>
 
-        <div class="flex flex-row md:flex-col items-center md:items-end justify-between shrink-0 mb-2 gap-1">
+        <div class="flex flex-col items-end shrink-0 mb-2">
           <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
-          <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105 w-full md:w-auto justify-center">
+          <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
             <i class="fa-solid fa-rotate" id="load-icon"></i> <span>LOAD</span>
           </button>
         </div>
@@ -518,20 +592,26 @@
       const fog = document.createElement('div');
       fog.className = 'water-ripple-fog';
       const fogSize = 65;
-      fog.style.width = fogSize + 'px'; fog.style.height = fogSize + 'px';
-      fog.style.left = (e.clientX - fogSize / 2) + 'px'; fog.style.top = (e.clientY - fogSize / 2) + 'px';
+      fog.style.width = fogSize + 'px';
+      fog.style.height = fogSize + 'px';
+      fog.style.left = (e.clientX - fogSize / 2) + 'px';
+      fog.style.top = (e.clientY - fogSize / 2) + 'px';
 
       const outerRipple = document.createElement('div');
       outerRipple.className = 'water-ripple-outer';
       const outerSize = 55;
-      outerRipple.style.width = outerSize + 'px'; outerRipple.style.height = outerSize + 'px';
-      outerRipple.style.left = (e.clientX - outerSize / 2) + 'px'; outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
+      outerRipple.style.width = outerSize + 'px';
+      outerRipple.style.height = outerSize + 'px';
+      outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
+      outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
       
       const innerRipple = document.createElement('div');
       innerRipple.className = 'water-ripple-inner';
       const innerSize = 25;
-      innerRipple.style.width = innerSize + 'px'; innerRipple.style.height = innerSize + 'px';
-      innerRipple.style.left = (e.clientX - innerSize / 2) + 'px'; innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
+      innerRipple.style.width = innerSize + 'px';
+      innerRipple.style.height = innerSize + 'px';
+      innerRipple.style.left = (e.clientX - innerSize / 2) + 'px';
+      innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
       
       document.body.appendChild(fog);
       document.body.appendChild(outerRipple);
@@ -545,11 +625,15 @@
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 2.8 + 1.2;
         clickParticles.push({
-          x: e.clientX, y: e.clientY,
+          x: e.clientX,
+          y: e.clientY,
           size: Math.random() * 2.8 + 1.5,
-          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 0.4,
-          alpha: 1.0, color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
-          life: 0, maxLife: 42
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 0.4,
+          alpha: 1.0,
+          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
+          life: 0,
+          maxLife: 42
         });
       }
     });
@@ -561,8 +645,10 @@
       const clickCtx = clickCanvas.getContext('2d');
 
       function resizeCanvases() {
-        bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
-        clickCanvas.width = window.innerWidth; clickCanvas.height = window.innerHeight;
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+        clickCanvas.width = window.innerWidth;
+        clickCanvas.height = window.innerHeight;
       }
       resizeCanvases();
       window.addEventListener('resize', resizeCanvases);
@@ -572,10 +658,13 @@
 
       for (let i = 0; i < particleCount; i++) {
         backgroundParticles.push({
-          x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
           size: Math.random() * 2.5 + 1,
-          speedX: (Math.random() - 0.5) * 0.4, speedY: -Math.random() * 0.6 - 0.2,
-          opacity: Math.random() * 0.6 + 0.2, color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7'
+          speedX: (Math.random() - 0.5) * 0.4,
+          speedY: -Math.random() * 0.6 - 0.2,
+          opacity: Math.random() * 0.6 + 0.2,
+          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7'
         });
       }
 
@@ -584,12 +673,19 @@
         backgroundParticles.forEach(p => {
           bgCtx.beginPath();
           bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          bgCtx.fillStyle = p.color; bgCtx.globalAlpha = p.opacity;
-          bgCtx.shadowBlur = 8; bgCtx.shadowColor = '#c084fc';
+          bgCtx.fillStyle = p.color;
+          bgCtx.globalAlpha = p.opacity;
+          bgCtx.shadowBlur = 8;
+          bgCtx.shadowColor = '#c084fc';
           bgCtx.fill();
 
-          p.x += p.speedX; p.y += p.speedY;
-          if (p.y < -10) { p.y = bgCanvas.height + 10; p.x = Math.random() * bgCanvas.width; }
+          p.x += p.speedX;
+          p.y += p.speedY;
+
+          if (p.y < -10) {
+            p.y = bgCanvas.height + 10;
+            p.x = Math.random() * bgCanvas.width;
+          }
           if (p.x < -10) p.x = bgCanvas.width + 10;
           if (p.x > bgCanvas.width + 10) p.x = -10;
         });
@@ -602,14 +698,20 @@
 
           clickCtx.beginPath();
           clickCtx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
-          clickCtx.fillStyle = cp.color; clickCtx.globalAlpha = cp.alpha;
-          clickCtx.shadowBlur = 12; clickCtx.shadowColor = '#e879f9';
+          clickCtx.fillStyle = cp.color;
+          clickCtx.globalAlpha = cp.alpha;
+          clickCtx.shadowBlur = 12;
+          clickCtx.shadowColor = '#e879f9';
           clickCtx.fill();
 
-          cp.x += cp.vx; cp.y += cp.vy;
-          cp.vx *= 0.94; cp.vy *= 0.94;
+          cp.x += cp.vx;
+          cp.y += cp.vy;
+          cp.vx *= 0.94;
+          cp.vy *= 0.94;
 
-          if (cp.life >= cp.maxLife) clickParticles.splice(i, 1);
+          if (cp.life >= cp.maxLife) {
+            clickParticles.splice(i, 1);
+          }
         }
 
         requestAnimationFrame(animate);
@@ -791,9 +893,9 @@
       
       document.querySelectorAll('.kit-tab').forEach(btn => {
         if (btn.getAttribute('data-kit') === kit) {
-          btn.className = "kit-tab active bg-brand-purple text-white px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
+          btn.className = "kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
         } else {
-          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-3 sm:px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
+          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
         }
       });
 
@@ -1019,6 +1121,7 @@
       }
     }
 
+    // プレイヤーログインモーダルの開閉用関数
     function openLoginModal() {
       document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
@@ -1056,6 +1159,7 @@
         closeLoginModal();
       } else {
         errorMsg.innerText = "該当するプレイヤーが見つかりません。";
+        errorMsg.classList.add('hidden');
         errorMsg.classList.remove('hidden');
       }
     }
