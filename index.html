@@ -53,7 +53,6 @@
       overflow-x: hidden;
     }
 
-    /* 🟣 背景用ネザー粒子描画キャンバス */
     #nether-particles {
       position: fixed;
       top: 0; left: 0;
@@ -62,7 +61,6 @@
       z-index: 10;
     }
 
-    /* 🟣 タップ時専用・最前面（一番上）に描画するキャンバス */
     #click-particles-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -76,7 +74,6 @@
       z-index: 20;
     }
 
-    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
     .clytiers-gradient-logo {
       background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
       background-size: 400% 400%;
@@ -300,7 +297,6 @@
       border-color: #d8b4fe !important;
     }
 
-    /* ✨ 水面の一滴＋紫の霧（サクッと消えるスピード） */
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
       position: fixed;
       border-radius: 50%;
@@ -350,38 +346,39 @@
   <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
   <canvas id="click-particles-canvas"></canvas>
 
-  <!-- Header : 左側に Home, Tiers, ロゴ / 右側に Discord, Login -->
+  <!-- Header : 3分割グリッドで絶対に中央にロゴが来る構造 -->
   <header class="sticky top-0 z-20 glass-nav">
-    <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
-      <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
-        
-        <!-- 左側グループ：Home, Tiers, ロゴ -->
-        <div class="flex items-center gap-4 sm:gap-6">
-          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
-            <i class="fa-solid fa-house text-xs"></i><span>Home</span>
-          </button>
+    <div class="max-w-7xl mx-auto px-4 h-16 grid grid-cols-3 items-center">
+      
+      <!-- 左側：Home, Tiers -->
+      <nav class="flex items-center gap-4 sm:gap-6 justify-start font-orbitron font-bold text-xs sm:text-sm">
+        <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
+          <i class="fa-solid fa-house text-xs"></i><span>Home</span>
+        </button>
 
-          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
-            <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
-          </button>
-
-          <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
-            CLYTIERS
-          </a>
-        </div>
-
-        <!-- 右側グループ：Discord と Loginボタン -->
-        <div class="flex items-center gap-4 sm:gap-6">
-          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
-            <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
-          </a>
-
-          <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
-            <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
-          </button>
-        </div>
-
+        <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300" id="nav-tiers">
+          <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
+        </button>
       </nav>
+
+      <!-- 中央：CLYTIERS ロゴ -->
+      <div class="flex justify-center font-orbitron font-bold">
+        <a href="#" onclick="switchTab('home')" class="font-black text-base sm:text-xl tracking-wider clytiers-gradient-logo">
+          CLYTIERS
+        </a>
+      </div>
+
+      <!-- 右側：Discord, Login -->
+      <nav class="flex items-center gap-4 sm:gap-6 justify-end font-orbitron font-bold text-xs sm:text-sm">
+        <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
+          <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
+        </a>
+
+        <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
+          <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
+        </button>
+      </nav>
+
     </div>
   </header>
 
@@ -448,9 +445,7 @@
 
     <!-- TIERS TAB -->
     <section id="tab-tiers" class="hidden space-y-6">
-      <!-- Kit Tabs & Load Button Container -->
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- Kit Tabs -->
         <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
           <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
             <i class="fa-solid fa-trophy"></i> OVERALL
@@ -484,7 +479,6 @@
           </button>
         </div>
 
-        <!-- Load Button & CoolDown Display -->
         <div class="flex flex-col items-end shrink-0 mb-2">
           <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
           <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
@@ -493,7 +487,6 @@
         </div>
       </div>
 
-      <!-- Search & Filters -->
       <div class="flex flex-wrap items-center justify-between gap-4 bg-brand-card p-4 rounded-xl border border-brand-border">
         <div class="relative flex-1 min-w-[200px]">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
@@ -504,7 +497,6 @@
         </div>
       </div>
 
-      <!-- Tiers Table -->
       <div id="table-container" class="overflow-x-auto rounded-xl border border-brand-border bg-brand-card">
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
@@ -530,7 +522,6 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- Profile Header -->
       <div class="skin-showcase-bg rounded-xl p-4 sm:p-5 mb-4 border border-brand-border flex items-center gap-4 sm:gap-6 relative">
         <div class="absolute top-2 left-3 text-[9px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
           // PLAYER PROFILE
@@ -593,9 +584,6 @@
   </footer>
 
   <script>
-    /* ========================================================
-       🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
-       ======================================================== */
     const clickParticles = [];
 
     window.addEventListener('click', (e) => {
@@ -1131,9 +1119,6 @@
       }
     }
 
-    /* ========================================================
-       🟣 ログインモーダル用の独立した安全な制御関数
-       ======================================================== */
     function openLoginModal() {
       document.getElementById('login-mcid-input').value = '';
       document.getElementById('login-password-input').value = '';
@@ -1158,7 +1143,7 @@
       
       if (!mcid || !pass) {
         errorMsg.innerText = "MCIDとパスワードを入力してください。";
-        errorMsg.classList.remove('hidden');
+        errorMsg.classList.add('hidden');
         return;
       }
 
