@@ -19,17 +19,22 @@ function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// 1. スプレッドシートからプレイヤーデータを取得するエンドポイント
+// 1. スプレッドシートからプレイヤーデータを取得するエンドポイント（詳細ログ出力版）
 app.get('/api/players', async (req, res) => {
   try {
+    console.log("Fetching from GAS URL:", GAS_URL + "?action=getPlayers");
     const gasResponse = await fetch(GAS_URL + "?action=getPlayers", {
       method: 'GET'
     });
-    const data = await gasResponse.json();
+    
+    const textData = await gasResponse.text(); // 一度テキストとして受け取る
+    console.log("GAS Response Raw Text (First 200 chars):", textData.substring(0, 200)); // 最初の200文字をログに出す
+
+    const data = JSON.parse(textData);
     res.json(data);
   } catch (error) {
-    console.error('Failed to fetch players from GAS:', error);
-    res.status(500).json({ status: 'error', message: 'Failed to fetch players' });
+    console.error('Detailed Failed to fetch players from GAS:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to fetch players: ' + error.message });
   }
 });
 
