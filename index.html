@@ -53,7 +53,6 @@
       overflow-x: hidden;
     }
 
-    /* 🟣 背景用ネザー粒子描画キャンバス */
     #nether-particles {
       position: fixed;
       top: 0; left: 0;
@@ -62,7 +61,6 @@
       z-index: 10;
     }
 
-    /* 🟣 タップ時専用・最前面に描画するキャンバス */
     #click-particles-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -76,7 +74,6 @@
       z-index: 20;
     }
 
-    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
     .clytiers-gradient-logo {
       background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
       background-size: 400% 400%;
@@ -168,16 +165,9 @@
     .rank-shining::after {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to right,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.8) 50%,
-        rgba(255,255,255,0) 100%
-      );
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
       transform: rotate(30deg);
       animation: shine 1.8s infinite;
       pointer-events: none;
@@ -189,21 +179,9 @@
       100% { transform: translateX(100%) rotate(30deg); }
     }
 
-    .rank-1-box {
-      background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
-      border: 1px solid rgba(253, 230, 138, 0.95);
-    }
-    .rank-2-box {
-      background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-      box-shadow: 0 0 25px rgba(209, 213, 219, 0.8);
-      border: 1px solid rgba(243, 244, 246, 0.95);
-    }
-    .rank-3-box {
-      background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
-      box-shadow: 0 0 25px rgba(217, 119, 6, 0.8);
-      border: 1px solid rgba(253, 186, 116, 0.95);
-    }
+    .rank-1-box { background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%); box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); border: 1px solid rgba(253, 230, 138, 0.95); }
+    .rank-2-box { background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%); box-shadow: 0 0 25px rgba(209, 213, 219, 0.8); border: 1px solid rgba(243, 244, 246, 0.95); }
+    .rank-3-box { background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%); box-shadow: 0 0 25px rgba(217, 119, 6, 0.8); border: 1px solid rgba(253, 186, 116, 0.95); }
     
     .rank-normal-box {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -211,9 +189,7 @@
       border: 1px solid rgba(96, 165, 250, 0.8);
       transition: transform 0.3s ease;
     }
-    #tier-tbody tr:hover .rank-normal-box {
-      transform: scale(1.05);
-    }
+    #tier-tbody tr:hover .rank-normal-box { transform: scale(1.05); }
 
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(7, 3, 13, 0.96) 85%);
@@ -230,43 +206,28 @@
       0% { opacity: 0; transform: translateY(14px) scale(0.97); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
-    section:not(.hidden) {
-      animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
+    section:not(.hidden) { animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     @keyframes rowCascadeIn {
       0% { opacity: 0; transform: translateY(15px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-
-    .tier-row-animated {
-      opacity: 0;
-      animation: rowCascadeIn 0.3s ease forwards;
-    }
+    .tier-row-animated { opacity: 0; animation: rowCascadeIn 0.3s ease forwards; }
 
     @keyframes scanWave {
       0% { background-position: 0 -100vh; }
       100% { background-position: 0 100vh; }
     }
-
-    .scan-effect {
-      position: relative;
-    }
+    .scan-effect { position: relative; }
     .scan-effect::after {
       content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
-      background-size: 100% 200px;
-      background-repeat: no-repeat;
-      animation: scanWave 0.7s ease-in-out;
-      pointer-events: none;
-      z-index: 20;
+      background-size: 100% 200px; background-repeat: no-repeat;
+      animation: scanWave 0.7s ease-in-out; pointer-events: none; z-index: 20;
     }
 
-    #tier-tbody tr {
-      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-    }
+    #tier-tbody tr { transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
     #tier-tbody tr:hover {
       background-color: rgba(168, 85, 247, 0.22) !important;
       transform: translateX(6px);
@@ -278,83 +239,50 @@
       transition: transform 0.3s ease, filter 0.3s ease;
     }
 
-    #player-modal:not(.hidden) > div {
-      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
+    #player-modal:not(.hidden) > div { animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     @keyframes modalPop {
       0% { opacity: 0; transform: scale(0.8); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    button, .kit-tab {
-      transition: all 0.2s ease;
-    }
-    button:hover, .kit-tab:hover {
-      filter: brightness(1.2);
-    }
+    button, .kit-tab { transition: all 0.2s ease; }
+    button:hover, .kit-tab:hover { filter: brightness(1.2); }
+    .kit-tab.active { box-shadow: 0 0 15px rgba(168, 85, 247, 0.6); border-color: #d8b4fe !important; }
 
-    .kit-tab.active {
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
-      border-color: #d8b4fe !important;
-    }
-
-    /* ✨ 水面の一滴＋紫の霧 */
     .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: scale(0);
-      z-index: 99998;
+      position: fixed; border-radius: 50%; pointer-events: none; transform: scale(0); z-index: 99998;
     }
-
     .water-ripple-fog {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
-      filter: blur(6px);
-      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
+      filter: blur(6px); animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
     }
-
     .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.8);
-      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+      border: 1.5px solid rgba(217, 70, 239, 0.8); box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
       animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
     }
-
     .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.95);
-      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
+      border: 1px solid rgba(232, 121, 249, 0.95); box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
       animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
     }
-
-    @keyframes waterRippleFogAnim {
-      0% { transform: scale(0.1); opacity: 0.8; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-
-    @keyframes waterRippleOuterAnim {
-      0% { transform: scale(0.1); opacity: 1; }
-      100% { transform: scale(1.3); opacity: 0; }
-    }
-
-    @keyframes waterRippleInnerAnim {
-      0% { transform: scale(0.05); opacity: 0.9; }
-      100% { transform: scale(0.8); opacity: 0; }
-    }
+    @keyframes waterRippleFogAnim { 0% { transform: scale(0.1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+    @keyframes waterRippleOuterAnim { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+    @keyframes waterRippleInnerAnim { 0% { transform: scale(0.05); opacity: 0.9; } 100% { transform: scale(0.8); opacity: 0; } }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- 🟣 背景の通常ネザー粒子用キャンバス -->
+  <!-- 背景用ネザー粒子 -->
   <canvas id="nether-particles"></canvas>
-  <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
   <canvas id="click-particles-canvas"></canvas>
 
   <!-- Header -->
   <header class="sticky top-0 z-20 glass-nav">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
+      <!-- 横幅が狭い場合でも絶対に折り返さず、1行で美しく均等配置させるためのクラス構成 -->
+      <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm whitespace-nowrap">
         
-        <!-- 左側〜中央：Home, Tiers, CLYTIERS を均等な間隔で配置 -->
-        <div class="flex items-center gap-6 sm:gap-10">
+        <!-- 左側：Home と Tiers -->
+        <div class="flex items-center gap-4 sm:gap-8">
           <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
           </button>
@@ -362,19 +290,21 @@
           <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300" id="nav-tiers">
             <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
           </button>
+        </div>
 
-          <a href="#" onclick="switchTab('home')" class="font-black text-base sm:text-2xl tracking-wider clytiers-gradient-logo">
+        <!-- 中央：CLYTIERS ロゴ -->
+        <div class="absolute left-1/2 -translate-x-1/2">
+          <a href="#" onclick="switchTab('home')" class="font-black text-sm sm:text-xl md:text-2xl tracking-wider clytiers-gradient-logo">
             CLYTIERS
           </a>
         </div>
 
         <!-- 右側：Discord と Login -->
-        <div class="flex items-center gap-4 sm:gap-6 shrink-0">
+        <div class="flex items-center gap-4 sm:gap-6">
           <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
             <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
           </a>
 
-          <!-- ログインボタン -->
           <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
             <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
           </button>
@@ -1159,7 +1089,6 @@
         closeLoginModal();
       } else {
         errorMsg.innerText = "該当するプレイヤーが見つかりません。";
-        errorMsg.classList.add('hidden');
         errorMsg.classList.remove('hidden');
       }
     }
