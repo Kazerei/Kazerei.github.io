@@ -277,30 +277,35 @@
 
   <!-- Header -->
   <header class="sticky top-0 z-20 glass-nav">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
-      <!-- 左右のナビゲーション＆ロゴをフレックスで最適化（狭い画面でも崩れないように） -->
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
-        <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
+        
+        <!-- 左側・中央：Home, Tiers, CLYTIERS を均等間隔に配置 -->
+        <div class="flex items-center justify-start flex-1 gap-4 sm:gap-10">
+          <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-brand-lightPurple" id="nav-home">
             <i class="fa-solid fa-house text-xs"></i><span>Home</span>
           </button>
-          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
+
+          <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300" id="nav-tiers">
             <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
           </button>
+
+          <a href="#" onclick="switchTab('home')" class="font-black text-base sm:text-2xl tracking-wider clytiers-gradient-logo">
+            CLYTIERS
+          </a>
         </div>
 
-        <a href="#" onclick="switchTab('home')" class="font-black text-base sm:text-2xl tracking-wider clytiers-gradient-logo px-1 shrink-0">
-          CLYTIERS
-        </a>
-
-        <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1 text-gray-300">
-            <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span class="hidden sm:inline">Discord</span>
+        <!-- 右側：Discord と Login -->
+        <div class="flex items-center gap-4 sm:gap-6 shrink-0">
+          <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
+            <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
           </a>
-          <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1 text-gray-300">
+
+          <button onclick="openLoginModal()" class="transition-colors hover:text-brand-lightPurple py-1 flex items-center gap-1.5 text-gray-300">
             <i class="fa-solid fa-right-to-bracket text-xs text-brand-purple"></i><span>Login</span>
           </button>
         </div>
+
       </nav>
     </div>
   </header>
