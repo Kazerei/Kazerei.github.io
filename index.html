@@ -159,10 +159,11 @@
       transform-style: preserve-3d;
     }
 
+    /* ホバー時のバナーの動きに合わせてスキンが飛び出さないように調整 */
     #tier-tbody tr:hover .rank-1-box,
     #tier-tbody tr:hover .rank-2-box,
     #tier-tbody tr:hover .rank-3-box {
-      transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
+      transform: rotateX(6deg) rotateY(-6deg) scale(1.05);
     }
 
     .rank-shining::after {
@@ -214,7 +215,7 @@
       transition: transform 0.3s ease;
     }
     #tier-tbody tr:hover .rank-normal-box {
-      transform: scale(1.05);
+      transform: scale(1.02);
     }
 
     .skin-showcase-bg {
@@ -271,12 +272,13 @@
     }
     #tier-tbody tr:hover {
       background-color: rgba(168, 85, 247, 0.22) !important;
-      transform: translateX(6px);
+      transform: translateX(4px);
       box-shadow: inset 5px 0 0 0 #e879f9, 0 8px 25px rgba(217, 70, 239, 0.35);
     }
+    /* ホバー時の画像の過度な拡大を抑えて頭が切れるのを防ぐ */
     #tier-tbody tr:hover img {
-      transform: translateY(2px) scale(1.08);
-      filter: drop-shadow(0 0 12px rgba(232, 121, 249, 0.9));
+      transform: translateY(10px) scale(1.02);
+      filter: drop-shadow(0 0 10px rgba(232, 121, 249, 0.8));
       transition: transform 0.3s ease, filter 0.3s ease;
     }
 
@@ -370,7 +372,7 @@
           <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
         </a>
 
-        <!-- Login Button (Replaced Language Dropdown, preserving exact original class and structure) -->
+        <!-- Login Button -->
         <button onclick="openLoginModal()" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded text-xs flex items-center gap-1.5 hover:border-brand-purple text-gray-300 hover:text-brand-lightPurple transition-colors">
           <i class="fa-solid fa-right-to-bracket text-brand-purple"></i>
           <span>Login</span>
@@ -576,8 +578,7 @@
           <label class="block text-[11px] font-mono text-gray-400 mb-1">Password</label>
           <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
         </div>
-        <button onclick="handleLoginSubmit()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
-        <div id="login-error-msg" class="text-[11px] text-red-400 text-center hidden">MCIDまたはパスワードが違います。</div>
+        <button onclick="alert('ログイン機能は準備中です')" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
       </div>
     </div>
   </div>
@@ -593,7 +594,6 @@
     const clickParticles = [];
 
     window.addEventListener('click', (e) => {
-      // 1. 周りにボワッと広がる紫色の霧（フォグ）
       const fog = document.createElement('div');
       fog.className = 'water-ripple-fog';
       const fogSize = 65;
@@ -602,7 +602,6 @@
       fog.style.left = (e.clientX - fogSize / 2) + 'px';
       fog.style.top = (e.clientY - fogSize / 2) + 'px';
 
-      // 2. 外側の波紋リング
       const outerRipple = document.createElement('div');
       outerRipple.className = 'water-ripple-outer';
       const outerSize = 55;
@@ -611,7 +610,6 @@
       outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
       outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
       
-      // 3. 内側の波紋リング
       const innerRipple = document.createElement('div');
       innerRipple.className = 'water-ripple-inner';
       const innerSize = 25;
@@ -624,12 +622,10 @@
       document.body.appendChild(outerRipple);
       document.body.appendChild(innerRipple);
       
-      // 波紋は約0.75秒で消去
       setTimeout(() => fog.remove(), 750);
       setTimeout(() => outerRipple.remove(), 650);
       setTimeout(() => innerRipple.remove(), 500);
 
-      // 4. タップした位置からランダムな方向に飛び散り、約0.7秒（42フレーム）で消えるネザー粒子（5個）を最前面に追加
       for (let i = 0; i < 5; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 2.8 + 1.2;
@@ -642,20 +638,14 @@
           alpha: 1.0,
           color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
           life: 0,
-          maxLife: 42 // 60fpsで約0.7秒
+          maxLife: 42
         });
       }
     });
 
-    /* ========================================================
-       🟣 ネザーの紫粒子（背景浮遊 ＆ 最前面クリック時飛び散りアニメーション）
-       ======================================================== */
     window.addEventListener('DOMContentLoaded', () => {
-      // 背景用キャンバス
       const bgCanvas = document.getElementById('nether-particles');
       const bgCtx = bgCanvas.getContext('2d');
-
-      // 最前面クリック粒子用キャンバス
       const clickCanvas = document.getElementById('click-particles-canvas');
       const clickCtx = clickCanvas.getContext('2d');
 
@@ -668,7 +658,6 @@
       resizeCanvases();
       window.addEventListener('resize', resizeCanvases);
 
-      // 背景用粒子データの初期化
       const backgroundParticles = [];
       const particleCount = 45;
 
@@ -685,7 +674,6 @@
       }
 
       function animate() {
-        // --- 1. 背景キャンバスの描画 ---
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
         backgroundParticles.forEach(p => {
           bgCtx.beginPath();
@@ -707,7 +695,6 @@
           if (p.x > bgCanvas.width + 10) p.x = -10;
         });
 
-        // --- 2. 最前面（一番上）クリック粒子の描画 ---
         clickCtx.clearRect(0, 0, clickCanvas.width, clickCanvas.height);
         for (let i = clickParticles.length - 1; i >= 0; i--) {
           const cp = clickParticles[i];
@@ -1075,7 +1062,7 @@
               <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
                 <span>${rankNum}.</span>
                 <div class="h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
-                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7" onerror="handleSkinError(this)">
+                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-10" onerror="handleSkinError(this)">
                 </div>
               </div>
             </div>
@@ -1139,19 +1126,12 @@
       }
     }
 
-    /* ========================================================
-       🟣 ログインモーダル関連の関数（追加）
-       ======================================================== */
     function openLoginModal() {
-      // ログインモーダルを作る場合の安全なダミー処理
-      const modal = document.getElementById('login-modal');
-      if (modal) modal.classList.remove('hidden');
-      else alert('Loginモーダルが設定されていません。');
+      document.getElementById('login-modal').classList.remove('hidden');
     }
 
     function closeLoginModal() {
-      const modal = document.getElementById('login-modal');
-      if (modal) modal.classList.add('hidden');
+      document.getElementById('login-modal').classList.add('hidden');
     }
 
     function handleLoginModalBgClick(event) {
@@ -1160,32 +1140,5 @@
       }
     }
   </script>
-
-  <!-- Login Modal Structure -->
-  <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleLoginModalBgClick(event)">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box shadow-2xl">
-      <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div class="text-center mb-4">
-        <div class="inline-block p-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple mb-2">
-          <i class="fa-solid fa-user-lock text-xl"></i>
-        </div>
-        <h3 class="text-lg font-bold font-orbitron text-white">PLAYER LOGIN</h3>
-        <p class="text-xs text-gray-400 mt-1">プレイヤーログイン</p>
-      </div>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-mono text-gray-400 mb-1">MCID / UUID</label>
-          <input type="text" id="login-mcid-input" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div>
-          <label class="block text-[11px] font-mono text-gray-400 mb-1">Password</label>
-          <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <button onclick="alert('ログイン機能は準備中です')" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
