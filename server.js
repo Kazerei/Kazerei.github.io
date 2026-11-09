@@ -1,19 +1,5 @@
 const express = require('express');
-const path = require('path'); // 追加
-const cors = require('cors');
-const crypto = require('crypto');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-const app = express();
-app.use(express.json({ limit: '15mb' }));
-app.use(cors());
-
-const PORT = process.env.PORT || 3000;
-const GAS_URL = process.env.GAS_URL;
-
-// 🟣 ここを追加：同じフォルダ内にあるファイル（HTMLや画像）を外部に公開する
-app.use(express.static(path.join(__dirname)));
-const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const crypto = require('crypto');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -25,15 +11,13 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 const GAS_URL = process.env.GAS_URL;
 
+// 🟣 同じフォルダ内にあるHTMLや画像などの静的ファイルを配信する設定
+app.use(express.static(path.join(__dirname)));
+
 // SHA-256 ハッシュ化関数
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
-
-// ヘルスチェック
-app.get('/', (req, res) => {
-  res.send('Clytiers Secure Backend is running!');
-});
 
 // 1. スプレッドシートからプレイヤーデータを取得するエンドポイント
 app.get('/api/players', async (req, res) => {
