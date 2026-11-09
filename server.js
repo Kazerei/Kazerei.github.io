@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const crypto = require('crypto');
+const https = require('https'); // 追加
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
@@ -13,6 +14,18 @@ const GAS_URL = process.env.GAS_URL;
 
 // 🟣 同じフォルダ内にあるHTMLや画像などの静的ファイルを配信する設定
 app.use(express.static(path.join(__dirname)));
+
+// 🟣 スリープ防止用：14分おきに自分自身へPingを送信
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://kazerei-github-io.onrender.com'; // 自分のRenderのURLに書き換えてもOKです
+setInterval(() => {
+  if (RENDER_URL.includes('onrender.com')) {
+    https.get(RENDER_URL, (res) => {
+      console.log(`Keep-Alive ping sent, status: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error('Keep-Alive ping error:', err.message);
+    });
+  }
+}, 14 * 60 * 1000);
 
 // SHA-256 ハッシュ化関数
 function hashPassword(password) {
@@ -28,7 +41,7 @@ app.get('/api/players', async (req, res) => {
     });
     
     const textData = await gasResponse.text(); // 一度テキストとして受け取る
-    console.log("GAS Response Raw Text (First 200 chars):", textData.substring(0, 200)); // 最初の200文字をログに出す
+    console.log("GAS Response Raw Text (First 200 chars):", textData.substring(0, 200));
 
     const data = JSON.parse(textData);
     res.json(data);
@@ -47,7 +60,6 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ status: 'error', message: '必須パラメータが不足しています。' });
     }
 
-    // 試すモデルのリスト
     const modelNames = [
       'gemini-3.5-flash-lite',
       'gemini-3.6-flash-lite',
@@ -55,7 +67,6 @@ app.post('/api/register', async (req, res) => {
       'gemini-3.6-flash'
     ];
 
-    // 使用するAPIキーのリスト（GEMINI_API_1 と GEMINI_API_2）
     const apiKeys = [
       process.env.GEMINI_API_1,
       process.env.GEMINI_API_2
@@ -68,7 +79,6 @@ app.post('/api/register', async (req, res) => {
     let aiPassed = false;
     let aiErrorMsg = '';
 
-    // Base64データをGemini形式に変換
     const imagePart = {
       inlineData: {
         data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
@@ -83,12 +93,10 @@ app.post('/api/register', async (req, res) => {
       {"result": "pass"} または {"result": "fail", "reason": "理由"}
     `;
 
-    // APIキーごとにループ
     for (let keyIdx = 0; keyIdx < apiKeys.length; keyIdx++) {
       const currentApiKey = apiKeys[keyIdx];
       const genAI = new GoogleGenerativeAI(currentApiKey);
 
-      // モデルごとに順番にループ
       for (let modelIdx = 0; modelIdx < modelNames.length; modelIdx++) {
         const modelName = modelNames[modelIdx];
         try {
@@ -120,10 +128,8 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ status: 'fail', message: `AI画像検証に失敗しました: ${aiErrorMsg}` });
     }
 
-    // パスワードのハッシュ化
     const passwordHash = hashPassword(password);
 
-    // GASへデータを転送
     const gasResponse = await fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
