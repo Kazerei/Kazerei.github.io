@@ -577,7 +577,9 @@
           <label class="block text-[11px] font-mono text-gray-400 mb-1">Password</label>
           <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
         </div>
-        <button onclick="alert('ログイン機能は準備中です')" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
+        <!-- エラーメッセージ表示用 -->
+        <div id="login-error-msg" class="text-[11px] text-red-400 text-center hidden"></div>
+        <button onclick="handleLoginSubmit()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
       </div>
     </div>
   </div>
@@ -922,7 +924,7 @@
       tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
 
       try {
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbybXABVRz47h-EpEwjnfmsyUEGz2_BokIuHZDpB7vh6rOrXVsQMF8muCnLQk0mrFRG6dg/exec?t=" + new Date().getTime();
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxmbRgLlxeJzvNhNC_BGlxTwVzVJVRaCrgGf2e0dioe7DfuUoutYb6GQqhPygnK5iA28g/exec?t=" + new Date().getTime();
         
         const response = await fetch(webAppUrl);
         const rawData = await response.json();
@@ -1127,6 +1129,11 @@
 
     function openLoginModal() {
       document.getElementById('login-modal').classList.remove('hidden');
+      const errorMsg = document.getElementById('login-error-msg');
+      if (errorMsg) {
+        errorMsg.classList.add('hidden');
+        errorMsg.innerText = '';
+      }
     }
 
     function closeLoginModal() {
@@ -1136,6 +1143,54 @@
     function handleLoginModalBgClick(event) {
       if (event.target.id === 'login-modal') {
         closeLoginModal();
+      }
+    }
+
+    /* 🟣 SHA-256を用いたログイン認証ロジック */
+    async function handleLoginSubmit() {
+      const mcidInput = document.getElementById('login-mcid-input').value.trim();
+      const passwordInput = document.getElementById('login-password-input').value;
+      const errorMsg = document.getElementById('login-error-msg');
+      
+      if (!mcidInput || !passwordInput) {
+        if (errorMsg) {
+          errorMsg.innerText = "MCIDとパスワードを入力してください。";
+          errorMsg.classList.remove('hidden');
+        }
+        return;
+      }
+
+      try {
+        if (errorMsg) errorMsg.classList.add('hidden');
+
+        // パスワードをSHA-256でハッシュ化
+        const msgBuffer = new TextEncoder().encode(passwordInput);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // 新しい読み込み専用GASのURLにパラメータをつけてGETリクエスト
+        const baseUrl = "https://script.google.com/macros/s/AKfycbxmbRgLlxeJzvNhNC_BGlxTwVzVJVRaCrgGf2e0dioe7DfuUoutYb6GQqhPygnK5iA28g/exec";
+        const url = `${baseUrl}?action=login&mcid=${encodeURIComponent(mcidInput)}&passwordHash=${passwordHash}`;
+        
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.success) {
+          alert('ログイン成功！ようこそ、' + result.name + 'さん');
+          closeLoginModal();
+        } else {
+          if (errorMsg) {
+            errorMsg.innerText = result.message || "MCIDまたはパスワードが違います。";
+            errorMsg.classList.remove('hidden');
+          }
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        if (errorMsg) {
+          errorMsg.innerText = "通信エラーが発生しました。";
+          errorMsg.classList.remove('hidden');
+        }
       }
     }
   </script>
