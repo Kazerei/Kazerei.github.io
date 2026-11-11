@@ -285,7 +285,8 @@
       transition: filter 0.3s ease;
     }
 
-    #player-modal:not(.hidden) > div {
+    #player-modal:not(.hidden) > div,
+    #profile-modal:not(.hidden) > div {
       animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
     @keyframes modalPop {
@@ -363,7 +364,7 @@
           <i class="fa-solid fa-house text-xs"></i><span>Home</span>
         </button>
 
-        <button onclick="switchTab('tiers')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tiers">
+        <button onclick="switchTab('tier')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tier">
           <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
         </button>
 
@@ -474,7 +475,7 @@
     </section>
 
     <!-- TIERS TAB -->
-    <section id="tab-tiers" class="hidden space-y-6">
+    <section id="tab-tier" class="hidden space-y-6">
       <!-- Kit Tabs & Load Button Container -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <!-- Kit Tabs -->
@@ -527,7 +528,7 @@
           <input type="text" id="search-input" onkeyup="renderTable()" placeholder="Search MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg pl-9 pr-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
         </div>
         <div class="text-xs text-gray-400 font-mono">
-          <span>※ プレイヤー行をクリックで詳細プロフィールを表示</span>
+          <span>※ プレイヤー行をクリックで詳細Tierを表示</span>
         </div>
       </div>
 
@@ -550,7 +551,7 @@
     </section>
   </main>
 
-  <!-- Player Detail Modal -->
+  <!-- Player Tier Detail Modal -->
   <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleModalBgClick(event)">
     <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-md w-full p-5 sm:p-6 relative glow-box overflow-hidden shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
@@ -560,7 +561,7 @@
       <!-- Profile Header -->
       <div class="skin-showcase-bg rounded-xl p-4 sm:p-5 mb-4 border border-brand-border flex items-center gap-4 sm:gap-6 relative">
         <div class="absolute top-2 left-3 text-[9px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
-          // PLAYER PROFILE
+          // PLAYER TIER DETAIL
         </div>
         <div class="relative group mt-2 shrink-0">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
@@ -583,6 +584,35 @@
       </h4>
       <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
         <!-- Dynamic -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal (完全別物) -->
+  <div id="profile-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleProfileModalBgClick(event)">
+    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-md w-full p-6 relative glow-box shadow-2xl">
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="text-center mb-4">
+        <div class="inline-block p-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple mb-2">
+          <i class="fa-solid fa-user-gear text-xl"></i>
+        </div>
+        <h3 class="text-lg font-bold font-orbitron text-white">PLAYER PROFILE</h3>
+        <p class="text-xs text-gray-400 mt-1">アカウント設定 & プロフィール</p>
+      </div>
+      <div class="space-y-4 text-xs font-mono">
+        <div class="bg-brand-dark p-3 rounded-lg border border-brand-border">
+          <span class="text-gray-400 block mb-1">Logged in as:</span>
+          <span id="profile-username" class="text-white font-bold text-sm"></span>
+        </div>
+        <div class="bg-brand-dark p-3 rounded-lg border border-brand-border">
+          <span class="text-gray-400 block mb-1">Status:</span>
+          <span class="text-emerald-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> 認証済みアカウント (Active Session)
+          </span>
+        </div>
+        <button onclick="closeProfileModal()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all">閉じる</button>
       </div>
     </div>
   </div>
@@ -765,6 +795,7 @@
 
     let activeKitFilter = 'OVERALL';
     let playersData = [];
+    let isDataLoaded = false; // データの重複ロードを防ぐフラグ
     let cooldownTimer = null;
     let loggedInUser = null;
 
@@ -919,14 +950,14 @@
     }
 
     /* ========================================================
-       🟣 ルーター＆タブ切り替え機構
+       🟣 ルーター＆タブ切り替え機構 (/#/tier と /#/tier/mcid に対応)
        ======================================================== */
     function switchTab(tabName, updateHash = true) {
       document.getElementById('tab-home').classList.add('hidden');
-      document.getElementById('tab-tiers').classList.add('hidden');
+      document.getElementById('tab-tier').classList.add('hidden');
       
       document.getElementById('nav-home').classList.replace('text-brand-lightPurple', 'text-gray-300');
-      document.getElementById('nav-tiers').classList.replace('text-brand-lightPurple', 'text-gray-300');
+      document.getElementById('nav-tier').classList.replace('text-brand-lightPurple', 'text-gray-300');
 
       const targetTab = document.getElementById(`tab-${tabName}`);
       const targetNav = document.getElementById(`nav-${tabName}`);
@@ -934,30 +965,35 @@
       if (targetTab) targetTab.classList.remove('hidden');
       if (targetNav) targetNav.classList.replace('text-gray-300', 'text-brand-lightPurple');
 
-      if (tabName === 'tiers') {
-        fetchSpreadsheetData();
+      if (tabName === 'tier') {
+        // すでにデータがロード済みでなければ初回のみフェッチする
+        if (!isDataLoaded) {
+          fetchSpreadsheetData();
+        }
       }
 
       if (updateHash) {
-        window.location.hash = `#/${tabName}`;
+        if (tabName === 'tier') {
+          window.location.hash = '#/tier';
+        } else {
+          window.location.hash = '#/home';
+        }
       }
     }
 
     function handleRouting() {
-      const hash = window.location.hash; // 例: "#/tier", "#/home", "#/profile/.kazereich"
+      const hash = window.location.hash; // 例: "#/tier", "#/home", "#/tier/.kazereich"
       
-      if (hash.startsWith('#/profile/')) {
-        const username = decodeURIComponent(hash.replace('#/profile/', ''));
-        switchTab('tiers', false);
-        setTimeout(() => {
-          if (playersData.length === 0) {
-            fetchSpreadsheetData().then(() => openUserByUsername(username));
-          } else {
-            openUserByUsername(username);
-          }
-        }, 300);
-      } else if (hash === '#/tier' || hash === '#/tiers') {
-        switchTab('tiers', false);
+      if (hash.startsWith('#/tier/')) {
+        const username = decodeURIComponent(hash.replace('#/tier/', ''));
+        switchTab('tier', false);
+        if (!isDataLoaded) {
+          fetchSpreadsheetData().then(() => openUserByUsername(username));
+        } else {
+          openUserByUsername(username);
+        }
+      } else if (hash === '#/tier') {
+        switchTab('tier', false);
       } else {
         switchTab('home', false);
       }
@@ -966,7 +1002,7 @@
     function openUserByUsername(username) {
       const found = playersData.find(p => p.name.toLowerCase() === username.toLowerCase() || p.rawId.toLowerCase() === username.toLowerCase());
       if (found) {
-        openModal(found);
+        openModal(found, false); // URLを二重書き換えしないようフラグを設定
       }
     }
 
@@ -984,7 +1020,9 @@
       renderTable();
     }
 
-    async function fetchSpreadsheetData() {
+    async function fetchSpreadsheetData(force = false) {
+      if (isDataLoaded && !force) return; // 既にロード済みの場合は再ロードをスキップ
+
       const tbody = document.getElementById('tier-tbody');
       const loadIcon = document.getElementById('load-icon');
       const container = document.getElementById('table-container');
@@ -1025,6 +1063,7 @@
           };
         });
 
+        isDataLoaded = true; // ロード完了フラグを立てる
         renderTable();
       } catch (error) {
         console.error("Failed to load spreadsheet data:", error);
@@ -1040,7 +1079,7 @@
       
       if (loadBtn.disabled) return;
 
-      fetchSpreadsheetData();
+      fetchSpreadsheetData(true); // 手動ロード時は強制リフレッシュ
 
       loadBtn.disabled = true;
       loadBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -1096,7 +1135,7 @@
         tr.style.animationDelay = `${delay}s`;
         
         tr.onclick = () => {
-          openModal(p, idx + 1);
+          openModal(p, true);
         };
 
         const rankNum = idx + 1;
@@ -1155,8 +1194,12 @@
       });
     }
 
-    function openModal(player, currentRank) {
+    function openModal(player, updateHash = true) {
       window.currentModalPlayer = player;
+      if (updateHash) {
+        window.location.hash = `#/tier/${encodeURIComponent(player.name)}`;
+      }
+
       const bodyUrl = getSkinUrl(player, 150);
       const modalBody = document.getElementById('modal-fullbody');
       modalBody.dataset.fallbackStep = "0";
@@ -1195,9 +1238,8 @@
     function closeModal() {
       document.getElementById('player-modal').classList.add('hidden');
       window.currentModalPlayer = null;
-      // モーダルを閉じたら現在のタブに応じたハッシュに戻す
-      const currentTab = document.getElementById('tab-tiers').classList.contains('hidden') ? 'home' : 'tier';
-      window.location.hash = `#/${currentTab}`;
+      // モーダルを閉じたら一覧のURL（#/tier）に戻す
+      window.location.hash = '#/tier';
     }
 
     function handleModalBgClick(event) {
@@ -1222,6 +1264,25 @@
     function handleLoginModalBgClick(event) {
       if (event.target.id === 'login-modal') {
         closeLoginModal();
+      }
+    }
+
+    /* ========================================================
+       🟣 プロフィール画面（完全に別物のモーダル）
+       ======================================================== */
+    function openProfileModal() {
+      if (!loggedInUser) return;
+      document.getElementById('profile-username').innerText = loggedInUser;
+      document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    function handleProfileModalBgClick(event) {
+      if (event.target.id === 'profile-modal') {
+        closeProfileModal();
       }
     }
 
@@ -1283,25 +1344,21 @@
       alert('ログアウトしました。');
     }
 
-    function openProfileModal() {
-      if (!loggedInUser) return;
-      window.location.hash = `#/profile/${encodeURIComponent(loggedInUser)}`;
-      const found = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
-      if (found) {
-        openModal(found);
-      } else {
-        alert(`ユーザー「${loggedInUser}」のプロフィール詳細データが読み込まれていません。「Tiers」タブを一度開いてデータを読み込んでからお試しください。`);
-      }
-    }
-
     function openMyTierModal() {
       if (!loggedInUser) return;
-      window.location.hash = `#/profile/${encodeURIComponent(loggedInUser)}`;
       const found = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
       if (found) {
-        openModal(found);
+        openModal(found, true);
       } else {
-        alert(`ユーザー「${loggedInUser}」のTierデータが読み込まれていません。「Tiers」タブを一度開いてデータを読み込んでからお試しください。`);
+        // データがまだロードされていない場合はロードしてから開く
+        fetchSpreadsheetData().then(() => {
+          const foundAfterLoad = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
+          if (foundAfterLoad) {
+            openModal(foundAfterLoad, true);
+          } else {
+            alert(`ユーザー「${loggedInUser}」のTierデータが見つかりませんでした。`);
+          }
+        });
       }
     }
 
@@ -1348,7 +1405,7 @@
         } else {
           if (errorMsg) {
             errorMsg.innerText = result.message || "MCIDまたはパスワードが違います。";
-            errorMsg.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
           }
         }
       } catch (err) {
