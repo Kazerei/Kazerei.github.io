@@ -71,7 +71,12 @@
       z-index: 99999;
     }
 
-    header, main, footer {
+    header {
+      position: relative;
+      z-index: 50; /* ドロップダウンメニューを最前面に表示するため引き上げ */
+    }
+
+    main, footer {
       position: relative;
       z-index: 20;
     }
@@ -351,7 +356,7 @@
   <canvas id="click-particles-canvas"></canvas>
 
   <!-- Header -->
-  <header class="sticky top-0 z-20 glass-nav">
+  <header class="sticky top-0 glass-nav">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
       <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
         <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
@@ -381,13 +386,11 @@
           <!-- ログイン成功時（ドロップダウン用トリガー） -->
           <div id="user-menu-wrapper" class="hidden relative">
             <button onclick="toggleUserMenu(event)" class="bg-brand-card border border-brand-purple px-3 py-1.5 rounded text-xs flex items-center gap-2 hover:border-brand-lightPurple text-white transition-colors shadow-[0_0_10px_rgba(139,92,246,0.3)]">
-              <i class="fa-solid fa-user-shield text-brand-lightPurple"></i>
-              <span id="nav-username-display" class="font-mono font-bold truncate max-w-[120px]"></span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+              <i class="fa-solid fa-ellipsis-vertical text-brand-lightPurple text-sm px-0.5"></i>
             </button>
 
-            <!-- ドロップダウンメニュー -->
-            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-brand-card border border-brand-border rounded-xl shadow-2xl py-1.5 z-50 font-sans">
+            <!-- 修正：z-50 から z-[999] に引き上げて一番手前に表示 -->
+            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-brand-card border border-brand-border rounded-xl shadow-2xl py-1.5 z-[999] font-sans">
               <button onclick="openProfileModal(); toggleUserMenu();" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-brand-purple/20 hover:text-brand-lightPurple flex items-center gap-2.5 transition-colors">
                 <i class="fa-solid fa-user text-brand-purple w-4"></i>
                 <span>プロフィール画面</span>
@@ -1202,7 +1205,6 @@
       loggedInUser = username;
       const loginBtn = document.getElementById('login-open-btn');
       const userWrapper = document.getElementById('user-menu-wrapper');
-      const nameDisplay = document.getElementById('nav-username-display');
       
       const welcomeTitle = document.getElementById('home-welcome-title');
       const welcomeDesc = document.getElementById('home-welcome-desc');
@@ -1210,14 +1212,12 @@
       if (username) {
         if (loginBtn) loginBtn.classList.add('hidden');
         if (userWrapper) userWrapper.classList.remove('hidden');
-        if (nameDisplay) nameDisplay.innerText = username;
 
         if (welcomeTitle) welcomeTitle.innerText = `おかえりなさい、${username}さん`;
         if (welcomeDesc) welcomeDesc.innerText = `clytiersへようこそ！今日もランキング上位を目指してベストを尽くしましょう。`;
       } else {
         if (loginBtn) loginBtn.classList.remove('hidden');
         if (userWrapper) userWrapper.classList.add('hidden');
-        if (nameDisplay) nameDisplay.innerText = '';
 
         if (welcomeTitle) welcomeTitle.innerText = `COMPETITIVE MINECRAFT PVP TIERS`;
         if (welcomeDesc) welcomeDesc.innerText = `clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。`;
@@ -1241,7 +1241,6 @@
 
     function openProfileModal() {
       if (!loggedInUser) return;
-      // プレイヤーデータから該当するユーザーを探して既存の詳細モーダルを開く
       const found = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
       if (found) {
         openModal(found);
@@ -1278,18 +1277,15 @@
       try {
         if (errorMsg) errorMsg.classList.add('hidden');
         
-        // ログインボタンを「ログイン中...」に変更して無効化
         submitBtn.disabled = true;
         submitBtn.innerText = "ログイン中...";
         submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
-        // パスワードをSHA-256でハッシュ化
         const msgBuffer = new TextEncoder().encode(passwordInput);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        // 新しい読み込み専用GASのURLにパラメータをつけてGETリクエスト
         const baseUrl = "https://script.google.com/macros/s/AKfycbxmbRgLlxeJzvNhNC_BGlxTwVzVJVRaCrgGf2e0dioe7DfuUoutYb6GQqhPygnK5iA28g/exec";
         const url = `${baseUrl}?action=login&mcid=${encodeURIComponent(mcidInput)}&passwordHash=${passwordHash}`;
         
@@ -1297,7 +1293,6 @@
         const result = await response.json();
 
         if (result.success) {
-          // ローカルストレージにログイン情報を保存（再起動対策）
           localStorage.setItem('clytiers_logged_in_user', result.name);
           updateHeaderLoginState(result.name);
 
@@ -1317,7 +1312,6 @@
           errorMsg.classList.remove('hidden');
         }
       } finally {
-        // ボタンの状態を元に戻す
         submitBtn.disabled = false;
         submitBtn.innerText = "ログイン";
         submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
