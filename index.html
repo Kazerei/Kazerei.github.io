@@ -73,7 +73,7 @@
 
     header {
       position: relative;
-      z-index: 50; /* ドロップダウンメニューを最前面に表示するため引き上げ */
+      z-index: 50;
     }
 
     main, footer {
@@ -389,7 +389,7 @@
               <i class="fa-solid fa-ellipsis-vertical text-brand-lightPurple text-sm px-0.5"></i>
             </button>
 
-            <!-- 修正：z-50 から z-[999] に引き上げて一番手前に表示 -->
+            <!-- 最前面に表示するドロップダウンメニュー -->
             <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-brand-card border border-brand-border rounded-xl shadow-2xl py-1.5 z-[999] font-sans">
               <button onclick="openProfileModal(); toggleUserMenu();" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-brand-purple/20 hover:text-brand-lightPurple flex items-center gap-2.5 transition-colors">
                 <i class="fa-solid fa-user text-brand-purple w-4"></i>
@@ -756,7 +756,10 @@
       }
       animate();
 
-      // ページ読み込み時にログイン状態を復元
+      // ページ読み込み・ハッシュ変更時のルーター初期化
+      handleRouting();
+      window.addEventListener('hashchange', handleRouting);
+
       checkPersistedLogin();
     });
 
@@ -915,18 +918,55 @@
       return 'tier-blue';
     }
 
-    function switchTab(tabName) {
+    /* ========================================================
+       🟣 ルーター＆タブ切り替え機構
+       ======================================================== */
+    function switchTab(tabName, updateHash = true) {
       document.getElementById('tab-home').classList.add('hidden');
       document.getElementById('tab-tiers').classList.add('hidden');
       
       document.getElementById('nav-home').classList.replace('text-brand-lightPurple', 'text-gray-300');
       document.getElementById('nav-tiers').classList.replace('text-brand-lightPurple', 'text-gray-300');
 
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      document.getElementById(`nav-${tabName}`).classList.replace('text-gray-300', 'text-brand-lightPurple');
+      const targetTab = document.getElementById(`tab-${tabName}`);
+      const targetNav = document.getElementById(`nav-${tabName}`);
+
+      if (targetTab) targetTab.classList.remove('hidden');
+      if (targetNav) targetNav.classList.replace('text-gray-300', 'text-brand-lightPurple');
 
       if (tabName === 'tiers') {
         fetchSpreadsheetData();
+      }
+
+      if (updateHash) {
+        window.location.hash = `#/${tabName}`;
+      }
+    }
+
+    function handleRouting() {
+      const hash = window.location.hash; // 例: "#/tier", "#/home", "#/profile/.kazereich"
+      
+      if (hash.startsWith('#/profile/')) {
+        const username = decodeURIComponent(hash.replace('#/profile/', ''));
+        switchTab('tiers', false);
+        setTimeout(() => {
+          if (playersData.length === 0) {
+            fetchSpreadsheetData().then(() => openUserByUsername(username));
+          } else {
+            openUserByUsername(username);
+          }
+        }, 300);
+      } else if (hash === '#/tier' || hash === '#/tiers') {
+        switchTab('tiers', false);
+      } else {
+        switchTab('home', false);
+      }
+    }
+
+    function openUserByUsername(username) {
+      const found = playersData.find(p => p.name.toLowerCase() === username.toLowerCase() || p.rawId.toLowerCase() === username.toLowerCase());
+      if (found) {
+        openModal(found);
       }
     }
 
@@ -1155,6 +1195,9 @@
     function closeModal() {
       document.getElementById('player-modal').classList.add('hidden');
       window.currentModalPlayer = null;
+      // モーダルを閉じたら現在のタブに応じたハッシュに戻す
+      const currentTab = document.getElementById('tab-tiers').classList.contains('hidden') ? 'home' : 'tier';
+      window.location.hash = `#/${currentTab}`;
     }
 
     function handleModalBgClick(event) {
@@ -1236,11 +1279,13 @@
       updateHeaderLoginState(null);
       const menu = document.getElementById('user-dropdown-menu');
       if (menu) menu.classList.add('hidden');
+      window.location.hash = '#/home';
       alert('ログアウトしました。');
     }
 
     function openProfileModal() {
       if (!loggedInUser) return;
+      window.location.hash = `#/profile/${encodeURIComponent(loggedInUser)}`;
       const found = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
       if (found) {
         openModal(found);
@@ -1251,6 +1296,7 @@
 
     function openMyTierModal() {
       if (!loggedInUser) return;
+      window.location.hash = `#/profile/${encodeURIComponent(loggedInUser)}`;
       const found = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
       if (found) {
         openModal(found);
@@ -1259,7 +1305,7 @@
       }
     }
 
-    /* 🟣 SHA-256を用いたログイン認証ロジック（「ログイン中...」表示対応） */
+    /* 🟣 SHA-256を用いたログイン認証ロジック */
     async function handleLoginSubmit() {
       const mcidInput = document.getElementById('login-mcid-input').value.trim();
       const passwordInput = document.getElementById('login-password-input').value;
