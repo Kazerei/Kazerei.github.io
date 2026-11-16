@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta name="google-site-verification" content="vToBu8DZbx1TLc7hWl4jukVEtWVZnOPuFB1TsU8C05A" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>clytiers | Official Tier List & Community</title>
@@ -879,11 +880,10 @@
       return map[clean] || countryStr;
     }
 
-    /* 🟣 画像の配点テーブルに基づくポイント計算ロジック */
+    /* 🟣 新しい正確なポイント設計マップ */
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
-      
       const scoreMap = {
         'HT1': 65,
         'MT1': 55,
@@ -901,22 +901,7 @@
         'MT5': 2,
         'LT5': 1
       };
-
-      if (scoreMap[clean] !== undefined) {
-        return scoreMap[clean];
-      }
-
-      // 予備のフォールバック処理（万一定義外の文字列があった場合）
-      const match = clean.match(/([HLM]T)(\d+)/);
-      if (match) {
-        const type = match[1];
-        const num = parseInt(match[2]);
-        let baseScore = (6 - num) * 10;
-        if (type === 'HT') baseScore += 4;
-        else if (type === 'MT') baseScore += 2;
-        return Math.max(1, baseScore);
-      }
-      return 10;
+      return scoreMap[clean] || 0;
     }
 
     function formatTierFullTitle(tierStr) {
@@ -1288,6 +1273,9 @@
       }
     }
 
+    /* ========================================================
+       🟣 プロフィール画面
+       ======================================================== */
     function openProfileModal() {
       if (!loggedInUser) return;
       document.getElementById('profile-username').innerText = loggedInUser;
@@ -1304,6 +1292,9 @@
       }
     }
 
+    /* ========================================================
+       🟣 ログインメニュー・認証関連ロジック
+       ======================================================== */
     function toggleUserMenu(event) {
       if (event) event.stopPropagation();
       const menu = document.getElementById('user-dropdown-menu');
@@ -1413,7 +1404,7 @@
           updateHeaderLoginState(result.name);
 
           closeLoginModal();
-5          document.getElementById('login-mcid-input').value = '';
+          document.getElementById('login-mcid-input').value = '';
           document.getElementById('login-password-input').value = '';
         } else {
           if (errorMsg) {
@@ -1425,7 +1416,7 @@
         console.error("Login error:", err);
         if (errorMsg) {
           errorMsg.innerText = "通信エラーが発生しました。";
-          errorMsg.classList.add('hidden');
+          errorMsg.classList.remove('hidden');
         }
       } finally {
         submitBtn.disabled = false;
