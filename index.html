@@ -816,6 +816,7 @@
     let loggedInUser = null;
 
     const DEFAULT_STEVE_BODY = "https://crafatar.com/renders/body/8667ba71-b85a-4004-af54-457a973daf31?scale=4&overlay=true";
+    const TRANSPARENT_GIF = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
     function isUuid(str) {
       if (!str) return false;
@@ -1191,7 +1192,6 @@
         }
 
         const originalIndex = playersData.findIndex(item => item.name === p.name && item.rawId === p.rawId);
-        const bodyUrl = getSkinUrl(p, 140);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
@@ -1199,8 +1199,8 @@
             <div class="rank-banner-container">
               <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
                 <span>${rankNum}.</span>
-                <div class="h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
-                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7" onerror="handleSkinError(this)">
+                <div class="h-14 w-8 flex items-end justify-center shrink-0 -translate-x-1">
+                  <img src="${TRANSPARENT_GIF}" data-index="${originalIndex}" alt="${p.name}" class="h-12 w-auto object-contain" style="image-rendering:pixelated" onerror="handleSkinError(this)">
                 </div>
               </div>
             </div>
@@ -1213,6 +1213,8 @@
           <td class="p-3 text-right overflow-x-auto max-w-[200px] sm:max-w-none">${kitBadges}</td>
         `;
         tbody.appendChild(tr);
+
+        applyListSkin(tr.querySelector('img'), p);
       });
     }
 
@@ -1436,7 +1438,7 @@
     }
 
     /* ========================================================
-       🟣 3Dスキン（モーダル用）
+       🟣 スキン取得（一覧・モーダル共通）
        ======================================================== */
     const SKIN_SOURCES = [
       { name: "crafatar", url: id => `https://crafatar.com/skins/${id}` },
@@ -1444,6 +1446,109 @@
       { name: "中継", url: id => `https://corsproxy.io/?${encodeURIComponent(`https://crafatar.com/skins/${id}`)}` }
     ];
 
+    // 同じプレイヤーを何度も取りに行かないためのキャッシュ（uuid → Promise）
+    const skinCache = new Map();
+
+    async function fetchSkinBlob(id) {
+      const errors = [];
+      for (const src of SKIN_SOURCES) {
+        try {
+          const res = await fetch(src.url(id));
+          if (!res.ok) { errors.push(`${src.name}:${res.status}`); continue; }
+          const blob = await res.blob();
+          if (blob.type.startsWith("image/")) return blob;
+          errors.push(`${src.name}:画像ではない`);
+        } catch (e) {
+          errors.push(`${src.name}:通信失敗`);
+        }
+      }
+      throw new Error(errors.join(", "));
+    }
+
+    function blobToImg(blob) {
+      return new Promise((ok, ng) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        img.onload = () => { URL.revokeObjectURL(url); ok(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("デコード失敗")); };
+        img.src = url;
+      });
+    }
+
+    // 右腕の外側1列（x=47）が透明ならSlim（細腕）
+    function detectSlim(cx) {
+      const d = cx.getImageData(47, 20, 1, 12).data;
+      for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
+      return true;
+    }
+
+    // uuid から 64×64 のスキンキャンバスと Slim 判定を得る（キャッシュあり）
+    function loadSkinCanvas(uuid) {
+      if (!skinCache.has(uuid)) {
+        const p = (async () => {
+          const blob = await fetchSkinBlob(uuid);
+          const im = await blobToImg(blob);
+          if (im.height !== 64) throw new Error("旧形式スキン(64×32)は未対応です");
+          const cv = document.createElement("canvas");
+          cv.width = 64; cv.height = 64;
+          const cx = cv.getContext("2d");
+          cx.imageSmoothingEnabled = false;
+          cx.drawImage(im, 0, 0);
+          return { cv, slim: detectSlim(cx) };
+        })();
+        p.catch(() => skinCache.delete(uuid));
+        skinCache.set(uuid, p);
+      }
+      return skinCache.get(uuid);
+    }
+
+    // 64×64 スキンから正面の全身（16×32）を描き直す（一覧用）
+    function makeBustURL(cv, slim) {
+      const c = document.createElement("canvas");
+      c.width = 16; c.height = 32;
+      const x = c.getContext("2d");
+      x.imageSmoothingEnabled = false;
+      const aw = slim ? 3 : 4;
+      const part = (sx, sy, sw, sh, dx, dy) => x.drawImage(cv, sx, sy, sw, sh, dx, dy, sw, sh);
+
+      // 頭（本体＋帽子）
+      part(8, 8, 8, 8, 4, 0);
+      part(40, 8, 8, 8, 4, 0);
+      // 胴（本体＋上着）
+      part(20, 20, 8, 12, 4, 8);
+      part(20, 36, 8, 12, 4, 8);
+      // 腕（キャラの右腕は画面の左側）
+      part(44, 20, aw, 12, 4 - aw, 8);
+      part(44, 36, aw, 12, 4 - aw, 8);
+      part(36, 52, aw, 12, 12, 8);
+      part(52, 52, aw, 12, 12, 8);
+      // 脚
+      part(4, 20, 4, 12, 4, 20);
+      part(4, 36, 4, 12, 4, 20);
+      part(20, 52, 4, 12, 8, 20);
+      part(4, 52, 4, 12, 8, 20);
+
+      return c.toDataURL();
+    }
+
+    // 一覧の行に全身スキンを入れる（Java版のみ。Bedrockや失敗時は従来の画像）
+    function applyListSkin(img, player) {
+      if (!img) return;
+      if (!player.isUuid) {
+        img.src = getSkinUrl(player, 140);
+        return;
+      }
+      loadSkinCanvas(getCleanUuid(player.rawId))
+        .then(({ cv, slim }) => { img.src = makeBustURL(cv, slim); })
+        .catch(() => {
+          img.dataset.fallbackStep = "0";
+          img.src = getSkinUrl(player, 140);
+        });
+    }
+
+    /* ========================================================
+       🟣 3Dスキン（モーダル用）
+       ======================================================== */
     // 角度は度数。x：前後（負が前） z：左右（内向き） body：上半身の前傾
     const POSES = {
       idle:  { rArm:{x:0,    z:0},  lArm:{x:0,    z:0},  rLeg:{x:0,   z:0}, lLeg:{x:0,  z:0}, body:0 },
@@ -1470,8 +1575,9 @@
       wrap3.appendChild(r3.domElement);
 
       s3 = new THREE.Scene();
+      // モデルの高さ（約32ユニット）が枠の8割程度に入るよう近めに置く
       c3 = new THREE.PerspectiveCamera(35, 1, 1, 1000);
-      c3.position.set(0, 16, 120);
+      c3.position.set(0, 16, 62);
       c3.lookAt(0, 16, 0);
       s3.add(new THREE.AmbientLight(0xffffff, 0.85));
       const dl = new THREE.DirectionalLight(0xffffff, 0.6);
@@ -1509,9 +1615,10 @@
       c3.updateProjectionMatrix();
     }
 
-    // ポーズへ滑らかに補間しながら描画
+    // ポーズへ滑らかに補間しながら描画（非表示中は描画しない）
     function loop3() {
       requestAnimationFrame(loop3);
+      if (!r3 || !wrap3 || wrap3.classList.contains("hidden")) return;
       if (parts3.rArm && pose3) {
         const k = 0.15;
         for (const key of ["rArm", "lArm", "rLeg", "lLeg"]) {
@@ -1521,7 +1628,7 @@
         }
         body3.rotation.x += (rad(pose3.body) - body3.rotation.x) * k;
       }
-      if (r3) r3.render(s3, c3);
+      r3.render(s3, c3);
     }
 
     function setPose(name) {
@@ -1605,39 +1712,6 @@
       root3.add(parts3.rLeg, parts3.lLeg);
     }
 
-    async function fetchSkinBlob(id) {
-      const errors = [];
-      for (const src of SKIN_SOURCES) {
-        try {
-          const res = await fetch(src.url(id));
-          if (!res.ok) { errors.push(`${src.name}:${res.status}`); continue; }
-          const blob = await res.blob();
-          if (blob.type.startsWith("image/")) return blob;
-          errors.push(`${src.name}:画像ではない`);
-        } catch (e) {
-          errors.push(`${src.name}:通信失敗`);
-        }
-      }
-      throw new Error(errors.join(", "));
-    }
-
-    function blobToImg(blob) {
-      return new Promise((ok, ng) => {
-        const img = new Image();
-        const url = URL.createObjectURL(blob);
-        img.onload = () => { URL.revokeObjectURL(url); ok(img); };
-        img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("デコード失敗")); };
-        img.src = url;
-      });
-    }
-
-    // 右腕の外側1列（x=47）が透明ならSlim（細腕）
-    function detectSlim(cx) {
-      const d = cx.getImageData(47, 20, 1, 12).data;
-      for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
-      return true;
-    }
-
     async function show3DSkin(player) {
       const reqId = ++skinReqId;
       const img = document.getElementById("modal-fullbody");
@@ -1658,22 +1732,15 @@
       if (!player.isUuid || typeof THREE === "undefined" || !ensure3D()) return showFallback();
 
       try {
-        const blob = await fetchSkinBlob(getCleanUuid(player.rawId));
+        const { cv, slim } = await loadSkinCanvas(getCleanUuid(player.rawId));
         if (reqId !== skinReqId) return; // 別のプレイヤーを開いた後なら何もしない
-        const im = await blobToImg(blob);
-        if (im.height !== 64) throw new Error("旧形式スキン");
-
-        const cv = document.createElement("canvas");
-        cv.width = 64; cv.height = 64;
-        const cx = cv.getContext("2d");
-        cx.imageSmoothingEnabled = false;
-        cx.drawImage(im, 0, 0);
 
         const tex = new THREE.CanvasTexture(cv);
         tex.magFilter = THREE.NearestFilter;
         tex.minFilter = THREE.NearestFilter;
+        tex.needsUpdate = true;
 
-        buildModel3D(tex, detectSlim(cx));
+        buildModel3D(tex, slim);
         img.classList.add("hidden");
         box.classList.remove("hidden");
         resize3D();
