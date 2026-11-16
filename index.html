@@ -35,8 +35,13 @@
 </div>
 
 <script>
-// ★ここをWorkerのURLに差し替え
-const WORKER_URL = "https://clytiers-skin.YOUR-SUBDOMAIN.workers.dev";
+/* ---------- スキンの取得元（上から順に試す） ---------- */
+// crafatarはMCIDでもUUIDでも指定できる
+const SOURCES = [
+  id => `https://crafatar.com/skins/${id}`,
+  id => `https://mc-heads.net/skin/${id}`,
+  id => `https://corsproxy.io/?${encodeURIComponent(`https://crafatar.com/skins/${id}`)}`
+];
 
 const viewer = document.getElementById("viewer");
 const statusEl = document.getElementById("status");
@@ -191,24 +196,43 @@ document.querySelectorAll("[data-part]").forEach(s =>
   s.addEventListener("input", applyPose)
 );
 
-/* ---------- テクスチャ読み込み ---------- */
-function loadTex(url) {
+/* ---------- スキン取得 ---------- */
+async function fetchSkin(id) {
+  const errors = [];
+  for (let i = 0; i < SOURCES.length; i++) {
+    const name = ["crafatar", "mc-heads", "中継(corsproxy)"][i];
+    try {
+      const res = await fetch(SOURCES[i](id));
+      if (!res.ok) { errors.push(`${name}:${res.status}`); continue; }
+      const blob = await res.blob();
+      if (!blob.type.startsWith("image/")) { errors.push(`${name}:画像ではない`); continue; }
+      return blob;
+    } catch (e) {
+      errors.push(`${name}:通信失敗(CORSの可能性)`);
+    }
+  }
+  throw new Error("全ての取得元で失敗しました\n" + errors.join("\n"));
+}
+
+function blobToImage(blob) {
   return new Promise((ok, ng) => {
-    new THREE.TextureLoader().load(
-      url,
-      tex => {
-        tex.magFilter = THREE.NearestFilter;
-        tex.minFilter = THREE.NearestFilter;
-        ok(tex);
-      },
-      undefined,
-      () => ng(new Error("スキン画像の読み込みに失敗しました"))
-    );
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    img.onload = () => { URL.revokeObjectURL(url); ok(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("画像のデコードに失敗しました")); };
+    img.src = url;
   });
 }
 
+// 細腕(Slim)判定：右腕前面の右端1列が全部透明ならSlim
+function detectSlim(cx) {
+  const d = cx.getImageData(47, 20, 1, 12).data;
+  for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
+  return true;
+}
+
 /* ---------- メイン処理 ---------- */
-function showSkin() {
+async function showSkin() {
   const q = queryInput.value.trim();
   if (!q) { setStatus("MCIDまたはUUIDを入力してください", true); return; }
   if (typeof THREE === "undefined") {
@@ -216,30 +240,42 @@ function showSkin() {
     return;
   }
 
-  setStatus("読み込み中...");
+  // ハイフン入りUUIDはハイフンを取る。それ以外（MCID）はそのまま
+  let id = q;
+  const clean = q.replace(/-/g, "");
+  if (/^[0-9a-fA-F]{32}$/.test(clean)) id = clean.toLowerCase();
+  else if (!/^[A-Za-z0-9_]{3,16}$/.test(q)) {
+    setStatus("MCIDまたはUUIDの形式が正しくありません", true);
+    return;
+  }
 
-  fetch(`${WORKER_URL}/?q=${encodeURIComponent(q)}`)
-    .then(async res => {
-      if (!res.ok) {
-        let msg = `HTTP ${res.status}`;
-        try {
-          const j = await res.json();
-          if (j.message) msg = j.message;
-        } catch (_) {}
-        throw new Error(msg);
-      }
-      return res;
-    })
-    .then(async res => {
-      const slim = res.headers.get("X-Skin-Model") === "slim";
-      const name = decodeURIComponent(res.headers.get("X-Skin-Name") || "");
-      const objUrl = URL.createObjectURL(await res.blob());
-      previewEl.src = objUrl;
-      const tex = await loadTex(objUrl);
-      buildModel(tex, slim);
-      setStatus(`${name} （${slim ? "Slim" : "Classic"}モデル）`);
-    })
-    .catch(e => setStatus("エラー: " + e.message, true));
+  setStatus("読み込み中...");
+  try {
+    const blob = await fetchSkin(id);
+    const img = await blobToImage(blob);
+
+    if (img.height !== 64) {
+      throw new Error(`スキンは${img.width}×${img.height}です。旧形式(64×32)は未対応です`);
+    }
+
+    const cv = document.createElement("canvas");
+    cv.width = 64; cv.height = 64;
+    const cx = cv.getContext("2d");
+    cx.imageSmoothingEnabled = false;
+    cx.drawImage(img, 0, 0);
+
+    const slim = detectSlim(cx);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+    tex.needsUpdate = true;
+
+    previewEl.src = cv.toDataURL();
+    buildModel(tex, slim);
+    setStatus(`${q} （${slim ? "Slim" : "Classic"}モデル）`);
+  } catch (e) {
+    setStatus("エラー: " + e.message, true);
+  }
 }
 
 document.getElementById("go").addEventListener("click", showSkin);
