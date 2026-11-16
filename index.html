@@ -7,25 +7,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   body { background:#07030d; color:#e2e8f0; font-family:sans-serif; margin:0; padding:16px; }
-  .row { display:flex; gap:8px; margin-bottom:12px; align-items:center; }
-  input[type=text] { flex:1; padding:8px; border-radius:6px; border:1px solid #2a164f; background:#120924; color:#fff; }
-  button { padding:8px 14px; border-radius:6px; border:0; background:#8b5cf6; color:#fff; cursor:pointer; }
-  #viewer { width:100%; height:380px; background:#120924; border:1px solid #2a164f; border-radius:12px; touch-action:none; cursor:grab; }
-  #status { font-size:12px; color:#a855f7; min-height:18px; margin:8px 0; }
-  #preview { width:128px; image-rendering:pixelated; border:1px solid #2a164f; background:#120924; }
-  .poses label { display:block; font-size:12px; margin:6px 0; }
+  .row { display:flex; gap:8px; margin-bottom:10px; align-items:center; }
+  input[type=text] { flex:1; min-width:0; padding:10px; border-radius:6px; border:1px solid #2a164f; background:#120924; color:#fff; font-size:16px; }
+  button { padding:10px 16px; border-radius:6px; border:0; background:#8b5cf6; color:#fff; font-size:15px; cursor:pointer; }
+  #viewer { width:100%; height:360px; background:#120924; border:1px solid #2a164f; border-radius:12px; touch-action:none; cursor:grab; }
+  #status { font-size:14px; margin:10px 0; min-height:40px; white-space:pre-wrap; word-break:break-all; color:#a855f7; }
+  #preview { width:96px; image-rendering:pixelated; border:1px solid #2a164f; background:#120924; }
+  .poses label { display:block; font-size:13px; margin:6px 0; }
   .poses input { width:100%; }
 </style>
 </head>
 <body>
 
 <div class="row">
-  <input type="text" id="uuid" placeholder="UUID（ハイフンあり・なしどちらでも可）">
+  <input type="text" id="query" placeholder="MCID または UUID">
   <button id="go">表示</button>
 </div>
 <div id="status"></div>
 <div id="viewer"></div>
-
 <div class="row"><img id="preview" alt="skin"></div>
 
 <div class="poses">
@@ -36,20 +35,31 @@
 </div>
 
 <script>
-const WORKER_URL = "https://system.clytiers.workers.dev";
+// ★ここをWorkerのURLに差し替え
+const WORKER_URL = "https://clytiers-skin.YOUR-SUBDOMAIN.workers.dev";
 
 const viewer = document.getElementById("viewer");
 const statusEl = document.getElementById("status");
-const uuidInput = document.getElementById("uuid");
+const queryInput = document.getElementById("query");
 const previewEl = document.getElementById("preview");
 
 let renderer, scene, camera, model;
 const parts = {};
 
+function setStatus(msg, isErr) {
+  statusEl.textContent = msg;
+  statusEl.style.color = isErr ? "#f87171" : "#a855f7";
+}
+
 /* ---------- 3D初期化 ---------- */
 function init() {
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  } catch (e) {
+    setStatus("この端末では3D表示（WebGL）が使えません: " + e.message, true);
+    return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   viewer.appendChild(renderer.domElement);
 
   scene = new THREE.Scene();
@@ -68,7 +78,6 @@ function init() {
   resize();
   window.addEventListener("resize", resize);
 
-  // ドラッグで回転
   let dragging = false, lastX = 0;
   viewer.addEventListener("pointerdown", e => {
     dragging = true; lastX = e.clientX;
@@ -98,17 +107,15 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-/* ---------- スキンのUV割り当て ---------- */
-// 1ピクセル = 1ユニット。原点は腰の中央（足元が y=0、頭頂が y=32）
+/* ---------- UV割り当て ---------- */
 // 面の順番は BoxGeometry と同じ [+x, -x, +y, -y, +z, -z]
-// +x = キャラの左側, -x = キャラの右側（正面は +z）
 function rectsFor(u, v, w, h, d) {
   const R = {
-    right:  { x: u,         y: v + d, w: d, h: h },
-    left:   { x: u + d + w, y: v + d, w: d, h: h },
-    top:    { x: u + d,     y: v,     w: w, h: d },
-    bottom: { x: u + d + w, y: v,     w: w, h: d },
-    front:  { x: u + d,     y: v + d, w: w, h: h },
+    right:  { x: u,             y: v + d, w: d, h: h },
+    left:   { x: u + d + w,     y: v + d, w: d, h: h },
+    top:    { x: u + d,         y: v,     w: w, h: d },
+    bottom: { x: u + d + w,     y: v,     w: w, h: d },
+    front:  { x: u + d,         y: v + d, w: w, h: h },
     back:   { x: u + 2 * d + w, y: v + d, w: w, h: h }
   };
   return [R.left, R.right, R.top, R.bottom, R.front, R.back];
@@ -137,7 +144,6 @@ function makePart(w, h, d, u, v, inflate, x, y, mat) {
   return m;
 }
 
-// 肩・股関節を支点にした関節グループ
 function limb(pivotX, pivotY, w, base, over, mat, omat) {
   const p = new THREE.Group();
   p.position.set(pivotX, pivotY, 0);
@@ -153,15 +159,13 @@ function buildModel(tex, slim) {
   while (model.children.length) model.remove(model.children[0]);
 
   const mat  = new THREE.MeshLambertMaterial({ map: tex });
-  const omat = new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.5 });
-  const aw = slim ? 3 : 4; // Slim は腕が3px幅
+  const omat = new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.5, transparent: true });
+  const aw = slim ? 3 : 4;
 
-  // 頭
   model.add(
     makePart(8, 8, 8, 0, 0, 0, 0, 28, mat),
     makePart(8, 8, 8, 32, 0, 0.25, 0, 28, omat)
   );
-  // 胴
   model.add(
     makePart(8, 12, 4, 16, 16, 0, 0, 18, mat),
     makePart(8, 12, 4, 16, 32, 0.25, 0, 18, omat)
@@ -187,43 +191,59 @@ document.querySelectorAll("[data-part]").forEach(s =>
   s.addEventListener("input", applyPose)
 );
 
-/* ---------- スキン取得 ---------- */
-function setStatus(msg) { statusEl.textContent = msg; }
+/* ---------- テクスチャ読み込み ---------- */
+function loadTex(url) {
+  return new Promise((ok, ng) => {
+    new THREE.TextureLoader().load(
+      url,
+      tex => {
+        tex.magFilter = THREE.NearestFilter;
+        tex.minFilter = THREE.NearestFilter;
+        ok(tex);
+      },
+      undefined,
+      () => ng(new Error("スキン画像の読み込みに失敗しました"))
+    );
+  });
+}
 
-async function showSkin() {
-  const clean = uuidInput.value.trim().replace(/-/g, "").toLowerCase();
-  if (!/^[0-9a-f]{32}$/.test(clean)) {
-    setStatus("UUIDの形式が正しくありません");
+/* ---------- メイン処理 ---------- */
+function showSkin() {
+  const q = queryInput.value.trim();
+  if (!q) { setStatus("MCIDまたはUUIDを入力してください", true); return; }
+  if (typeof THREE === "undefined") {
+    setStatus("Three.jsの読み込みに失敗しました。通信環境を確認してください", true);
     return;
   }
 
   setStatus("読み込み中...");
-  try {
-    const res = await fetch(`${WORKER_URL}?action=skin&uuid=${clean}`);
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({}));
-      throw new Error(j.message || `取得に失敗しました (${res.status})`);
-    }
 
-    const slim = res.headers.get("X-Skin-Model") === "slim";
-    const objUrl = URL.createObjectURL(await res.blob());
-    previewEl.src = objUrl;
-
-    const tex = await new Promise((ok, err) =>
-      new THREE.TextureLoader().load(objUrl, ok, undefined, err)
-    );
-    tex.magFilter = THREE.NearestFilter;
-    tex.minFilter = THREE.NearestFilter;
-
-    buildModel(tex, slim);
-    setStatus(slim ? "Slim（細腕）モデル" : "Classic（通常）モデル");
-  } catch (e) {
-    setStatus("エラー: " + e.message);
-  }
+  fetch(`${WORKER_URL}/?q=${encodeURIComponent(q)}`)
+    .then(async res => {
+      if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try {
+          const j = await res.json();
+          if (j.message) msg = j.message;
+        } catch (_) {}
+        throw new Error(msg);
+      }
+      return res;
+    })
+    .then(async res => {
+      const slim = res.headers.get("X-Skin-Model") === "slim";
+      const name = decodeURIComponent(res.headers.get("X-Skin-Name") || "");
+      const objUrl = URL.createObjectURL(await res.blob());
+      previewEl.src = objUrl;
+      const tex = await loadTex(objUrl);
+      buildModel(tex, slim);
+      setStatus(`${name} （${slim ? "Slim" : "Classic"}モデル）`);
+    })
+    .catch(e => setStatus("エラー: " + e.message, true));
 }
 
 document.getElementById("go").addEventListener("click", showSkin);
-uuidInput.addEventListener("keydown", e => { if (e.key === "Enter") showSkin(); });
+queryInput.addEventListener("keydown", e => { if (e.key === "Enter") showSkin(); });
 
 init();
 </script>
