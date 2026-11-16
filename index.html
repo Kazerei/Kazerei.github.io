@@ -1,1429 +1,231 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta name="google-site-verification" content="vToBu8DZbx1TLc7hWl4jukVEtWVZnOPuFB1TsU8C05A" />
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>clytiers | Official Tier List & Community</title>
-  <!-- サイトのアイコン -->
-  <link rel="icon" href="./IMG_5686.png" type="image/png">
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              dark: '#07030d',
-              card: '#120924',
-              border: '#2a164f',
-              purple: '#8b5cf6',
-              lightPurple: '#a855f7',
-              accent: '#d946ef',
-              gold: '#f59e0b',
-              silver: '#9ca3af',
-              bronze: '#d97706',
-              blue: '#3b82f6'
-            }
-          },
-          fontFamily: {
-            orbitron: ['Orbitron', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-            sans: ['Noto Sans JP', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    body {
-      background-color: #07030d;
-      color: #e2e8f0;
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.28) 0%, transparent 55%),
-        radial-gradient(circle at 85% 85%, rgba(217, 70, 239, 0.15) 0%, transparent 45%),
-        radial-gradient(circle at 15% 90%, rgba(139, 92, 246, 0.22) 0%, transparent 55%);
-      background-attachment: fixed;
-      overflow-x: hidden;
-    }
-
-    /* 🟣 背景用ネザー粒子描画キャンバス */
-    #nether-particles {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    /* 🟣 タップ時専用・最前面（一番上）に描画するキャンバス */
-    #click-particles-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 99999;
-    }
-
-    header {
-      position: relative;
-      z-index: 50;
-    }
-
-    main, footer {
-      position: relative;
-      z-index: 20;
-    }
-
-    /* ✨ CLYTIERSロゴのなめらかなグラデーション＆発光アニメーション */
-    .clytiers-gradient-logo {
-      background: linear-gradient(270deg, #d8b4fe, #e879f9, #c084fc, #8b5cf6, #3b82f6);
-      background-size: 400% 400%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: gradientFlow 8s ease infinite, logo-glow 3.5s ease-in-out infinite alternate;
-    }
-
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @keyframes logo-glow {
-      0% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5)); transform: scale(1); }
-      100% { filter: drop-shadow(0 0 26px rgba(232, 121, 249, 0.95)); transform: scale(1.03); }
-    }
-
-    .glow-box {
-      box-shadow: 0 0 25px rgba(139, 92, 246, 0.2);
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-    }
-    .glow-box:hover {
-      box-shadow: 0 0 40px rgba(217, 70, 239, 0.35);
-      border-color: rgba(217, 70, 239, 0.7);
-    }
-
-    .glass-nav {
-      background: rgba(18, 9, 36, 0.88);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(168, 85, 247, 0.3);
-    }
-
-    .tier-badge {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: transform 0.2s ease, filter 0.2s ease;
-    }
-    .tier-badge:hover {
-      transform: translateY(-2px) scale(1.05);
-      filter: brightness(1.2);
-    }
-    .tier-gold { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 0 12px rgba(245, 158, 11, 0.5); }
-    .tier-silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; box-shadow: 0 0 12px rgba(156, 163, 175, 0.5); }
-    .tier-bronze { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; box-shadow: 0 0 12px rgba(217, 119, 6, 0.5); }
-    .tier-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; box-shadow: 0 0 12px rgba(59, 130, 246, 0.5); }
-
-    .rank-banner-container {
-      perspective: 800px;
-      display: inline-block;
-    }
-
-    .rank-banner-box {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 8px 4px 12px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 20px;
-      color: #ffffff;
-      clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      width: 130px;
-      height: 56px;
-      overflow: hidden;
-      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
-      transform-style: preserve-3d;
-    }
-
-    #tier-tbody tr:hover .rank-1-box,
-    #tier-tbody tr:hover .rank-2-box,
-    #tier-tbody tr:hover .rank-3-box {
-      transform: rotateX(12deg) rotateY(-12deg) scale(1.1);
-    }
-
-    .rank-shining::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to right,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.8) 50%,
-        rgba(255,255,255,0) 100%
-      );
-      transform: rotate(30deg);
-      animation: shine 1.8s infinite;
-      pointer-events: none;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) rotate(30deg); }
-      40% { transform: translateX(100%) rotate(30deg); }
-      100% { transform: translateX(100%) rotate(30deg); }
-    }
-
-    .rank-1-box {
-      background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
-      border: 1px solid rgba(253, 230, 138, 0.95);
-    }
-    .rank-2-box {
-      background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-      box-shadow: 0 0 25px rgba(209, 213, 219, 0.8);
-      border: 1px solid rgba(243, 244, 246, 0.95);
-    }
-    .rank-2-box.rank-shining::after { animation-delay: 0.3s; }
-    .rank-3-box {
-      background: linear-gradient(135deg, #fdba74 0%, #d97706 50%, #78350f 100%);
-      box-shadow: 0 0 25px rgba(217, 119, 6, 0.8);
-      border: 1px solid rgba(253, 186, 116, 0.95);
-    }
-    .rank-3-box.rank-shining::after { animation-delay: 0.6s; }
-    
-    .rank-normal-box {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-      border: 1px solid rgba(96, 165, 250, 0.8);
-      transition: transform 0.3s ease;
-    }
-    #tier-tbody tr:hover .rank-normal-box {
-      transform: scale(1.05);
-    }
-
-    .skin-showcase-bg {
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(7, 3, 13, 0.96) 85%);
-      position: relative;
-      overflow: hidden;
-    }
-
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #07030d; }
-    ::-webkit-scrollbar-thumb { background: #3b1f6d; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
-
-    @keyframes contentFadeIn {
-      0% { opacity: 0; transform: translateY(14px) scale(0.97); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    section:not(.hidden) {
-      animation: contentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes rowCascadeIn {
-      0% { opacity: 0; transform: translateY(15px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .tier-row-animated {
-      opacity: 0;
-      animation: rowCascadeIn 0.3s ease forwards;
-    }
-
-    @keyframes scanWave {
-      0% { background-position: 0 -100vh; }
-      100% { background-position: 0 100vh; }
-    }
-
-    .scan-effect {
-      position: relative;
-    }
-    .scan-effect::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(to bottom, transparent 0%, rgba(217, 70, 239, 0.25) 50%, transparent 100%);
-      background-size: 100% 200px;
-      background-repeat: no-repeat;
-      animation: scanWave 0.7s ease-in-out;
-      pointer-events: none;
-      z-index: 20;
-    }
-
-    #tier-tbody tr {
-      transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-    }
-    #tier-tbody tr:hover {
-      background-color: rgba(168, 85, 247, 0.22) !important;
-      transform: translateX(6px);
-      box-shadow: inset 5px 0 0 0 #e879f9, 0 8px 25px rgba(217, 70, 239, 0.35);
-    }
-    
-    #tier-tbody tr:hover img {
-      filter: drop-shadow(0 0 12px rgba(232, 121, 249, 0.9));
-      transition: filter 0.3s ease;
-    }
-
-    #player-modal:not(.hidden) > div,
-    #profile-modal:not(.hidden) > div {
-      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-    @keyframes modalPop {
-      0% { opacity: 0; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    button, .kit-tab {
-      transition: all 0.2s ease;
-    }
-    button:hover, .kit-tab:hover {
-      filter: brightness(1.2);
-    }
-
-    .kit-tab.active {
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
-      border-color: #d8b4fe !important;
-    }
-
-    /* ✨ 水面の一滴＋紫の霧 */
-    .water-ripple-outer, .water-ripple-inner, .water-ripple-fog {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: scale(0);
-      z-index: 99998;
-    }
-
-    .water-ripple-fog {
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(217, 70, 239, 0.2) 50%, transparent 75%);
-      filter: blur(6px);
-      animation: waterRippleFogAnim 0.75s cubic-bezier(0, 0.5, 0.2, 1) forwards;
-    }
-
-    .water-ripple-outer {
-      border: 1.5px solid rgba(217, 70, 239, 0.8);
-      box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
-      animation: waterRippleOuterAnim 0.65s cubic-bezier(0, 0.6, 0.2, 1) forwards;
-    }
-
-    .water-ripple-inner {
-      border: 1px solid rgba(232, 121, 249, 0.95);
-      box-shadow: 0 0 5px rgba(232, 121, 249, 0.7);
-      animation: waterRippleInnerAnim 0.5s cubic-bezier(0, 0.5, 0.3, 1) forwards;
-    }
-
-    @keyframes waterRippleFogAnim {
-      0% { transform: scale(0.1); opacity: 0.8; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-
-    @keyframes waterRippleOuterAnim {
-      0% { transform: scale(0.1); opacity: 1; }
-      100% { transform: scale(1.3); opacity: 0; }
-    }
-
-    @keyframes waterRippleInnerAnim {
-      0% { transform: scale(0.05); opacity: 0.9; }
-      100% { transform: scale(0.8); opacity: 0; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skin 3D Viewer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  body { background:#07030d; color:#e2e8f0; font-family:sans-serif; margin:0; padding:16px; }
+  .row { display:flex; gap:8px; margin-bottom:12px; align-items:center; }
+  input[type=text] { flex:1; padding:8px; border-radius:6px; border:1px solid #2a164f; background:#120924; color:#fff; }
+  button { padding:8px 14px; border-radius:6px; border:0; background:#8b5cf6; color:#fff; cursor:pointer; }
+  #viewer { width:100%; height:380px; background:#120924; border:1px solid #2a164f; border-radius:12px; touch-action:none; cursor:grab; }
+  #status { font-size:12px; color:#a855f7; min-height:18px; margin:8px 0; }
+  #preview { width:128px; image-rendering:pixelated; border:1px solid #2a164f; background:#120924; }
+  .poses label { display:block; font-size:12px; margin:6px 0; }
+  .poses input { width:100%; }
+</style>
 </head>
-<body class="font-sans antialiased min-h-screen flex flex-col justify-between" onclick="closeUserMenuOutside(event)">
+<body>
 
-  <!-- 🟣 背景の通常ネザー粒子用キャンバス -->
-  <canvas id="nether-particles"></canvas>
-  <!-- 🟣 タップ時専用・最前面のネザー粒子用キャンバス -->
-  <canvas id="click-particles-canvas"></canvas>
+<div class="row">
+  <input type="text" id="uuid" placeholder="UUID（ハイフンあり・なしどちらでも可）">
+  <button id="go">表示</button>
+</div>
+<div id="status"></div>
+<div id="viewer"></div>
 
-  <!-- Header -->
-  <header class="sticky top-0 glass-nav">
-    <div class="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
-      <nav class="flex items-center justify-between w-full font-orbitron font-bold text-xs sm:text-sm">
-        <button onclick="switchTab('home')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-brand-lightPurple" id="nav-home">
-          <i class="fa-solid fa-house text-xs"></i><span>Home</span>
-        </button>
+<div class="row"><img id="preview" alt="skin"></div>
 
-        <button onclick="switchTab('tier')" class="nav-btn transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300" id="nav-tier">
-          <i class="fa-solid fa-trophy text-xs"></i><span>Tiers</span>
-        </button>
+<div class="poses">
+  <label>右腕 <input type="range" min="-90" max="90" value="0" data-part="rArm"></label>
+  <label>左腕 <input type="range" min="-90" max="90" value="0" data-part="lArm"></label>
+  <label>右脚 <input type="range" min="-90" max="90" value="0" data-part="rLeg"></label>
+  <label>左脚 <input type="range" min="-90" max="90" value="0" data-part="lLeg"></label>
+</div>
 
-        <a href="#" onclick="switchTab('home')" class="font-black text-lg sm:text-2xl tracking-wider clytiers-gradient-logo px-1 sm:px-4">
-          CLYTIERS
-        </a>
+<script>
+const WORKER_URL = "https://system.clytiers.workers.dev";
 
-        <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="transition-colors hover:text-brand-lightPurple px-1 sm:px-3 py-1 flex items-center gap-1 text-gray-300">
-          <i class="fa-brands fa-discord text-xs text-indigo-400"></i><span>Discord</span>
-        </a>
+const viewer = document.getElementById("viewer");
+const statusEl = document.getElementById("status");
+const uuidInput = document.getElementById("uuid");
+const previewEl = document.getElementById("preview");
 
-        <!-- Login / User Menu Area -->
-        <div id="auth-nav-container" class="relative">
-          <!-- 未ログイン時 -->
-          <button id="login-open-btn" onclick="openLoginModal()" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded text-xs flex items-center gap-1.5 hover:border-brand-purple text-gray-300 hover:text-brand-lightPurple transition-colors">
-            <i class="fa-solid fa-right-to-bracket text-brand-purple"></i>
-            <span>Login</span>
-          </button>
+let renderer, scene, camera, model;
+const parts = {};
 
-          <!-- ログイン成功時（ドロップダウン用トリガー） -->
-          <div id="user-menu-wrapper" class="hidden relative">
-            <button onclick="toggleUserMenu(event)" class="bg-brand-card border border-brand-purple px-3 py-1.5 rounded text-xs flex items-center gap-2 hover:border-brand-lightPurple text-white transition-colors shadow-[0_0_10px_rgba(139,92,246,0.3)]">
-              <i class="fa-solid fa-ellipsis-vertical text-brand-lightPurple text-sm px-0.5"></i>
-            </button>
+/* ---------- 3D初期化 ---------- */
+function init() {
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  viewer.appendChild(renderer.domElement);
 
-            <!-- 最前面に表示するドロップダウンメニュー -->
-            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-brand-card border border-brand-border rounded-xl shadow-2xl py-1.5 z-[999] font-sans">
-              <button onclick="openProfileModal(); toggleUserMenu();" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-brand-purple/20 hover:text-brand-lightPurple flex items-center gap-2.5 transition-colors">
-                <i class="fa-solid fa-user text-brand-purple w-4"></i>
-                <span>プロフィール画面</span>
-              </button>
-              <button onclick="openMyTierModal(); toggleUserMenu();" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-brand-purple/20 hover:text-brand-lightPurple flex items-center gap-2.5 transition-colors">
-                <i class="fa-solid fa-trophy text-amber-400 w-4"></i>
-                <span>my tier</span>
-              </button>
-              <div class="h-px bg-brand-border my-1"></div>
-              <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-2.5 transition-colors">
-                <i class="fa-solid fa-right-from-bracket w-4"></i>
-                <span>ログアウト</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </header>
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(35, 1, 1, 1000);
+  camera.position.set(0, 16, 120);
+  camera.lookAt(0, 16, 0);
 
-  <!-- Main Content Area -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 flex-grow w-full">
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+  dl.position.set(1, 2, 3);
+  scene.add(dl);
 
-    <!-- HOME TAB -->
-    <section id="tab-home" class="space-y-8">
-      <div class="glow-box bg-brand-card rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="inline-block px-3 py-1 rounded-full bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple font-orbitron text-xs mb-4">
-          OFFICIAL COMMUNITY & TIER LIST
-        </div>
-        <!-- ログイン時のウェルカムメッセージ対応 -->
-        <h1 id="home-welcome-title" class="text-2xl sm:text-5xl font-black font-orbitron text-white tracking-wide mb-4">
-          COMPETITIVE MINECRAFT PVP TIERS
-        </h1>
-        <p id="home-welcome-desc" class="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base mb-6 leading-relaxed">
-          clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。
-        </p>
-        <a href="https://discord.gg/VVumwrtyDP" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold font-orbitron px-8 py-3.5 rounded-xl shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
-          <i class="fa-brands fa-discord text-xl"></i>
-          <span>DISCORD サーバーに参加</span>
-        </a>
-      </div>
+  model = new THREE.Group();
+  scene.add(model);
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="glow-box bg-brand-card rounded-xl p-6 relative">
-          <div class="flex items-center gap-3 border-b border-brand-border pb-4 mb-4">
-            <div class="w-10 h-10 rounded-lg bg-red-500/20 border border-red-500/40 flex items-center justify-center p-2">
-              <img src="./IMG_8237.png" alt="Shield" class="w-full h-full object-contain">
-            </div>
-            <div>
-              <h2 class="text-xl font-bold font-orbitron text-white">SERVER RULES</h2>
-              <p class="text-xs text-gray-400">サーバー利用規約</p>
-            </div>
-          </div>
-          <ul class="space-y-3 text-sm text-gray-300">
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">1.</span><span>他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">2.</span><span>荒らし行為は理由を問わず即Ban対象となります。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span>Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">4.</span><span>その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。</span></li>
-          </ul>
-        </div>
+  resize();
+  window.addEventListener("resize", resize);
 
-        <div class="glow-box bg-brand-card rounded-xl p-6 relative">
-          <div class="flex items-center gap-3 border-b border-brand-border pb-4 mb-4">
-            <div class="w-10 h-10 rounded-lg bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center p-2">
-              <img src="./IMG_8232.png" alt="Crystal" class="w-full h-full object-contain">
-            </div>
-            <div>
-              <h2 class="text-xl font-bold font-orbitron text-white">TIER TEST RULES</h2>
-              <p class="text-xs text-gray-400">テスト規定</p>
-            </div>
-          </div>
-          <ul class="space-y-3 text-sm text-gray-300">
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">1.</span><span>TestはFirst to 4 (FT4)で行います。使用サーバーはDiscord内の test-server チャンネルをご確認ください。</span></li>
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">2.</span><span>クールダウンはありませんが、1日に受けられるTestは最大2回までです。</span></li>
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">3.</span><span>使用KitはLT3まではVanilla Kitであれば自由です。HT3からはDrain Kitを使用します。</span></li>
-            <li class="flex items-start gap-2"><span class="text-brand-lightPurple font-bold">4.</span><span>チート・マクロの使用禁止。キーボード2個使いも禁止です。</span></li>
-          </ul>
-        </div>
-      </div>
-    </section>
+  // ドラッグで回転
+  let dragging = false, lastX = 0;
+  viewer.addEventListener("pointerdown", e => {
+    dragging = true; lastX = e.clientX;
+    viewer.setPointerCapture(e.pointerId);
+  });
+  viewer.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    model.rotation.y += (e.clientX - lastX) * 0.01;
+    lastX = e.clientX;
+  });
+  const endDrag = () => { dragging = false; };
+  viewer.addEventListener("pointerup", endDrag);
+  viewer.addEventListener("pointercancel", endDrag);
 
-    <!-- TIERS TAB -->
-    <section id="tab-tier" class="hidden space-y-6">
-      <!-- Kit Tabs & Load Button Container -->
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <!-- Kit Tabs -->
-        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-none flex-1" id="kit-tabs-container">
-          <button onclick="filterKit('OVERALL')" class="kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple" data-kit="OVERALL">
-            <i class="fa-solid fa-trophy"></i> OVERALL
-          </button>
-          <button onclick="filterKit('SWORD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SWORD">
-            <img src="./IMG_8234.png" alt="Sword" class="w-4 h-4 object-contain"> SWORD
-          </button>
-          <button onclick="filterKit('AXE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="AXE">
-            <img src="./IMG_8246.png" alt="Axe" class="w-4 h-4 object-contain"> AXE
-          </button>
-          <button onclick="filterKit('MACE')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="MACE">
-            <img src="./IMG_8236.png" alt="Mace" class="w-4 h-4 object-contain"> MACE
-          </button>
-          <button onclick="filterKit('SPEAR')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SPEAR">
-            <img src="./IMG_8233.png" alt="Spear" class="w-4 h-4 object-contain"> SPEAR
-          </button>
-          <button onclick="filterKit('CRYSTAL')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CRYSTAL">
-            <img src="./IMG_8232.png" alt="Crystal" class="w-4 h-4 object-contain"> CRYSTAL
-          </button>
-          <button onclick="filterKit('SHIELD')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="SHIELD">
-            <img src="./IMG_8237.png" alt="Shield" class="w-4 h-4 object-contain"> SHIELD
-          </button>
-          <button onclick="filterKit('POT')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="POT">
-            <img src="./IMG_8239.png" alt="Pot" class="w-4 h-4 object-contain"> POT
-          </button>
-          <button onclick="filterKit('CART')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="CART">
-            <img src="./IMG_8244.png" alt="Cart" class="w-4 h-4 object-contain"> CART
-          </button>
-          <button onclick="filterKit('UHC')" class="kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border" data-kit="UHC">
-            <img src="./IMG_8238.png" alt="UHC" class="w-4 h-4 object-contain"> UHC
-          </button>
-        </div>
+  animate();
+}
 
-        <!-- Load Button & CoolDown Display -->
-        <div class="flex flex-col items-end shrink-0 mb-2">
-          <span id="cooldown-text" class="text-[10px] font-mono text-brand-lightPurple h-4 mb-0.5"></span>
-          <button id="load-btn" onclick="handleLoadData()" class="bg-brand-purple hover:bg-brand-lightPurple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple shadow-lg shadow-purple-600/40 transition-all hover:scale-105">
-            <i class="fa-solid fa-rotate" id="load-icon"></i> <span>LOAD</span>
-          </button>
-        </div>
-      </div>
+function resize() {
+  const w = viewer.clientWidth, h = viewer.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
 
-      <!-- Search & Filters -->
-      <div class="flex flex-wrap items-center justify-between gap-4 bg-brand-card p-4 rounded-xl border border-brand-border">
-        <div class="relative flex-1 min-w-[200px]">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
-          <input type="text" id="search-input" onkeyup="renderTable()" placeholder="Search MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg pl-9 pr-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div class="text-xs text-gray-400 font-mono">
-          <span>※ プレイヤー行をクリックで詳細Tierを表示</span>
-        </div>
-      </div>
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
 
-      <!-- Tiers Table -->
-      <div id="table-container" class="overflow-x-auto rounded-xl border border-brand-border bg-brand-card">
-        <table class="w-full text-left border-collapse min-w-[650px]">
-          <thead>
-            <tr class="border-b border-brand-border bg-brand-dark/50 text-[11px] font-orbitron text-gray-400 uppercase">
-              <th class="p-3 text-center w-36">RANK</th>
-              <th class="p-3">PLAYER</th>
-              <th class="p-3 text-center">COUNTRY</th>
-              <th class="p-3 text-right">CONTRIBUTING KITS</th>
-            </tr>
-          </thead>
-          <tbody id="tier-tbody" class="divide-y divide-brand-border/40 text-xs font-mono">
-            <!-- Dynamic JS Output -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+/* ---------- スキンのUV割り当て ---------- */
+// 1ピクセル = 1ユニット。原点は腰の中央（足元が y=0、頭頂が y=32）
+// 面の順番は BoxGeometry と同じ [+x, -x, +y, -y, +z, -z]
+// +x = キャラの左側, -x = キャラの右側（正面は +z）
+function rectsFor(u, v, w, h, d) {
+  const R = {
+    right:  { x: u,         y: v + d, w: d, h: h },
+    left:   { x: u + d + w, y: v + d, w: d, h: h },
+    top:    { x: u + d,     y: v,     w: w, h: d },
+    bottom: { x: u + d + w, y: v,     w: w, h: d },
+    front:  { x: u + d,     y: v + d, w: w, h: h },
+    back:   { x: u + 2 * d + w, y: v + d, w: w, h: h }
+  };
+  return [R.left, R.right, R.top, R.bottom, R.front, R.back];
+}
 
-  <!-- Player Tier Detail Modal -->
-  <div id="player-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleModalBgClick(event)">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-md w-full p-5 sm:p-6 relative glow-box overflow-hidden shadow-2xl">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+function remapUV(geom, rects) {
+  const uv = geom.attributes.uv;
+  for (let f = 0; f < 6; f++) {
+    const r = rects[f];
+    for (let k = 0; k < 4; k++) {
+      const i = f * 4 + k;
+      const a = uv.getX(i), b = uv.getY(i);
+      const px = r.x + a * r.w;
+      const py = r.y + (1 - b) * r.h;
+      uv.setXY(i, px / 64, 1 - py / 64);
+    }
+  }
+  uv.needsUpdate = true;
+}
 
-      <!-- Profile Header -->
-      <div class="skin-showcase-bg rounded-xl p-4 sm:p-5 mb-4 border border-brand-border flex items-center gap-4 sm:gap-6 relative">
-        <div class="absolute top-2 left-3 text-[9px] font-orbitron text-brand-lightPurple tracking-widest uppercase opacity-70">
-          // PLAYER TIER DETAIL
-        </div>
-        <div class="relative group mt-2 shrink-0">
-          <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
-          <div class="relative w-24 h-36 sm:w-28 sm:h-40 bg-brand-dark/90 rounded-xl border border-brand-purple/50 flex items-center justify-center p-2 overflow-hidden">
-            <img id="modal-fullbody" src="" alt="Skin" onerror="handleModalSkinError(this)" class="h-full object-contain object-bottom filter drop-shadow-[0_0_10px_rgba(168,85,247,0.7)]">
-          </div>
-        </div>
-        <div class="text-left z-10 overflow-hidden mt-2">
-          <h3 id="modal-name" class="text-xl sm:text-2xl font-black font-orbitron text-white tracking-wide mb-1 truncate glow-text"></h3>
-          <div class="text-xs font-mono text-brand-lightPurple font-bold mb-2" id="modal-total-score">Total: 0 pts</div>
-          <div class="inline-flex items-center gap-2 bg-brand-dark/80 px-2.5 py-1 rounded-lg border border-brand-border">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[10px] sm:text-[11px] font-mono text-gray-300" id="modal-edition-badge">Verified Player</span>
-          </div>
-        </div>
-      </div>
+function makePart(w, h, d, u, v, inflate, x, y, mat) {
+  const g = new THREE.BoxGeometry(w + inflate * 2, h + inflate * 2, d + inflate * 2);
+  remapUV(g, rectsFor(u, v, w, h, d));
+  const m = new THREE.Mesh(g, mat);
+  m.position.set(x, y, 0);
+  return m;
+}
 
-      <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
-        <i class="fa-solid fa-layer-group text-brand-purple"></i> <span>Kit Tier Breakdown & Points</span>
-      </h4>
-      <div id="modal-kits" class="grid grid-cols-1 gap-2 text-xs max-h-44 overflow-y-auto pr-1">
-        <!-- Dynamic -->
-      </div>
-    </div>
-  </div>
+// 肩・股関節を支点にした関節グループ
+function limb(pivotX, pivotY, w, base, over, mat, omat) {
+  const p = new THREE.Group();
+  p.position.set(pivotX, pivotY, 0);
+  p.add(
+    makePart(w, 12, 4, base[0], base[1], 0, 0, -6, mat),
+    makePart(w, 12, 4, over[0], over[1], 0.25, 0, -6, omat)
+  );
+  return p;
+}
 
-  <!-- Profile Modal (完全別物) -->
-  <div id="profile-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleProfileModalBgClick(event)">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-md w-full p-6 relative glow-box shadow-2xl">
-      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div class="text-center mb-4">
-        <div class="inline-block p-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple mb-2">
-          <i class="fa-solid fa-user-gear text-xl"></i>
-        </div>
-        <h3 class="text-lg font-bold font-orbitron text-white">PLAYER PROFILE</h3>
-        <p class="text-xs text-gray-400 mt-1">アカウント設定 & プロフィール</p>
-      </div>
-      <div class="space-y-4 text-xs font-mono">
-        <div class="bg-brand-dark p-3 rounded-lg border border-brand-border">
-          <span class="text-gray-400 block mb-1">Logged in as:</span>
-          <span id="profile-username" class="text-white font-bold text-sm"></span>
-        </div>
-        <div class="bg-brand-dark p-3 rounded-lg border border-brand-border">
-          <span class="text-gray-400 block mb-1">Status:</span>
-          <span class="text-emerald-400 flex items-center gap-1.5">
-            <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> 認証済みアカウント (Active Session)
-          </span>
-        </div>
-        <button onclick="closeProfileModal()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all">閉じる</button>
-      </div>
-    </div>
-  </div>
+/* ---------- モデル構築 ---------- */
+function buildModel(tex, slim) {
+  while (model.children.length) model.remove(model.children[0]);
 
-  <!-- Login Modal -->
-  <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="handleLoginModalBgClick(event)">
-    <div class="bg-brand-card border-2 border-brand-purple/60 rounded-2xl max-w-sm w-full p-6 relative glow-box shadow-2xl">
-      <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl z-20 w-8 h-8 rounded-full bg-brand-dark/80 flex items-center justify-center border border-brand-border">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div class="text-center mb-4">
-        <div class="inline-block p-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-lightPurple mb-2">
-          <i class="fa-solid fa-user-lock text-xl"></i>
-        </div>
-        <h3 class="text-lg font-bold font-orbitron text-white">PLAYER LOGIN</h3>
-        <p class="text-xs text-gray-400 mt-1">プレイヤーログイン</p>
-      </div>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-mono text-gray-400 mb-1">MCID / UUID</label>
-          <input type="text" id="login-mcid-input" placeholder="Enter your MCID..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <div>
-          <label class="block text-[11px] font-mono text-gray-400 mb-1">Password</label>
-          <input type="password" id="login-password-input" placeholder="Enter password..." class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-purple">
-        </div>
-        <!-- エラーメッセージ表示用 -->
-        <div id="login-error-msg" class="text-[11px] text-red-400 text-center hidden"></div>
-        <button id="login-submit-btn" onclick="handleLoginSubmit()" class="w-full bg-brand-purple hover:bg-brand-lightPurple text-white py-2.5 rounded-lg font-orbitron text-xs font-bold transition-all mt-2">ログイン</button>
-      </div>
-    </div>
-  </div>
+  const mat  = new THREE.MeshLambertMaterial({ map: tex });
+  const omat = new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.5 });
+  const aw = slim ? 3 : 4; // Slim は腕が3px幅
 
-  <footer class="border-t border-brand-border/40 bg-brand-dark py-4 text-center text-xs text-gray-500 font-mono">
-    &copy; 2026 clytiers. All rights reserved. Not affiliated with Mojang AB.
-  </footer>
+  // 頭
+  model.add(
+    makePart(8, 8, 8, 0, 0, 0, 0, 28, mat),
+    makePart(8, 8, 8, 32, 0, 0.25, 0, 28, omat)
+  );
+  // 胴
+  model.add(
+    makePart(8, 12, 4, 16, 16, 0, 0, 18, mat),
+    makePart(8, 12, 4, 16, 32, 0.25, 0, 18, omat)
+  );
 
-  <script>
-    /* ========================================================
-       🟣 クリック時：サクッと消える波紋 ＆ 最前面で約0.7秒で消える飛び散り粒子
-       ======================================================== */
-    const clickParticles = [];
+  parts.rArm = limb(-(4 + aw / 2), 24, aw, [40, 16], [40, 32], mat, omat);
+  parts.lArm = limb( (4 + aw / 2), 24, aw, [32, 48], [48, 48], mat, omat);
+  parts.rLeg = limb(-2, 12, 4, [0, 16], [0, 32], mat, omat);
+  parts.lLeg = limb( 2, 12, 4, [16, 48], [0, 48], mat, omat);
+  model.add(parts.rArm, parts.lArm, parts.rLeg, parts.lLeg);
 
-    window.addEventListener('click', (e) => {
-      const fog = document.createElement('div');
-      fog.className = 'water-ripple-fog';
-      const fogSize = 65;
-      fog.style.width = fogSize + 'px';
-      fog.style.height = fogSize + 'px';
-      fog.style.left = (e.clientX - fogSize / 2) + 'px';
-      fog.style.top = (e.clientY - fogSize / 2) + 'px';
+  applyPose();
+}
 
-      const outerRipple = document.createElement('div');
-      outerRipple.className = 'water-ripple-outer';
-      const outerSize = 55;
-      outerRipple.style.width = outerSize + 'px';
-      outerRipple.style.height = outerSize + 'px';
-      outerRipple.style.left = (e.clientX - outerSize / 2) + 'px';
-      outerRipple.style.top = (e.clientY - outerSize / 2) + 'px';
-      
-      const innerRipple = document.createElement('div');
-      innerRipple.className = 'water-ripple-inner';
-      const innerSize = 25;
-      innerRipple.style.width = innerSize + 'px';
-      innerRipple.style.height = innerSize + 'px';
-      innerRipple.style.left = (e.clientX - innerSize / 2) + 'px';
-      innerRipple.style.top = (e.clientY - innerSize / 2) + 'px';
-      
-      document.body.appendChild(fog);
-      document.body.appendChild(outerRipple);
-      document.body.appendChild(innerRipple);
-      
-      setTimeout(() => fog.remove(), 750);
-      setTimeout(() => outerRipple.remove(), 650);
-      setTimeout(() => innerRipple.remove(), 500);
+/* ---------- ポーズ ---------- */
+function applyPose() {
+  document.querySelectorAll("[data-part]").forEach(s => {
+    const p = parts[s.dataset.part];
+    if (p) p.rotation.x = THREE.MathUtils.degToRad(+s.value);
+  });
+}
+document.querySelectorAll("[data-part]").forEach(s =>
+  s.addEventListener("input", applyPose)
+);
 
-      for (let i = 0; i < 5; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 2.8 + 1.2;
-        clickParticles.push({
-          x: e.clientX,
-          y: e.clientY,
-          size: Math.random() * 2.8 + 1.5,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 0.4,
-          alpha: 1.0,
-          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7',
-          life: 0,
-          maxLife: 42
-        });
-      }
-    });
+/* ---------- スキン取得 ---------- */
+function setStatus(msg) { statusEl.textContent = msg; }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const bgCanvas = document.getElementById('nether-particles');
-      const bgCtx = bgCanvas.getContext('2d');
-      const clickCanvas = document.getElementById('click-particles-canvas');
-      const clickCtx = clickCanvas.getContext('2d');
+async function showSkin() {
+  const clean = uuidInput.value.trim().replace(/-/g, "").toLowerCase();
+  if (!/^[0-9a-f]{32}$/.test(clean)) {
+    setStatus("UUIDの形式が正しくありません");
+    return;
+  }
 
-      function resizeCanvases() {
-        bgCanvas.width = window.innerWidth;
-        bgCanvas.height = window.innerHeight;
-        clickCanvas.width = window.innerWidth;
-        clickCanvas.height = window.innerHeight;
-      }
-      resizeCanvases();
-      window.addEventListener('resize', resizeCanvases);
-
-      const backgroundParticles = [];
-      const particleCount = 45;
-
-      for (let i = 0; i < particleCount; i++) {
-        backgroundParticles.push({
-          x: Math.random() * bgCanvas.width,
-          y: Math.random() * bgCanvas.height,
-          size: Math.random() * 2.5 + 1,
-          speedX: (Math.random() - 0.5) * 0.4,
-          speedY: -Math.random() * 0.6 - 0.2,
-          opacity: Math.random() * 0.6 + 0.2,
-          color: Math.random() > 0.5 ? '#d8b4fe' : '#a855f7'
-        });
-      }
-
-      function animate() {
-        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        backgroundParticles.forEach(p => {
-          bgCtx.beginPath();
-          bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          bgCtx.fillStyle = p.color;
-          bgCtx.globalAlpha = p.opacity;
-          bgCtx.shadowBlur = 8;
-          bgCtx.shadowColor = '#c084fc';
-          bgCtx.fill();
-
-          p.x += p.speedX;
-          p.y += p.speedY;
-
-          if (p.y < -10) {
-            p.y = bgCanvas.height + 10;
-            p.x = Math.random() * bgCanvas.width;
-          }
-          if (p.x < -10) p.x = bgCanvas.width + 10;
-          if (p.x > bgCanvas.width + 10) p.x = -10;
-        });
-
-        clickCtx.clearRect(0, 0, clickCanvas.width, clickCanvas.height);
-        for (let i = clickParticles.length - 1; i >= 0; i--) {
-          const cp = clickParticles[i];
-          cp.life++;
-          cp.alpha = Math.max(0, 1.0 - (cp.life / cp.maxLife));
-
-          clickCtx.beginPath();
-          clickCtx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
-          clickCtx.fillStyle = cp.color;
-          clickCtx.globalAlpha = cp.alpha;
-          clickCtx.shadowBlur = 12;
-          clickCtx.shadowColor = '#e879f9';
-          clickCtx.fill();
-
-          cp.x += cp.vx;
-          cp.y += cp.vy;
-          cp.vx *= 0.94;
-          cp.vy *= 0.94;
-
-          if (cp.life >= cp.maxLife) {
-            clickParticles.splice(i, 1);
-          }
-        }
-
-        requestAnimationFrame(animate);
-      }
-      animate();
-
-      // ページ読み込み・ハッシュ変更時のルーター初期化
-      handleRouting();
-      window.addEventListener('hashchange', handleRouting);
-
-      checkPersistedLogin();
-    });
-
-    let activeKitFilter = 'OVERALL';
-    let playersData = [];
-    let isDataLoaded = false;
-    let cooldownTimer = null;
-    let loggedInUser = null;
-
-    const DEFAULT_STEVE_BODY = "https://crafatar.com/renders/body/8667ba71-b85a-4004-af54-457a973daf31?scale=4&overlay=true";
-
-    function isUuid(str) {
-      if (!str) return false;
-      const clean = str.trim().replace(/-/g, "");
-      return /^[0-9a-fA-F]{32}$/.test(clean);
+  setStatus("読み込み中...");
+  try {
+    const res = await fetch(`${WORKER_URL}?action=skin&uuid=${clean}`);
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.message || `取得に失敗しました (${res.status})`);
     }
 
-    function getCleanUuid(str) {
-      if (!str) return "";
-      return str.trim().replace(/-/g, "").toLowerCase();
-    }
-
-    function getSkinUrl(player, size = 140) {
-      if (player && isUuid(player.rawId)) {
-        return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
-      } else if (player && player.name) {
-        return `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${size}.png`;
-      }
-      return DEFAULT_STEVE_BODY;
-    }
-
-    function handleSkinError(img) {
-      const index = img.dataset.index;
-      const player = (index !== undefined && playersData[index]) ? playersData[index] : null;
-
-      const step = img.dataset.fallbackStep || "0";
-      if (step === "0") {
-        img.dataset.fallbackStep = "1";
-        if (player && isUuid(player.rawId) && player.name) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
-        } else if (player && player.name) {
-          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else if (step === "1") {
-        img.dataset.fallbackStep = "2";
-        if (player && player.name) {
-          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else {
-        img.src = DEFAULT_STEVE_BODY;
-      }
-    }
-
-    function handleModalSkinError(img) {
-      const player = window.currentModalPlayer;
-      const step = img.dataset.fallbackStep || "0";
-      if (step === "0") {
-        img.dataset.fallbackStep = "1";
-        if (player && player.name) {
-          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/150.png`;
-        } else {
-          img.src = DEFAULT_STEVE_BODY;
-        }
-      } else {
-        img.src = DEFAULT_STEVE_BODY;
-      }
-    }
-
-    function formatCountry(countryStr) {
-      if (!countryStr) return '';
-      const clean = countryStr.trim().toLowerCase();
-      const map = {
-        'japan': '🇯🇵', 'jp': '🇯🇵', '日本': '🇯🇵',
-        'america': '🇺🇸', 'usa': '🇺🇸', 'us': '🇺🇸', 'united states': '🇺🇸',
-        'denmark': '🇩🇰', 'dk': '🇩🇰',
-        'germany': '🇩🇪', 'de': '🇩🇪',
-        'canada': '🇨🇦', 'ca': '🇨🇦',
-        'uk': '🇬🇧', 'united kingdom': '🇬🇧', 'england': '🇬🇧',
-        'korea': '🇰🇷', 'kr': '🇰🇷',
-        'china': '🇨🇳', 'cn': '🇨🇳',
-        'france': '🇫🇷', 'fr': '🇫🇷'
-      };
-      return map[clean] || countryStr;
-    }
-
-    /* 🟣 新しい正確なポイント設計マップ */
-    function getTierScoreValue(tierStr) {
-      if (!tierStr) return 0;
-      const clean = tierStr.toUpperCase().trim();
-      const scoreMap = {
-        'HT1': 65,
-        'MT1': 55,
-        'LT1': 45,
-        'HT2': 34,
-        'MT2': 28,
-        'LT2': 22,
-        'HT3': 16,
-        'MT3': 12,
-        'LT3': 8,
-        'HT4': 6,
-        'MT4': 5,
-        'LT4': 4,
-        'HT5': 3,
-        'MT5': 2,
-        'LT5': 1
-      };
-      return scoreMap[clean] || 0;
-    }
-
-    function formatTierFullTitle(tierStr) {
-      if (!tierStr) return '';
-      const clean = tierStr.toUpperCase().trim();
-      const match = clean.match(/([HLM]T)(\d+)/);
-      if (match) {
-        const type = match[1];
-        const num = match[2];
-        let typeName = 'Tier';
-        if (type === 'HT') typeName = 'High Tier';
-        else if (type === 'MT') typeName = 'Mid Tier';
-        else if (type === 'LT') typeName = 'Low Tier';
-        return `${typeName} ${num}`;
-      }
-      return tierStr;
-    }
-
-    function calculatePlayerOverallScore(player) {
-      let total = 0;
-      if (player.kits) {
-        for (const tier of Object.values(player.kits)) {
-          total += getTierScoreValue(tier);
-        }
-      }
-      return total;
-    }
-
-    function getKitImageTag(kitName) {
-      const map = {
-        CRYSTAL: 'IMG_8232.png',
-        SPEAR: 'IMG_8233.png',
-        SWORD: 'IMG_8234.png',
-        MACE: 'IMG_8236.png',
-        SHIELD: 'IMG_8237.png',
-        UHC: 'IMG_8238.png',
-        POT: 'IMG_8239.png',
-        CART: 'IMG_8244.png',
-        AXE: 'IMG_8246.png'
-      };
-      if (map[kitName]) {
-        return `<img src="./${map[kitName]}" alt="${kitName}" class="w-4 h-4 object-contain inline-block">`;
-      }
-      return '';
-    }
-
-    function getTierColorClass(tierStr) {
-      if (!tierStr) return 'tier-blue';
-      const upper = tierStr.toUpperCase();
-      if (upper.includes('1')) return 'tier-gold';
-      if (upper.includes('2')) return 'tier-silver';
-      if (upper.includes('3')) return 'tier-bronze';
-      return 'tier-blue';
-    }
-
-    /* ========================================================
-       🟣 ルーター＆タブ切り替え機構
-       ======================================================== */
-    function switchTab(tabName, updateHash = true) {
-      document.getElementById('tab-home').classList.add('hidden');
-      document.getElementById('tab-tier').classList.add('hidden');
-      
-      document.getElementById('nav-home').classList.replace('text-brand-lightPurple', 'text-gray-300');
-      document.getElementById('nav-tier').classList.replace('text-brand-lightPurple', 'text-gray-300');
-
-      const targetTab = document.getElementById(`tab-${tabName}`);
-      const targetNav = document.getElementById(`nav-${tabName}`);
-
-      if (targetTab) targetTab.classList.remove('hidden');
-      if (targetNav) targetNav.classList.replace('text-gray-300', 'text-brand-lightPurple');
-
-      if (tabName === 'tier') {
-        if (!isDataLoaded) {
-          fetchSpreadsheetData();
-        }
-      }
-
-      if (updateHash) {
-        if (tabName === 'tier') {
-          window.location.hash = '#/tier';
-        } else {
-          window.location.hash = '#/home';
-        }
-      }
-    }
-
-    function handleRouting() {
-      const hash = window.location.hash;
-      
-      if (hash.startsWith('#/tier/')) {
-        const username = decodeURIComponent(hash.replace('#/tier/', ''));
-        switchTab('tier', false);
-        if (!isDataLoaded) {
-          fetchSpreadsheetData().then(() => openUserByUsername(username));
-        } else {
-          openUserByUsername(username);
-        }
-      } else if (hash === '#/tier') {
-        switchTab('tier', false);
-      } else {
-        switchTab('home', false);
-      }
-    }
-
-    function openUserByUsername(username) {
-      const found = playersData.find(p => p.name.toLowerCase() === username.toLowerCase() || p.rawId.toLowerCase() === username.toLowerCase());
-      if (found) {
-        openModal(found, false);
-      }
-    }
-
-    function filterKit(kit) {
-      activeKitFilter = kit;
-      
-      document.querySelectorAll('.kit-tab').forEach(btn => {
-        if (btn.getAttribute('data-kit') === kit) {
-          btn.className = "kit-tab active bg-brand-purple text-white px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-lightPurple";
-        } else {
-          btn.className = "kit-tab bg-brand-card hover:bg-brand-border text-gray-300 px-4 py-2 rounded-lg font-orbitron text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-brand-border";
-        }
-      });
-
-      renderTable();
-    }
-
-    async function fetchSpreadsheetData(force = false) {
-      if (isDataLoaded && !force) return;
-
-      const tbody = document.getElementById('tier-tbody');
-      const loadIcon = document.getElementById('load-icon');
-      const container = document.getElementById('table-container');
-
-      if (loadIcon) loadIcon.classList.add('fa-spin');
-
-      if (container) {
-        container.classList.remove('scan-effect');
-        void container.offsetWidth;
-        container.classList.add('scan-effect');
-      }
-
-      tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading data...</td></tr>`;
-
-      try {
-        const webAppUrl = "https://system.clytiers.workers.dev/?t=" + new Date().getTime();
-        
-        const response = await fetch(webAppUrl);
-        const rawData = await response.json();
-
-        playersData = rawData.map(p => {
-          let normalizedKits = {};
-          if (p.kits) {
-            for (let [k, v] of Object.entries(p.kits)) {
-              normalizedKits[k.toUpperCase()] = v ? v.toString().trim().toUpperCase() : '';
-            }
-          }
-
-          const isJavaUuid = isUuid(p.uuid);
-
-          return {
-            ...p,
-            rawId: p.uuid,
-            name: p.name,
-            isUuid: isJavaUuid,
-            country: formatCountry(p.country),
-            kits: normalizedKits
-          };
-        });
-
-        isDataLoaded = true;
-        renderTable();
-      } catch (error) {
-        console.error("Failed to load spreadsheet data:", error);
-        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-red-400">データの取得に失敗しました。</td></tr>`;
-      } finally {
-        if (loadIcon) loadIcon.classList.remove('fa-spin');
-      }
-    }
-
-    function handleLoadData() {
-      const loadBtn = document.getElementById('load-btn');
-      const cooldownText = document.getElementById('cooldown-text');
-      
-      if (loadBtn.disabled) return;
-
-      fetchSpreadsheetData(true);
-
-      loadBtn.disabled = true;
-      loadBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-      let timeLeft = 60;
-      cooldownText.innerText = `Cooldown: ${timeLeft}s`;
-
-      if (cooldownTimer) clearInterval(cooldownTimer);
-
-      cooldownTimer = setInterval(() => {
-        timeLeft--;
-        if (timeLeft > 0) {
-          cooldownText.innerText = `Cooldown: ${timeLeft}s`;
-        } else {
-          clearInterval(cooldownTimer);
-          cooldownText.innerText = '';
-          loadBtn.disabled = false;
-          loadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-      }, 1000);
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById('tier-tbody');
-      const search = document.getElementById('search-input').value.toLowerCase();
-      tbody.innerHTML = '';
-
-      let filtered = playersData.filter(p => {
-        const nameMatch = p.name.toLowerCase().includes(search) || p.rawId.toLowerCase().includes(search);
-        if (activeKitFilter === 'OVERALL') return nameMatch;
-        return nameMatch && (p.kits[activeKitFilter] !== undefined && p.kits[activeKitFilter] !== '');
-      });
-
-      if (activeKitFilter === 'OVERALL') {
-        filtered.sort((a, b) => calculatePlayerOverallScore(b) - calculatePlayerOverallScore(a));
-      } else {
-        filtered.sort((a, b) => {
-          const scoreA = getTierScoreValue(a.kits[activeKitFilter]);
-          const scoreB = getTierScoreValue(b.kits[activeKitFilter]);
-          return scoreB - scoreA;
-        });
-      }
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400">プレイヤーが見つかりません。</td></tr>`;
-        return;
-      }
-
-      filtered.forEach((p, idx) => {
-        const tr = document.createElement('tr');
-        const delay = Math.min(idx * 0.03, 1.0);
-        tr.className = "tier-row-animated cursor-pointer border-b border-brand-border/40";
-        tr.style.animationDelay = `${delay}s`;
-        
-        tr.onclick = () => {
-          openModal(p, true);
-        };
-
-        const rankNum = idx + 1;
-        let rankBoxClass = 'rank-normal-box';
-        let shiningClass = '';
-        
-        if (rankNum === 1) { rankBoxClass = 'rank-1-box'; shiningClass = 'rank-shining'; }
-        else if (rankNum === 2) { rankBoxClass = 'rank-2-box'; shiningClass = 'rank-shining'; }
-        else if (rankNum === 3) { rankBoxClass = 'rank-3-box'; shiningClass = 'rank-shining'; }
-
-        let kitBadges = '';
-        let subTierTextHtml = '';
-
-        if (activeKitFilter === 'OVERALL') {
-          for (const [kit, tier] of Object.entries(p.kits)) {
-            if (!tier) continue;
-            const colorClass = getTierColorClass(tier);
-            const imgTag = getKitImageTag(kit);
-            kitBadges += `<span class="tier-badge ${colorClass} mr-1 mb-1">${imgTag} ${kit}: ${tier}</span>`;
-          }
-        } else {
-          const tier = p.kits[activeKitFilter];
-          const colorClass = getTierColorClass(tier);
-          const imgTag = getKitImageTag(activeKitFilter);
-          kitBadges = `<span class="tier-badge ${colorClass}">${imgTag} ${activeKitFilter}: ${tier}</span>`;
-          
-          const fullTitle = formatTierFullTitle(tier);
-          if (fullTitle) {
-            subTierTextHtml = `<div class="text-[10px] text-brand-lightPurple font-mono whitespace-nowrap">${fullTitle}</div>`;
-          }
-        }
-
-        const originalIndex = playersData.findIndex(item => item.name === p.name && item.rawId === p.rawId);
-        const bodyUrl = getSkinUrl(p, 140);
-        const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
-
-        tr.innerHTML = `
-          <td class="py-3 px-4 text-center">
-            <div class="rank-banner-container">
-              <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
-                <span>${rankNum}.</span>
-                <div class="h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1">
-                  <img src="${bodyUrl}" data-index="${originalIndex}" data-size="140" alt="${p.name}" class="h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7" onerror="handleSkinError(this)">
-                </div>
-              </div>
-            </div>
-          </td>
-          <td class="p-3">
-            <div class="font-bold text-white tracking-wide text-sm truncate">${p.name} ${editionTag}</div>
-            ${subTierTextHtml}
-          </td>
-          <td class="p-3 text-center text-base">${p.country || ''}</td>
-          <td class="p-3 text-right overflow-x-auto max-w-[200px] sm:max-w-none">${kitBadges}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function openModal(player, updateHash = true) {
-      window.currentModalPlayer = player;
-      if (updateHash) {
-        window.location.hash = `#/tier/${encodeURIComponent(player.name)}`;
-      }
-
-      const bodyUrl = getSkinUrl(player, 150);
-      const modalBody = document.getElementById('modal-fullbody');
-      modalBody.dataset.fallbackStep = "0";
-      modalBody.dataset.size = "150";
-      modalBody.src = bodyUrl;
-
-      document.getElementById('modal-name').innerText = player.name;
-      document.getElementById('modal-edition-badge').innerText = player.isUuid ? 'Java Edition Player (UUID)' : 'Bedrock Edition Player';
-      
-      const totalScore = calculatePlayerOverallScore(player);
-      document.getElementById('modal-total-score').innerText = `Total Score: ${totalScore} pts`;
-
-      const kitsContainer = document.getElementById('modal-kits');
-      kitsContainer.innerHTML = '';
-      if (player.kits) {
-        for (const [kit, tier] of Object.entries(player.kits)) {
-          if (!tier) continue;
-          const colorClass = getTierColorClass(tier);
-          const imgTag = getKitImageTag(kit);
-          const kitScore = getTierScoreValue(tier);
-          kitsContainer.innerHTML += `
-            <div class="bg-brand-dark p-2.5 rounded-lg border border-brand-border flex justify-between items-center">
-              <span class="text-gray-300 font-orbitron text-xs flex items-center gap-1.5">${imgTag} ${kit}</span>
-              <div class="flex items-center gap-3">
-                <span class="text-[11px] font-mono text-brand-lightPurple font-bold">+${kitScore} pts</span>
-                <span class="tier-badge ${colorClass}">${tier}</span>
-              </div>
-            </div>
-          `;
-        }
-      }
-
-      document.getElementById('player-modal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('player-modal').classList.add('hidden');
-      window.currentModalPlayer = null;
-      window.location.hash = '#/tier';
-    }
-
-    function handleModalBgClick(event) {
-      if (event.target.id === 'player-modal') {
-        closeModal();
-      }
-    }
-
-    function openLoginModal() {
-      document.getElementById('login-modal').classList.remove('hidden');
-      const errorMsg = document.getElementById('login-error-msg');
-      if (errorMsg) {
-        errorMsg.classList.add('hidden');
-        errorMsg.innerText = '';
-      }
-    }
-
-    function closeLoginModal() {
-      document.getElementById('login-modal').classList.add('hidden');
-    }
-
-    function handleLoginModalBgClick(event) {
-      if (event.target.id === 'login-modal') {
-        closeLoginModal();
-      }
-    }
-
-    /* ========================================================
-       🟣 プロフィール画面
-       ======================================================== */
-    function openProfileModal() {
-      if (!loggedInUser) return;
-      document.getElementById('profile-username').innerText = loggedInUser;
-      document.getElementById('profile-modal').classList.remove('hidden');
-    }
-
-    function closeProfileModal() {
-      document.getElementById('profile-modal').classList.add('hidden');
-    }
-
-    function handleProfileModalBgClick(event) {
-      if (event.target.id === 'profile-modal') {
-        closeProfileModal();
-      }
-    }
-
-    /* ========================================================
-       🟣 ログインメニュー・認証関連ロジック
-       ======================================================== */
-    function toggleUserMenu(event) {
-      if (event) event.stopPropagation();
-      const menu = document.getElementById('user-dropdown-menu');
-      if (menu) {
-        menu.classList.toggle('hidden');
-      }
-    }
-
-    function closeUserMenuOutside(event) {
-      const wrapper = document.getElementById('user-menu-wrapper');
-      const menu = document.getElementById('user-dropdown-menu');
-      if (wrapper && menu && !wrapper.contains(event.target)) {
-        menu.classList.add('hidden');
-      }
-    }
-
-    function updateHeaderLoginState(username) {
-      loggedInUser = username;
-      const loginBtn = document.getElementById('login-open-btn');
-      const userWrapper = document.getElementById('user-menu-wrapper');
-      
-      const welcomeTitle = document.getElementById('home-welcome-title');
-      const welcomeDesc = document.getElementById('home-welcome-desc');
-
-      if (username) {
-        if (loginBtn) loginBtn.classList.add('hidden');
-        if (userWrapper) userWrapper.classList.remove('hidden');
-
-        if (welcomeTitle) welcomeTitle.innerText = `おかえりなさい、${username}さん`;
-        if (welcomeDesc) welcomeDesc.innerText = `clytiersへようこそ！今日もランキング上位を目指してベストを尽くしましょう。`;
-      } else {
-        if (loginBtn) loginBtn.classList.remove('hidden');
-        if (userWrapper) userWrapper.classList.add('hidden');
-
-        if (welcomeTitle) welcomeTitle.innerText = `COMPETITIVE MINECRAFT PVP TIERS`;
-        if (welcomeDesc) welcomeDesc.innerText = `clytiersへようこそ！公式DiscordサーバーでTierテストを受け、ランキングに挑戦しましょう。`;
-      }
-    }
-
-    function checkPersistedLogin() {
-      const savedUser = localStorage.getItem('clytiers_logged_in_user');
-      if (savedUser) {
-        updateHeaderLoginState(savedUser);
-      }
-    }
-
-    function handleLogout() {
-      localStorage.removeItem('clytiers_logged_in_user');
-      updateHeaderLoginState(null);
-      const menu = document.getElementById('user-dropdown-menu');
-      if (menu) menu.classList.add('hidden');
-      window.location.hash = '#/home';
-      alert('ログアウトしました。');
-    }
-
-    function openMyTierModal() {
-      if (!loggedInUser) return;
-      const found = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
-      if (found) {
-        openModal(found, true);
-      } else {
-        fetchSpreadsheetData().then(() => {
-          const foundAfterLoad = playersData.find(p => p.name.toLowerCase() === loggedInUser.toLowerCase() || p.rawId.toLowerCase() === loggedInUser.toLowerCase());
-          if (foundAfterLoad) {
-            openModal(foundAfterLoad, true);
-          } else {
-            alert(`ユーザー「${loggedInUser}」のTierデータが見つかりませんでした。`);
-          }
-        });
-      }
-    }
-
-    async function handleLoginSubmit() {
-      const mcidInput = document.getElementById('login-mcid-input').value.trim();
-      const passwordInput = document.getElementById('login-password-input').value;
-      const errorMsg = document.getElementById('login-error-msg');
-      const submitBtn = document.getElementById('login-submit-btn');
-      
-      if (!mcidInput || !passwordInput) {
-        if (errorMsg) {
-          errorMsg.innerText = "MCIDとパスワードを入力してください。";
-          errorMsg.classList.remove('hidden');
-        }
-        return;
-      }
-
-      try {
-        if (errorMsg) errorMsg.classList.add('hidden');
-        
-        submitBtn.disabled = true;
-        submitBtn.innerText = "ログイン中...";
-        submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
-
-        const msgBuffer = new TextEncoder().encode(passwordInput);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-        const baseUrl = "https://system.clytiers.workers.dev";
-        const url = `${baseUrl}?action=login&mcid=${encodeURIComponent(mcidInput)}&passwordHash=${passwordHash}`;
-        
-        const response = await fetch(url);
-        const result = await response.json();
-
-        if (result.success) {
-          localStorage.setItem('clytiers_logged_in_user', result.name);
-          updateHeaderLoginState(result.name);
-
-          closeLoginModal();
-          document.getElementById('login-mcid-input').value = '';
-          document.getElementById('login-password-input').value = '';
-        } else {
-          if (errorMsg) {
-            errorMsg.innerText = result.message || "MCIDまたはパスワードが違います。";
-            errorMsg.classList.remove('hidden');
-          }
-        }
-      } catch (err) {
-        console.error("Login error:", err);
-        if (errorMsg) {
-          errorMsg.innerText = "通信エラーが発生しました。";
-          errorMsg.classList.remove('hidden');
-        }
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "ログイン";
-        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-      }
-    }
-  </script>
+    const slim = res.headers.get("X-Skin-Model") === "slim";
+    const objUrl = URL.createObjectURL(await res.blob());
+    previewEl.src = objUrl;
+
+    const tex = await new Promise((ok, err) =>
+      new THREE.TextureLoader().load(objUrl, ok, undefined, err)
+    );
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+
+    buildModel(tex, slim);
+    setStatus(slim ? "Slim（細腕）モデル" : "Classic（通常）モデル");
+  } catch (e) {
+    setStatus("エラー: " + e.message);
+  }
+}
+
+document.getElementById("go").addEventListener("click", showSkin);
+uuidInput.addEventListener("keydown", e => { if (e.key === "Enter") showSkin(); });
+
+init();
+</script>
 </body>
 </html>
