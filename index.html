@@ -152,15 +152,15 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 10px 4px 14px;
+      padding: 4px 8px 4px 12px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
       font-size: 20px;
       color: #ffffff;
       clip-path: polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%);
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      width: 140px;
-      height: 60px;
+      width: 130px;
+      height: 56px;
       overflow: hidden;
       transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
       transform-style: preserve-3d;
@@ -224,30 +224,13 @@
       transform: scale(1.05);
     }
 
-    /* 一覧の各行に表示するThree.js用スキンコンテナ（1枚目画像の切り取り・回転を再現） */
-    .skin-viewport {
-      width: 52px;
-      height: 56px;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      overflow: hidden;
-    }
-    .skin-viewport canvas {
-      display: block;
-      width: 52px !important;
-      height: 56px !important;
-      image-rendering: pixelated;
-    }
-
     .skin-showcase-bg {
       background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(7, 3, 13, 0.96) 85%);
       position: relative;
       overflow: hidden;
     }
 
-    /* 3Dスキン表示（モーダル用） */
+    /* 3Dスキン表示 */
     #skin3d canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -301,10 +284,14 @@
       transform: translateX(6px);
       box-shadow: inset 5px 0 0 0 #e879f9, 0 8px 25px rgba(217, 70, 239, 0.35);
     }
+    
+    #tier-tbody tr:hover img {
+      filter: drop-shadow(0 0 12px rgba(232, 121, 249, 0.9));
+      transition: filter 0.3s ease;
+    }
 
     #player-modal:not(.hidden) > div,
-    #profile-modal:not(.hidden) > div,
-    #login-modal:not(.hidden) > div {
+    #profile-modal:not(.hidden) > div {
       animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
     @keyframes modalPop {
@@ -467,7 +454,7 @@
           <ul class="space-y-3 text-sm text-gray-300">
             <li class="flex items-start gap-2"><span class="text-red-400 font-bold">1.</span><span>他人への侮辱や不快な言動は禁止。相手をリスペクトしましょう。</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 font-bold">2.</span><span>荒らし行為は理由を問わず即Ban対象となります。</span></li>
-            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span>Tierテスト中のリキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
+            <li class="flex items-start gap-2"><span class="text-red-400 font-bold">3.</span><span>Tierテスト中のりキットの使用禁止。マクロやチートも完全禁止です。Testerと受検者はお互いを尊重してください。</span></li>
             <li class="flex items-start gap-2"><span class="text-red-400 font-bold">4.</span><span>その他、管理者が不適切と判断する行為は禁止。常識を守ってプレイしてください。</span></li>
           </ul>
         </div>
@@ -555,7 +542,7 @@
         <table class="w-full text-left border-collapse min-w-[650px]">
           <thead>
             <tr class="border-b border-brand-border bg-brand-dark/50 text-[11px] font-orbitron text-gray-400 uppercase">
-              <th class="p-3 text-center w-40">RANK</th>
+              <th class="p-3 text-center w-36">RANK</th>
               <th class="p-3">PLAYER</th>
               <th class="p-3 text-center">COUNTRY</th>
               <th class="p-3 text-right">CONTRIBUTING KITS</th>
@@ -815,8 +802,10 @@
       }
       animate();
 
+      // ページ読み込み・ハッシュ変更時のルーター初期化
       handleRouting();
       window.addEventListener('hashchange', handleRouting);
+
       checkPersistedLogin();
     });
 
@@ -827,6 +816,7 @@
     let loggedInUser = null;
 
     const DEFAULT_STEVE_BODY = "https://crafatar.com/renders/body/8667ba71-b85a-4004-af54-457a973daf31?scale=4&overlay=true";
+    const TRANSPARENT_GIF = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
     function isUuid(str) {
       if (!str) return false;
@@ -837,6 +827,56 @@
     function getCleanUuid(str) {
       if (!str) return "";
       return str.trim().replace(/-/g, "").toLowerCase();
+    }
+
+    function getSkinUrl(player, size = 140) {
+      if (player && isUuid(player.rawId)) {
+        return `https://mc-heads.net/body/${getCleanUuid(player.rawId)}/${size}`;
+      } else if (player && player.name) {
+        return `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/${size}.png`;
+      }
+      return DEFAULT_STEVE_BODY;
+    }
+
+    function handleSkinError(img) {
+      const index = img.dataset.index;
+      const player = (index !== undefined && playersData[index]) ? playersData[index] : null;
+
+      const step = img.dataset.fallbackStep || "0";
+      if (step === "0") {
+        img.dataset.fallbackStep = "1";
+        if (player && isUuid(player.rawId) && player.name) {
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/140.png`;
+        } else if (player && player.name) {
+          img.src = `https://crafatar.com/renders/body/${encodeURIComponent(player.name.trim())}?scale=4&overlay=true`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else if (step === "1") {
+        img.dataset.fallbackStep = "2";
+        if (player && player.name) {
+          img.src = `https://mc-heads.net/body/${encodeURIComponent(player.name.trim())}/140`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else {
+        img.src = DEFAULT_STEVE_BODY;
+      }
+    }
+
+    function handleModalSkinError(img) {
+      const player = window.currentModalPlayer;
+      const step = img.dataset.fallbackStep || "0";
+      if (step === "0") {
+        img.dataset.fallbackStep = "1";
+        if (player && player.name) {
+          img.src = `https://minotar.net/body/${encodeURIComponent(player.name.trim())}/150.png`;
+        } else {
+          img.src = DEFAULT_STEVE_BODY;
+        }
+      } else {
+        img.src = DEFAULT_STEVE_BODY;
+      }
     }
 
     function formatCountry(countryStr) {
@@ -856,15 +896,26 @@
       return map[clean] || countryStr;
     }
 
+    /* 🟣 新しい正確なポイント設計マップ */
     function getTierScoreValue(tierStr) {
       if (!tierStr) return 0;
       const clean = tierStr.toUpperCase().trim();
       const scoreMap = {
-        'HT1': 65, 'MT1': 55, 'LT1': 45,
-        'HT2': 34, 'MT2': 28, 'LT2': 22,
-        'HT3': 16, 'MT3': 12, 'LT3': 8,
-        'HT4': 6, 'MT4': 5, 'LT4': 4,
-        'HT5': 3, 'MT5': 2, 'LT5': 1
+        'HT1': 65,
+        'MT1': 55,
+        'LT1': 45,
+        'HT2': 34,
+        'MT2': 28,
+        'LT2': 22,
+        'HT3': 16,
+        'MT3': 12,
+        'LT3': 8,
+        'HT4': 6,
+        'MT4': 5,
+        'LT4': 4,
+        'HT5': 3,
+        'MT5': 2,
+        'LT5': 1
       };
       return scoreMap[clean] || 0;
     }
@@ -1074,242 +1125,6 @@
       }, 1000);
     }
 
-    /* ========================================================
-       🟣 Three.js によるスキン描画・回転・切り取り（クロップ）処理
-       ======================================================== */
-    const SKIN_SOURCES = [
-      { name: "crafatar", url: id => `https://crafatar.com/skins/${id}` },
-      { name: "mc-heads", url: id => `https://mc-heads.net/skin/${id}` },
-      { name: "中継", url: id => `https://corsproxy.io/?${encodeURIComponent(`https://crafatar.com/skins/${id}`)}` }
-    ];
-
-    const skinCache = new Map();
-
-    async function fetchSkinBlob(id) {
-      const errors = [];
-      for (const src of SKIN_SOURCES) {
-        try {
-          const res = await fetch(src.url(id));
-          if (!res.ok) { errors.push(`${src.name}:${res.status}`); continue; }
-          const blob = await res.blob();
-          if (blob.type.startsWith("image/")) return blob;
-          errors.push(`${src.name}:画像ではない`);
-        } catch (e) {
-          errors.push(`${src.name}:通信失敗`);
-        }
-      }
-      throw new Error(errors.join(", "));
-    }
-
-    function blobToImg(blob) {
-      return new Promise((ok, ng) => {
-        const img = new Image();
-        const url = URL.createObjectURL(blob);
-        img.onload = () => { URL.revokeObjectURL(url); ok(img); };
-        img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("デコード失敗")); };
-        img.src = url;
-      });
-    }
-
-    function detectSlim(cx) {
-      const d = cx.getImageData(47, 20, 1, 12).data;
-      for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
-      return true;
-    }
-
-    function loadSkinCanvas(uuid) {
-      if (!skinCache.has(uuid)) {
-        const p = (async () => {
-          const blob = await fetchSkinBlob(uuid);
-          const im = await blobToImg(blob);
-          if (im.height !== 64) throw new Error("旧形式スキン(64×32)は未対応です");
-          const cv = document.createElement("canvas");
-          cv.width = 64; cv.height = 64;
-          const cx = cv.getContext("2d");
-          cx.imageSmoothingEnabled = false;
-          cx.drawImage(im, 0, 0);
-          return { cv, slim: detectSlim(cx) };
-        })();
-        p.catch(() => skinCache.delete(uuid));
-        skinCache.set(uuid, p);
-      }
-      return skinCache.get(uuid);
-    }
-
-    // デフォルトスティーブのキャンバス生成
-    function createDefaultSteveCanvas() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext('2d');
-      ctx.imageSmoothingEnabled = false;
-
-      ctx.fillStyle = '#b58463';
-      ctx.fillRect(0, 0, 32, 16);
-
-      ctx.fillStyle = '#3b2718';
-      ctx.fillRect(8, 0, 8, 8);
-      ctx.fillRect(0, 8, 32, 3);
-      ctx.fillRect(8, 11, 1, 1);
-      ctx.fillRect(15, 11, 1, 1);
-      ctx.fillRect(0, 11, 7, 3);
-      ctx.fillRect(17, 11, 15, 5);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(9, 12, 1, 1);
-      ctx.fillRect(14, 12, 1, 1);
-      ctx.fillStyle = '#49389c';
-      ctx.fillRect(10, 12, 1, 1);
-      ctx.fillRect(13, 12, 1, 1);
-
-      ctx.fillStyle = '#9c6849';
-      ctx.fillRect(11, 13, 2, 1);
-      ctx.fillStyle = '#6b4228';
-      ctx.fillRect(10, 14, 4, 2);
-      ctx.fillStyle = '#b58463';
-      ctx.fillRect(11, 14, 2, 1);
-
-      ctx.fillStyle = '#00a8a8';
-      ctx.fillRect(16, 16, 24, 16);
-      ctx.fillStyle = '#b58463';
-      ctx.fillRect(22, 20, 4, 2);
-
-      ctx.fillStyle = '#b58463';
-      ctx.fillRect(40, 16, 16, 16);
-      ctx.fillStyle = '#00a8a8';
-      ctx.fillRect(40, 16, 16, 8);
-
-      ctx.fillStyle = '#b58463';
-      ctx.fillRect(32, 48, 16, 16);
-      ctx.fillStyle = '#00a8a8';
-      ctx.fillRect(32, 48, 16, 8);
-
-      ctx.fillStyle = '#3c44aa';
-      ctx.fillRect(0, 16, 16, 16);
-      ctx.fillRect(16, 48, 16, 16);
-
-      return canvas;
-    }
-
-    function createBoxPart(width, height, depth, texWidth, texHeight, uvMap, texture) {
-      const geometry = new THREE.BoxGeometry(width, height, depth);
-      const uvAttr = geometry.attributes.uv;
-      const faces = [uvMap.right, uvMap.left, uvMap.top, uvMap.bottom, uvMap.front, uvMap.back];
-
-      for (let i = 0; i < 6; i++) {
-        const [x, y, w, h] = faces[i];
-        const u0 = x / texWidth;
-        const u1 = (x + w) / texWidth;
-        const v1 = 1 - (y / texHeight);
-        const v0 = 1 - ((y + h) / texHeight);
-
-        const idx = i * 4;
-        uvAttr.setXY(idx + 0, u0, v1);
-        uvAttr.setXY(idx + 1, u1, v1);
-        uvAttr.setXY(idx + 2, u0, v0);
-        uvAttr.setXY(idx + 3, u1, v0);
-      }
-      uvAttr.needsUpdate = true;
-
-      return new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-        map: texture,
-        transparent: true,
-        alphaTest: 0.1
-      }));
-    }
-
-    function buildMinecraftCharacter(texture) {
-      const texW = 64, texH = 64;
-      const root = new THREE.Group();
-
-      const head = createBoxPart(8, 8, 8, texW, texH, {
-        right: [0, 8, 8, 8], left: [16, 8, 8, 8], top: [8, 0, 8, 8], bottom: [16, 0, 8, 8], front: [8, 8, 8, 8], back: [24, 8, 8, 8]
-      }, texture);
-      head.position.set(0, 4, 0);
-      root.add(head);
-
-      const hat = createBoxPart(8.8, 8.8, 8.8, texW, texH, {
-        right: [32, 8, 8, 8], left: [48, 8, 8, 8], top: [40, 0, 8, 8], bottom: [48, 0, 8, 8], front: [40, 8, 8, 8], back: [56, 8, 8, 8]
-      }, texture);
-      hat.position.set(0, 4, 0);
-      root.add(hat);
-
-      const body = createBoxPart(8, 12, 4, texW, texH, {
-        right: [16, 20, 4, 12], left: [28, 20, 4, 12], top: [20, 16, 8, 4], bottom: [28, 16, 8, 4], front: [20, 20, 8, 12], back: [32, 20, 8, 12]
-      }, texture);
-      body.position.set(0, -6, 0);
-      root.add(body);
-
-      const jacket = createBoxPart(8.5, 12.5, 4.5, texW, texH, {
-        right: [16, 36, 4, 12], left: [28, 36, 4, 12], top: [20, 32, 8, 4], bottom: [28, 32, 8, 4], front: [20, 36, 8, 12], back: [32, 36, 8, 12]
-      }, texture);
-      jacket.position.set(0, -6, 0);
-      root.add(jacket);
-
-      const rightArm = createBoxPart(4, 12, 4, texW, texH, {
-        right: [40, 20, 4, 12], left: [48, 20, 4, 12], top: [44, 16, 4, 4], bottom: [48, 16, 4, 4], front: [44, 20, 4, 12], back: [52, 20, 4, 12]
-      }, texture);
-      rightArm.position.set(-6, -6, 0);
-      root.add(rightArm);
-
-      const leftArm = createBoxPart(4, 12, 4, texW, texH, {
-        right: [32, 52, 4, 12], left: [40, 52, 4, 12], top: [36, 48, 4, 4], bottom: [40, 48, 4, 4], front: [36, 52, 4, 12], back: [44, 52, 4, 12]
-      }, texture);
-      leftArm.position.set(6, -6, 0);
-      root.add(leftArm);
-
-      return root;
-    }
-
-    // 1枚目画像と同じ「斜め向き＋胸から上の切り取り」で一覧のバッジ内に描画
-    function renderSkinBustToContainer(container, player) {
-      const width = 52;
-      const height = 56;
-
-      const scene = new THREE.Scene();
-      const frustumHalfW = 8.2;
-      const frustumHalfH = 9.3;
-      const camera = new THREE.OrthographicCamera(-frustumHalfW, frustumHalfW, frustumHalfH, -frustumHalfH, 0.1, 100);
-      camera.position.set(0, 1.4, 30);
-      camera.lookAt(0, 1.4, 0);
-
-      scene.add(new THREE.AmbientLight(0xffffff, 0.78));
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.45);
-      dirLight.position.set(-12, 20, 15);
-      scene.add(dirLight);
-
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(window.devicePixelRatio || 1);
-      container.appendChild(renderer.domElement);
-
-      const setupAndRender = (texture) => {
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestFilter;
-        texture.generateMipmaps = false;
-
-        const character = buildMinecraftCharacter(texture);
-        character.rotation.order = 'YXZ';
-        character.rotation.y = THREE.MathUtils.degToRad(-32);
-        character.rotation.x = THREE.MathUtils.degToRad(16);
-
-        scene.add(character);
-        renderer.render(scene, camera);
-      };
-
-      if (player && player.isUuid) {
-        loadSkinCanvas(getCleanUuid(player.rawId))
-          .then(({ cv }) => {
-            setupAndRender(new THREE.CanvasTexture(cv));
-          })
-          .catch(() => {
-            setupAndRender(new THREE.CanvasTexture(createDefaultSteveCanvas()));
-          });
-      } else {
-        setupAndRender(new THREE.CanvasTexture(createDefaultSteveCanvas()));
-      }
-    }
-
     function renderTable() {
       const tbody = document.getElementById('tier-tbody');
       const search = document.getElementById('search-input').value.toLowerCase();
@@ -1376,14 +1191,17 @@
           }
         }
 
+        const originalIndex = playersData.findIndex(item => item.name === p.name && item.rawId === p.rawId);
         const editionTag = p.isUuid ? '' : '<span class="text-[9px] text-sky-400 ml-1 font-mono">[Bedrock]</span>';
 
         tr.innerHTML = `
           <td class="py-3 px-4 text-center">
             <div class="rank-banner-container">
               <div class="rank-banner-box ${rankBoxClass} ${shiningClass} mx-auto">
-                <span class="text-xl font-black">${rankNum}.</span>
-                <div class="skin-viewport"></div>
+                <span>${rankNum}.</span>
+                <div class="relative h-12 w-12 overflow-hidden shrink-0 -translate-x-1">
+                  <img src="${TRANSPARENT_GIF}" data-index="${originalIndex}" alt="${p.name}" class="h-full w-full object-contain" onerror="handleSkinError(this)">
+                </div>
               </div>
             </div>
           </td>
@@ -1396,9 +1214,7 @@
         `;
         tbody.appendChild(tr);
 
-        // 各行のバッジ内にThree.jsで回転・切り取りされたスキンを埋め込む
-        const viewportEl = tr.querySelector('.skin-viewport');
-        renderSkinBustToContainer(viewportEl, p);
+        applyListSkin(tr.querySelector('img'), p);
       });
     }
 
@@ -1469,6 +1285,9 @@
       }
     }
 
+    /* ========================================================
+       🟣 プロフィール画面
+       ======================================================== */
     function openProfileModal() {
       if (!loggedInUser) return;
       document.getElementById('profile-username').innerText = loggedInUser;
@@ -1485,6 +1304,9 @@
       }
     }
 
+    /* ========================================================
+       🟣 ログインメニュー・認証関連ロジック
+       ======================================================== */
     function toggleUserMenu(event) {
       if (event) event.stopPropagation();
       const menu = document.getElementById('user-dropdown-menu');
@@ -1616,8 +1438,165 @@
     }
 
     /* ========================================================
+       🟣 スキン取得（一覧・モーダル共通）
+       ======================================================== */
+    const SKIN_SOURCES = [
+      { name: "crafatar", url: id => `https://crafatar.com/skins/${id}` },
+      { name: "mc-heads", url: id => `https://mc-heads.net/skin/${id}` },
+      { name: "中継", url: id => `https://corsproxy.io/?${encodeURIComponent(`https://crafatar.com/skins/${id}`)}` }
+    ];
+
+    // 同じプレイヤーを何度も取りに行かないためのキャッシュ（uuid → Promise）
+    const skinCache = new Map();
+
+    async function fetchSkinBlob(id) {
+      const errors = [];
+      for (const src of SKIN_SOURCES) {
+        try {
+          const res = await fetch(src.url(id));
+          if (!res.ok) { errors.push(`${src.name}:${res.status}`); continue; }
+          const blob = await res.blob();
+          if (blob.type.startsWith("image/")) return blob;
+          errors.push(`${src.name}:画像ではない`);
+        } catch (e) {
+          errors.push(`${src.name}:通信失敗`);
+        }
+      }
+      throw new Error(errors.join(", "));
+    }
+
+    function blobToImg(blob) {
+      return new Promise((ok, ng) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        img.onload = () => { URL.revokeObjectURL(url); ok(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("デコード失敗")); };
+        img.src = url;
+      });
+    }
+
+    // 右腕の外側1列（x=47）が透明ならSlim（細腕）
+    function detectSlim(cx) {
+      const d = cx.getImageData(47, 20, 1, 12).data;
+      for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
+      return true;
+    }
+
+    // uuid から 64×64 のスキンキャンバスと Slim 判定を得る（キャッシュあり）
+    function loadSkinCanvas(uuid) {
+      if (!skinCache.has(uuid)) {
+        const p = (async () => {
+          const blob = await fetchSkinBlob(uuid);
+          const im = await blobToImg(blob);
+          if (im.height !== 64) throw new Error("旧形式スキン(64×32)は未対応です");
+          const cv = document.createElement("canvas");
+          cv.width = 64; cv.height = 64;
+          const cx = cv.getContext("2d");
+          cx.imageSmoothingEnabled = false;
+          cx.drawImage(im, 0, 0);
+          return { cv, slim: detectSlim(cx) };
+        })();
+        p.catch(() => skinCache.delete(uuid));
+        skinCache.set(uuid, p);
+      }
+      return skinCache.get(uuid);
+    }
+
+    /* ========================================================
+       🟣 一覧用スキン（3Dモデルを斜めから撮影した上半身の画像）
+       ======================================================== */
+    // 向きの調整：マイナスで左向き、プラスで右向き。逆に見える場合は符号を反転してください
+    const LIST_YAW = -0.5;
+
+    let rList = null, sList, cList;
+    const listImgCache = new Map(); // uuid → 描画済みの画像(dataURL)
+
+    // 一覧の画像を作るための共有レンダラー（画面には表示しない）
+    function ensureListRenderer() {
+      if (rList) return true;
+      if (typeof THREE === "undefined") return false;
+      try {
+        rList = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      } catch (e) {
+        return false;
+      }
+      rList.setPixelRatio(1);
+      rList.setSize(128, 128);
+      rList.setClearColor(0x000000, 0);
+
+      sList = new THREE.Scene();
+      // 縦横20ユニットの範囲を映す。高さ13〜33（頭のてっぺんから胴の途中まで）
+      cList = new THREE.OrthographicCamera(-10, 10, 10, -10, 1, 300);
+      cList.position.set(0, 23, 100);
+      cList.lookAt(0, 23, 0);
+
+      sList.add(new THREE.AmbientLight(0xffffff, 0.85));
+      const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+      dl.position.set(1, 2, 3);
+      sList.add(dl);
+      return true;
+    }
+
+    function renderListImage(cv, slim) {
+      const tex = new THREE.CanvasTexture(cv);
+      tex.magFilter = THREE.NearestFilter;
+      tex.minFilter = THREE.NearestFilter;
+      tex.needsUpdate = true;
+
+      const group = new THREE.Group();
+      sList.add(group);
+      const ch = makeCharacter(group, tex, slim);
+      ch.rLeg.visible = false;
+      ch.lLeg.visible = false;
+      group.rotation.y = LIST_YAW;
+
+      rList.render(sList, cList);
+      const url = rList.domElement.toDataURL("image/png");
+
+      // 後片付け
+      sList.remove(group);
+      group.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) o.material.dispose();
+      });
+      tex.dispose();
+      return url;
+    }
+
+    // 3Dが使えない場合（Bedrock版・取得失敗など）は外部の全身画像を、上半身だけ見える位置で表示
+    function setListFallback(img, player) {
+      img.style.cssText = "position:absolute;left:50%;top:2px;height:112px;width:auto;max-width:none;transform:translateX(-50%);";
+      img.dataset.fallbackStep = "0";
+      img.src = getSkinUrl(player, 140);
+    }
+
+    function applyListSkin(img, player) {
+      if (!img) return;
+      if (!player.isUuid || !ensureListRenderer()) {
+        setListFallback(img, player);
+        return;
+      }
+      const uuid = getCleanUuid(player.rawId);
+      if (listImgCache.has(uuid)) {
+        img.src = listImgCache.get(uuid);
+        return;
+      }
+      loadSkinCanvas(uuid)
+        .then(({ cv, slim }) => {
+          let url = listImgCache.get(uuid);
+          if (!url) {
+            url = renderListImage(cv, slim);
+            listImgCache.set(uuid, url);
+          }
+          img.src = url;
+        })
+        .catch(() => setListFallback(img, player));
+    }
+
+    /* ========================================================
        🟣 3Dスキン（モーダル用）
        ======================================================== */
+    // 角度は度数。x：前後（負が前） z：左右（内向き） body：上半身の前傾
     const POSES = {
       idle:  { rArm:{x:0,    z:0},  lArm:{x:0,    z:0},  rLeg:{x:0,   z:0}, lLeg:{x:0,  z:0}, body:0 },
       guard: { rArm:{x:-65,  z:8},  lArm:{x:-55,  z:-6}, rLeg:{x:-12, z:0}, lLeg:{x:14, z:0}, body:6 },
@@ -1643,6 +1622,7 @@
       wrap3.appendChild(r3.domElement);
 
       s3 = new THREE.Scene();
+      // モデルの高さ（約32ユニット）が枠の8割程度に入るよう近めに置く
       c3 = new THREE.PerspectiveCamera(35, 1, 1, 1000);
       c3.position.set(0, 16, 62);
       c3.lookAt(0, 16, 0);
@@ -1682,6 +1662,7 @@
       c3.updateProjectionMatrix();
     }
 
+    // ポーズへ滑らかに補間しながら描画（非表示中は描画しない）
     function loop3() {
       requestAnimationFrame(loop3);
       if (!r3 || !wrap3 || wrap3.classList.contains("hidden")) return;
@@ -1707,6 +1688,7 @@
       });
     }
 
+    // UV割り当て（面の順番は BoxGeometry と同じ）
     function rectsFor(u, v, w, h, d) {
       const R = {
         right:  { x: u,             y: v + d, w: d, h: h },
@@ -1750,30 +1732,42 @@
       return p;
     }
 
-    function buildModel3D(tex, slim) {
-      while (root3.children.length) root3.remove(root3.children[0]);
-
+    // キャラクター一式を parent の中に組み立てる（モーダルと一覧で共通）
+    // 上半身（頭・胴・腕）は腰を支点に傾けられるよう body グループに入れる
+    function makeCharacter(parent, tex, slim) {
       const mat  = new THREE.MeshLambertMaterial({ map: tex });
       const omat = new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.5, transparent: true });
       const aw = slim ? 3 : 4;
 
-      body3 = new THREE.Group();
-      body3.position.set(0, 12, 0);
-      root3.add(body3);
+      const body = new THREE.Group();
+      body.position.set(0, 12, 0);
+      parent.add(body);
 
-      body3.add(
+      body.add(
         makePart(8, 8, 8, 0, 0, 0, 0, 16, mat),
         makePart(8, 8, 8, 32, 0, 0.25, 0, 16, omat),
         makePart(8, 12, 4, 16, 16, 0, 0, 6, mat),
         makePart(8, 12, 4, 16, 32, 0.25, 0, 6, omat)
       );
 
-      parts3.rArm = limb(-(4 + aw / 2), 12, aw, [40, 16], [40, 32], mat, omat);
-      parts3.lArm = limb( (4 + aw / 2), 12, aw, [32, 48], [48, 48], mat, omat);
-      parts3.rLeg = limb(-2, 12, 4, [0, 16], [0, 32], mat, omat);
-      parts3.lLeg = limb( 2, 12, 4, [16, 48], [0, 48], mat, omat);
-      body3.add(parts3.rArm, parts3.lArm);
-      root3.add(parts3.rLeg, parts3.lLeg);
+      const rArm = limb(-(4 + aw / 2), 12, aw, [40, 16], [40, 32], mat, omat);
+      const lArm = limb( (4 + aw / 2), 12, aw, [32, 48], [48, 48], mat, omat);
+      const rLeg = limb(-2, 12, 4, [0, 16], [0, 32], mat, omat);
+      const lLeg = limb( 2, 12, 4, [16, 48], [0, 48], mat, omat);
+      body.add(rArm, lArm);
+      parent.add(rLeg, lLeg);
+
+      return { body, rArm, lArm, rLeg, lLeg };
+    }
+
+    function buildModel3D(tex, slim) {
+      while (root3.children.length) root3.remove(root3.children[0]);
+      const ch = makeCharacter(root3, tex, slim);
+      body3 = ch.body;
+      parts3.rArm = ch.rArm;
+      parts3.lArm = ch.lArm;
+      parts3.rLeg = ch.rLeg;
+      parts3.lLeg = ch.lLeg;
     }
 
     async function show3DSkin(player) {
@@ -1788,14 +1782,16 @@
         box.classList.add("hidden");
         img.classList.remove("hidden");
         img.dataset.fallbackStep = "0";
-        img.src = DEFAULT_STEVE_BODY;
+        img.dataset.size = "150";
+        img.src = getSkinUrl(player, 150);
       };
 
+      // Bedrock版、Three.js未読込、WebGL不可の場合は従来の2D表示
       if (!player.isUuid || typeof THREE === "undefined" || !ensure3D()) return showFallback();
 
       try {
         const { cv, slim } = await loadSkinCanvas(getCleanUuid(player.rawId));
-        if (reqId !== skinReqId) return;
+        if (reqId !== skinReqId) return; // 別のプレイヤーを開いた後なら何もしない
 
         const tex = new THREE.CanvasTexture(cv);
         tex.magFilter = THREE.NearestFilter;
