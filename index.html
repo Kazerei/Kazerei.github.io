@@ -587,12 +587,14 @@
         </div>
       </div>
 
-      <!-- ポーズ切り替え -->
-      <div class="flex gap-1.5 mb-3">
-        <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="idle" onclick="setPose('idle')">待機</button>
-        <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="guard" onclick="setPose('guard')">構え</button>
-        <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="walk" onclick="setPose('walk')">歩行</button>
-        <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="swing" onclick="setPose('swing')">攻撃</button>
+      <!-- ポーズ切り替え（Java版で3D表示に成功したときだけ表示） -->
+      <div id="pose-buttons" class="hidden mb-3">
+        <div class="flex gap-1.5">
+          <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="idle" onclick="setPose('idle')">待機</button>
+          <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="guard" onclick="setPose('guard')">構え</button>
+          <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="walk" onclick="setPose('walk')">歩行</button>
+          <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="swing" onclick="setPose('swing')">攻撃</button>
+        </div>
       </div>
 
       <h4 class="text-xs font-bold font-orbitron text-gray-300 mb-2 uppercase flex items-center gap-2 mt-2">
@@ -1505,8 +1507,8 @@
     /* ========================================================
        🟣 一覧用スキン（3Dモデルを斜めから撮影した上半身の画像）
        ======================================================== */
-    // 向きの調整：マイナスで左向き、プラスで右向き。逆に見える場合は符号を反転してください
-    const LIST_YAW = -0.5;
+    // 体の向き（一覧・詳細で共通）。マイナスで左向き、プラスで右向き
+    const LIST_YAW = 0.5;
 
     let rList = null, sList, cList;
     const listImgCache = new Map(); // uuid → 描画済みの画像(dataURL)
@@ -1563,9 +1565,12 @@
       return url;
     }
 
-    // 3Dが使えない場合（Bedrock版・取得失敗など）は外部の全身画像を、上半身だけ見える位置で表示
+    // 3Dが使えない場合（Bedrock版・取得失敗など）は、元のコードと同じ表示（外部の全身画像を上半身だけ見せる）
     function setListFallback(img, player) {
-      img.style.cssText = "position:absolute;left:50%;top:2px;height:112px;width:auto;max-width:none;transform:translateX(-50%);";
+      const wrap = img.parentElement;
+      wrap.className = "h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1";
+      img.removeAttribute("style");
+      img.className = "h-28 object-contain object-bottom filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] translate-y-7";
       img.dataset.fallbackStep = "0";
       img.src = getSkinUrl(player, 140);
     }
@@ -1604,7 +1609,7 @@
       swing: { rArm:{x:-120, z:10}, lArm:{x:-40,  z:-10}, rLeg:{x:-10, z:0}, lLeg:{x:10, z:0}, body:8 }
     };
 
-    let r3 = null, s3, c3, root3, body3, wrap3, pose3 = POSES.guard;
+    let r3 = null, s3, c3, root3, body3, wrap3, pose3 = POSES.idle;
     const parts3 = {};
     let skinReqId = 0;
 
@@ -1774,12 +1779,17 @@
       const reqId = ++skinReqId;
       const img = document.getElementById("modal-fullbody");
       const box = document.getElementById("skin3d");
+      const poseBar = document.getElementById("pose-buttons");
+
+      // いったん2D表示に戻し、ポーズボタンも隠す（統合版・読み込み中・失敗時はボタンなし）
       box.classList.add("hidden");
+      poseBar.classList.add("hidden");
       img.classList.remove("hidden");
 
       const showFallback = () => {
         if (reqId !== skinReqId) return;
         box.classList.add("hidden");
+        poseBar.classList.add("hidden");
         img.classList.remove("hidden");
         img.dataset.fallbackStep = "0";
         img.dataset.size = "150";
@@ -1799,10 +1809,12 @@
         tex.needsUpdate = true;
 
         buildModel3D(tex, slim);
+        root3.rotation.y = LIST_YAW; // 一覧と同じ斜めの向きで開く
         img.classList.add("hidden");
         box.classList.remove("hidden");
+        poseBar.classList.remove("hidden");
         resize3D();
-        setPose("guard");
+        setPose("idle"); // 最初は待機ポーズ
       } catch (e) {
         console.warn("3Dスキン失敗:", e);
         showFallback();
