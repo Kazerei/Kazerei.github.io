@@ -1509,6 +1509,9 @@
        ======================================================== */
     // 体の向き（一覧・詳細で共通）。マイナスで左向き、プラスで右向き
     const LIST_YAW = 0.5;
+    // 見下ろす角度（ラジアン）。0で真横、大きいほど上から見下ろす
+    const LIST_PITCH = 0.35;   // 一覧（≒20度）
+    const MODAL_PITCH = 0.3;   // 詳細（≒17度）
 
     let rList = null, sList, cList;
     const listImgCache = new Map(); // uuid → 描画済みの画像(dataURL)
@@ -1529,7 +1532,7 @@
       sList = new THREE.Scene();
       // 縦横20ユニットの範囲を映す。高さ13〜33（頭のてっぺんから胴の途中まで）
       cList = new THREE.OrthographicCamera(-10, 10, 10, -10, 1, 300);
-      cList.position.set(0, 23, 100);
+      cList.position.set(0, 23 + 100 * Math.sin(LIST_PITCH), 100 * Math.cos(LIST_PITCH));
       cList.lookAt(0, 23, 0);
 
       sList.add(new THREE.AmbientLight(0xffffff, 0.85));
@@ -1615,6 +1618,13 @@
 
     const rad = d => d * Math.PI / 180;
 
+    // モデル全体を回すときの「体の中心」の高さ（足元 0 〜 頭頂 32 の真ん中）
+    const MODEL_CENTER_Y = 16;
+    const ROT_SPEED = 0.01; // ドラッグ1pxあたりの回転量（ラジアン）
+    const _qTmp = new THREE.Quaternion();
+    const _axisX = new THREE.Vector3(1, 0, 0);
+    const _axisY = new THREE.Vector3(0, 1, 0);
+
     function ensure3D() {
       if (r3) return true;
       wrap3 = document.getElementById("skin3d");
@@ -1627,27 +1637,34 @@
       wrap3.appendChild(r3.domElement);
 
       s3 = new THREE.Scene();
-      // モデルの高さ（約32ユニット）が枠の8割程度に入るよう近めに置く
+      // モデルの高さ（約32ユニット）が枠の8割程度に入るよう近めに置き、少し上から見下ろす
       c3 = new THREE.PerspectiveCamera(35, 1, 1, 1000);
-      c3.position.set(0, 16, 62);
-      c3.lookAt(0, 16, 0);
+      c3.position.set(0, MODEL_CENTER_Y + 62 * Math.sin(MODAL_PITCH), 62 * Math.cos(MODAL_PITCH));
+      c3.lookAt(0, MODEL_CENTER_Y, 0);
       s3.add(new THREE.AmbientLight(0xffffff, 0.85));
       const dl = new THREE.DirectionalLight(0xffffff, 0.6);
       dl.position.set(1, 2, 3);
       s3.add(dl);
 
+      // root3 は体の中心に置いた回転用の軸。中身は buildModel3D で足元を -16 ずらして入れる
       root3 = new THREE.Group();
+      root3.position.set(0, MODEL_CENTER_Y, 0);
       s3.add(root3);
 
-      let drag = false, lx = 0;
+      // ドラッグで横・縦どちらにも360度回転（画面基準の軸で回すので、どの向きからでも自然に動く）
+      let drag = false, lx = 0, ly = 0;
       wrap3.addEventListener("pointerdown", e => {
-        drag = true; lx = e.clientX;
+        drag = true; lx = e.clientX; ly = e.clientY;
         wrap3.setPointerCapture(e.pointerId);
       });
       wrap3.addEventListener("pointermove", e => {
         if (!drag) return;
-        root3.rotation.y += (e.clientX - lx) * 0.01;
-        lx = e.clientX;
+        const dx = e.clientX - lx, dy = e.clientY - ly;
+        lx = e.clientX; ly = e.clientY;
+        _qTmp.setFromAxisAngle(_axisY, dx * ROT_SPEED);
+        root3.quaternion.premultiply(_qTmp);
+        _qTmp.setFromAxisAngle(_axisX, dy * ROT_SPEED);
+        root3.quaternion.premultiply(_qTmp);
       });
       const end = () => { drag = false; };
       wrap3.addEventListener("pointerup", end);
@@ -1767,7 +1784,13 @@
 
     function buildModel3D(tex, slim) {
       while (root3.children.length) root3.remove(root3.children[0]);
-      const ch = makeCharacter(root3, tex, slim);
+
+      // 体の中心が回転軸の原点に来るよう、足元を下にずらした入れ物に組み立てる
+      const holder = new THREE.Group();
+      holder.position.set(0, -MODEL_CENTER_Y, 0);
+      root3.add(holder);
+
+      const ch = makeCharacter(holder, tex, slim);
       body3 = ch.body;
       parts3.rArm = ch.rArm;
       parts3.lArm = ch.lArm;
@@ -1809,7 +1832,8 @@
         tex.needsUpdate = true;
 
         buildModel3D(tex, slim);
-        root3.rotation.y = LIST_YAW; // 一覧と同じ斜めの向きで開く
+        // 開くたびに、一覧と同じ斜めの向きに戻す
+        root3.quaternion.setFromEuler(new THREE.Euler(0, LIST_YAW, 0));
         img.classList.add("hidden");
         box.classList.remove("hidden");
         poseBar.classList.remove("hidden");
