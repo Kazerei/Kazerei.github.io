@@ -587,7 +587,7 @@
         </div>
       </div>
 
-      <!-- ポーズ切り替え（Java版で3D表示に成功したときだけ表示） -->
+      <!-- ポーズ切り替え（3D表示のときだけ表示） -->
       <div id="pose-buttons" class="hidden mb-3">
         <div class="flex gap-1.5">
           <button class="pose-btn flex-1 text-[11px] font-orbitron py-1.5 rounded bg-brand-dark border border-brand-border text-gray-300" data-pose="idle" onclick="setPose('idle')">待機</button>
@@ -1448,7 +1448,15 @@
       { name: "中継", url: id => `https://corsproxy.io/?${encodeURIComponent(`https://crafatar.com/skins/${id}`)}` }
     ];
 
-    // 同じプレイヤーを何度も取りに行かないためのキャッシュ（uuid → Promise）
+    // 取得に失敗したときの裏での再挑戦：回数と、各回までの待ち時間（ミリ秒）
+    const SKIN_MAX_RETRY = 3;
+    const SKIN_RETRY_DELAYS = [3000, 8000, 15000];
+
+    // スティーブ（初期スキン）のUUID
+    const STEVE_UUID = "8667ba71b85a4004af54457a973daf31";
+    const STEVE_KEY = "__steve__";
+
+    // 同じスキンを何度も取りに行かないためのキャッシュ（key → Promise）
     const skinCache = new Map();
 
     async function fetchSkinBlob(id) {
@@ -1484,24 +1492,156 @@
       return true;
     }
 
+    // 画像を 64×64 のキャンバスにして Slim 判定を付けて返す
+    function imageToSkin(im) {
+      if (im.height !== 64) throw new Error("旧形式スキン(64×32)は未対応です");
+      const cv = document.createElement("canvas");
+      cv.width = 64; cv.height = 64;
+      const cx = cv.getContext("2d");
+      cx.imageSmoothingEnabled = false;
+      cx.drawImage(im, 0, 0);
+      return { cv, slim: detectSlim(cx) };
+    }
+
     // uuid から 64×64 のスキンキャンバスと Slim 判定を得る（キャッシュあり）
     function loadSkinCanvas(uuid) {
       if (!skinCache.has(uuid)) {
         const p = (async () => {
           const blob = await fetchSkinBlob(uuid);
-          const im = await blobToImg(blob);
-          if (im.height !== 64) throw new Error("旧形式スキン(64×32)は未対応です");
-          const cv = document.createElement("canvas");
-          cv.width = 64; cv.height = 64;
-          const cx = cv.getContext("2d");
-          cx.imageSmoothingEnabled = false;
-          cx.drawImage(im, 0, 0);
-          return { cv, slim: detectSlim(cx) };
+          return imageToSkin(await blobToImg(blob));
         })();
         p.catch(() => skinCache.delete(uuid));
         skinCache.set(uuid, p);
       }
       return skinCache.get(uuid);
+    }
+
+    // 【将来用】スプレッドシートの skin 欄（画像URL または data URL）から読み込む
+    function loadCustomSkin(url) {
+      const key = "c:" + url;
+      if (!skinCache.has(key)) {
+        const p = (async () => {
+          const im = await new Promise((ok, ng) => {
+            const i = new Image();
+            i.crossOrigin = "anonymous";
+            i.onload = () => ok(i);
+            i.onerror = () => ng(new Error("登録スキンの読み込みに失敗"));
+            i.src = url;
+          });
+          return imageToSkin(im);
+        })();
+        p.catch(() => skinCache.delete(key));
+        skinCache.set(key, p);
+      }
+      return skinCache.get(key);
+    }
+
+    // コードで描いた簡易スティーブ（ネットワークが全滅したときの最後の砦）
+    function makeProceduralSteve() {
+      const cv = document.createElement("canvas");
+      cv.width = 64; cv.height = 64;
+      const c = cv.getContext("2d");
+      const R = (col, x, y, w, h) => { c.fillStyle = col; c.fillRect(x, y, w, h); };
+      const SKIN = "#c08a62", HAIR = "#3b2615", SHIRT = "#16a3b0", PANTS = "#3b3b9c", SHOE = "#6e6e6e";
+
+      // 頭
+      R(SKIN, 0, 0, 32, 16);
+      R(HAIR, 8, 0, 8, 8);                                   // 頭のてっぺん
+      R(HAIR, 0, 8, 8, 3); R(HAIR, 8, 8, 8, 3); R(HAIR, 16, 8, 8, 3); // 髪の生え際
+      R(HAIR, 24, 8, 8, 6);                                  // 後頭部
+      R("#ffffff", 9, 12, 1, 1);  R("#4b3a9a", 10, 12, 1, 1); // 目
+      R("#4b3a9a", 13, 12, 1, 1); R("#ffffff", 14, 12, 1, 1);
+      R("#a06f4c", 11, 13, 2, 1);                            // 鼻
+      R("#7a4a30", 10, 14, 4, 1);                            // 口
+      // 右脚
+      R(PANTS, 0, 16, 16, 16); R(SHOE, 0, 28, 16, 4); R(SHOE, 8, 16, 4, 4);
+      // 胴
+      R(SHIRT, 16, 16, 24, 16);
+      // 右腕
+      R(SKIN, 40, 16, 16, 16); R(SHIRT, 40, 16, 16, 8); R(SKIN, 48, 16, 4, 4);
+      // 左脚
+      R(PANTS, 16, 48, 16, 16); R(SHOE, 16, 60, 16, 4); R(SHOE, 24, 48, 4, 4);
+      // 左腕
+      R(SKIN, 32, 48, 16, 16); R(SHIRT, 32, 48, 16, 8); R(SKIN, 40, 48, 4, 4);
+      return cv;
+    }
+
+    // スティーブのスキン（まず公式の初期スキンを取得、無理なら簡易版）
+    let stevePromise = null;
+    function loadSteve() {
+      if (!stevePromise) {
+        stevePromise = loadSkinCanvas(STEVE_UUID)
+          .catch(() => ({ cv: makeProceduralSteve(), slim: false }));
+      }
+      return stevePromise;
+    }
+
+    // そのプレイヤーを識別するキー（登録スキン優先、次にJavaのUUID、統合版で登録なしは null＝スティーブ）
+    function getPlayerKey(player) {
+      const custom = player && player.skin ? String(player.skin).trim() : "";
+      if (custom) return "c:" + custom;
+      if (player && player.isUuid) return getCleanUuid(player.rawId);
+      return null;
+    }
+
+    // 実際の取得：登録スキン → JavaのUUID の順に試す
+    function fetchPlayerSkin(player) {
+      const custom = player && player.skin ? String(player.skin).trim() : "";
+      const viaUuid = () => player.isUuid
+        ? loadSkinCanvas(getCleanUuid(player.rawId))
+        : Promise.reject(new Error("スキンなし"));
+      if (custom) return loadCustomSkin(custom).catch(viaUuid);
+      return viaUuid();
+    }
+
+    // 失敗したキーごとの再挑戦の状態
+    const skinRetry = new Map(); // key → { tries, running, listeners:Set }
+
+    // 裏で最大 SKIN_MAX_RETRY 回やり直し、成功したら待っている全員に結果を渡す
+    function scheduleSkinRetry(player, key, onLate) {
+      let st = skinRetry.get(key);
+      if (!st) {
+        st = { tries: 0, running: false, listeners: new Set() };
+        skinRetry.set(key, st);
+      }
+      if (onLate) st.listeners.add(onLate);
+      if (st.running || st.tries >= SKIN_MAX_RETRY) return;
+      st.running = true;
+
+      const step = () => {
+        if (st.tries >= SKIN_MAX_RETRY) { st.running = false; return; }
+        const wait = SKIN_RETRY_DELAYS[Math.min(st.tries, SKIN_RETRY_DELAYS.length - 1)];
+        st.tries++;
+        setTimeout(() => {
+          fetchPlayerSkin(player)
+            .then(res => {
+              st.running = false;
+              skinRetry.delete(key);
+              const ls = [...st.listeners];
+              st.listeners.clear();
+              ls.forEach(f => { try { f(res); } catch (e) { console.warn(e); } });
+            })
+            .catch(step);
+        }, wait);
+      };
+      step();
+    }
+
+    // スキンを取得する。失敗したら例外を投げつつ、裏で再挑戦を予約（成功したら onLate が呼ばれる）
+    function loadPlayerSkin(player, onLate) {
+      const key = getPlayerKey(player);
+      if (!key) return Promise.reject(new Error("スキンなし"));
+
+      const st = skinRetry.get(key);
+      // すでに再挑戦中、または回数を使い切っている場合は、むやみに通信しない
+      if (st && (st.running || st.tries >= SKIN_MAX_RETRY)) {
+        if (st.running && onLate) st.listeners.add(onLate);
+        return Promise.reject(new Error("再挑戦中または断念"));
+      }
+      return fetchPlayerSkin(player).catch(err => {
+        scheduleSkinRetry(player, key, onLate);
+        throw err;
+      });
     }
 
     /* ========================================================
@@ -1514,7 +1654,7 @@
     const MODAL_PITCH = 0.3;   // 詳細（≒17度）
 
     let rList = null, sList, cList;
-    const listImgCache = new Map(); // uuid → 描画済みの画像(dataURL)
+    const listImgCache = new Map(); // key → 描画済みの画像(dataURL)
 
     // 一覧の画像を作るための共有レンダラー（画面には表示しない）
     function ensureListRenderer() {
@@ -1568,7 +1708,7 @@
       return url;
     }
 
-    // 3Dが使えない場合（Bedrock版・取得失敗など）は、元のコードと同じ表示（外部の全身画像を上半身だけ見せる）
+    // 3Dがまったく使えない端末のときだけ使う、元のコードと同じ表示（外部の全身画像を上半身だけ見せる）
     function setListFallback(img, player) {
       const wrap = img.parentElement;
       wrap.className = "h-10 w-7 overflow-hidden flex items-end justify-center relative shrink-0 -translate-x-1";
@@ -1578,27 +1718,54 @@
       img.src = getSkinUrl(player, 140);
     }
 
+    // スティーブの一覧画像（1回だけ描いて使い回す）
+    async function getSteveListUrl() {
+      let url = listImgCache.get(STEVE_KEY);
+      if (!url) {
+        const { cv, slim } = await loadSteve();
+        url = renderListImage(cv, slim);
+        listImgCache.set(STEVE_KEY, url);
+      }
+      return url;
+    }
+
     function applyListSkin(img, player) {
       if (!img) return;
-      if (!player.isUuid || !ensureListRenderer()) {
+      if (!ensureListRenderer()) {
         setListFallback(img, player);
         return;
       }
-      const uuid = getCleanUuid(player.rawId);
-      if (listImgCache.has(uuid)) {
-        img.src = listImgCache.get(uuid);
+
+      const key = getPlayerKey(player);
+
+      // 統合版（登録スキンなし）：スティーブをJavaと同じ3D表示にする
+      if (!key) {
+        getSteveListUrl().then(u => { img.src = u; }).catch(() => setListFallback(img, player));
         return;
       }
-      loadSkinCanvas(uuid)
-        .then(({ cv, slim }) => {
-          let url = listImgCache.get(uuid);
-          if (!url) {
-            url = renderListImage(cv, slim);
-            listImgCache.set(uuid, url);
-          }
-          img.src = url;
-        })
-        .catch(() => setListFallback(img, player));
+
+      if (listImgCache.has(key)) {
+        img.src = listImgCache.get(key);
+        return;
+      }
+
+      const apply = ({ cv, slim }) => {
+        let url = listImgCache.get(key);
+        if (!url) {
+          url = renderListImage(cv, slim);
+          listImgCache.set(key, url);
+        }
+        img.src = url;
+      };
+
+      // 成功すれば本人のスキン。失敗してもスティーブを出し、裏の再挑戦が成功したら差し替える
+      loadPlayerSkin(player, apply)
+        .then(apply)
+        .catch(() => {
+          getSteveListUrl()
+            .then(u => { if (!listImgCache.has(key)) img.src = u; })
+            .catch(() => setListFallback(img, player));
+        });
     }
 
     /* ========================================================
@@ -1618,12 +1785,9 @@
 
     const rad = d => d * Math.PI / 180;
 
-    // モデル全体を回すときの「体の中心」の高さ（足元 0 〜 頭頂 32 の真ん中）
+    // モデルの中心の高さ（足元 0 〜 頭頂 32 の真ん中）
     const MODEL_CENTER_Y = 16;
     const ROT_SPEED = 0.01; // ドラッグ1pxあたりの回転量（ラジアン）
-    const _qTmp = new THREE.Quaternion();
-    const _axisX = new THREE.Vector3(1, 0, 0);
-    const _axisY = new THREE.Vector3(0, 1, 0);
 
     function ensure3D() {
       if (r3) return true;
@@ -1646,25 +1810,20 @@
       dl.position.set(1, 2, 3);
       s3.add(dl);
 
-      // root3 は体の中心に置いた回転用の軸。中身は buildModel3D で足元を -16 ずらして入れる
       root3 = new THREE.Group();
       root3.position.set(0, MODEL_CENTER_Y, 0);
       s3.add(root3);
 
-      // ドラッグで横・縦どちらにも360度回転（画面基準の軸で回すので、どの向きからでも自然に動く）
-      let drag = false, lx = 0, ly = 0;
+      // ドラッグで横回転のみ
+      let drag = false, lx = 0;
       wrap3.addEventListener("pointerdown", e => {
-        drag = true; lx = e.clientX; ly = e.clientY;
+        drag = true; lx = e.clientX;
         wrap3.setPointerCapture(e.pointerId);
       });
       wrap3.addEventListener("pointermove", e => {
         if (!drag) return;
-        const dx = e.clientX - lx, dy = e.clientY - ly;
-        lx = e.clientX; ly = e.clientY;
-        _qTmp.setFromAxisAngle(_axisY, dx * ROT_SPEED);
-        root3.quaternion.premultiply(_qTmp);
-        _qTmp.setFromAxisAngle(_axisX, dy * ROT_SPEED);
-        root3.quaternion.premultiply(_qTmp);
+        root3.rotation.y += (e.clientX - lx) * ROT_SPEED;
+        lx = e.clientX;
       });
       const end = () => { drag = false; };
       wrap3.addEventListener("pointerup", end);
@@ -1798,13 +1957,35 @@
       parts3.lLeg = ch.lLeg;
     }
 
+    // 詳細に3Dモデルを表示する。reset が true のときは向きとポーズを初期状態に戻す
+    function applyModalSkin({ cv, slim }, reqId, reset) {
+      if (reqId !== skinReqId) return; // 別のプレイヤーを開いた後なら何もしない
+      const img = document.getElementById("modal-fullbody");
+      const box = document.getElementById("skin3d");
+      const poseBar = document.getElementById("pose-buttons");
+
+      const tex = new THREE.CanvasTexture(cv);
+      tex.magFilter = THREE.NearestFilter;
+      tex.minFilter = THREE.NearestFilter;
+      tex.needsUpdate = true;
+
+      buildModel3D(tex, slim);
+      if (reset) root3.rotation.set(0, LIST_YAW, 0); // 一覧と同じ斜めの向きで開く
+
+      img.classList.add("hidden");
+      box.classList.remove("hidden");
+      poseBar.classList.remove("hidden");
+      resize3D();
+      if (reset) setPose("idle"); // 最初は待機ポーズ
+    }
+
     async function show3DSkin(player) {
       const reqId = ++skinReqId;
       const img = document.getElementById("modal-fullbody");
       const box = document.getElementById("skin3d");
       const poseBar = document.getElementById("pose-buttons");
 
-      // いったん2D表示に戻し、ポーズボタンも隠す（統合版・読み込み中・失敗時はボタンなし）
+      // いったん2D表示に戻し、ポーズボタンも隠す
       box.classList.add("hidden");
       poseBar.classList.add("hidden");
       img.classList.remove("hidden");
@@ -1819,29 +2000,21 @@
         img.src = getSkinUrl(player, 150);
       };
 
-      // Bedrock版、Three.js未読込、WebGL不可の場合は従来の2D表示
-      if (!player.isUuid || typeof THREE === "undefined" || !ensure3D()) return showFallback();
+      // 統合版（登録スキンなし）、Three.js未読込、WebGL不可の場合は従来の2D表示（ボタンなし）
+      if (!getPlayerKey(player) || typeof THREE === "undefined" || !ensure3D()) return showFallback();
 
       try {
-        const { cv, slim } = await loadSkinCanvas(getCleanUuid(player.rawId));
-        if (reqId !== skinReqId) return; // 別のプレイヤーを開いた後なら何もしない
-
-        const tex = new THREE.CanvasTexture(cv);
-        tex.magFilter = THREE.NearestFilter;
-        tex.minFilter = THREE.NearestFilter;
-        tex.needsUpdate = true;
-
-        buildModel3D(tex, slim);
-        // 開くたびに、一覧と同じ斜めの向きに戻す
-        root3.quaternion.setFromEuler(new THREE.Euler(0, LIST_YAW, 0));
-        img.classList.add("hidden");
-        box.classList.remove("hidden");
-        poseBar.classList.remove("hidden");
-        resize3D();
-        setPose("idle"); // 最初は待機ポーズ
+        // 失敗しても、裏の再挑戦が成功した時点で本人のスキンに差し替える（向き・ポーズはそのまま）
+        const res = await loadPlayerSkin(player, r => applyModalSkin(r, reqId, false));
+        applyModalSkin(res, reqId, true);
       } catch (e) {
-        console.warn("3Dスキン失敗:", e);
-        showFallback();
+        if (reqId !== skinReqId) return;
+        console.warn("スキン取得失敗。スティーブを表示して再挑戦します:", e);
+        try {
+          applyModalSkin(await loadSteve(), reqId, true);
+        } catch (e2) {
+          showFallback();
+        }
       }
     }
   </script>
