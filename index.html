@@ -3,143 +3,286 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moderation AI Lab - Context Learning</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PixelCode - 画像コード変換</title>
 <style>
-:root{color-scheme:dark;--bg:#090812;--panel:#141222;--line:#302a48;--text:#f4f1ff;--muted:#aaa3c2;--purple:#9b7cff;--green:#51d6a0;--red:#ff647c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#24183e 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
-header{padding:28px 20px 18px;max-width:1120px;margin:auto}h1{font-size:clamp(23px,4vw,34px);margin:0 0 5px}header p{color:var(--muted);margin:0}.tag{display:inline-block;color:#d7caff;background:#302450;border:1px solid #59458a;border-radius:99px;padding:3px 10px;font-size:11px;margin-bottom:10px}
-main{max-width:1120px;margin:auto;padding:0 20px 45px;display:grid;gap:16px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.panel{background:linear-gradient(145deg,rgba(28,24,47,.98),rgba(17,15,30,.98));border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 12px 35px #0003}.panel h2{font-size:17px;margin:0 0 13px}.muted{color:var(--muted);font-size:13px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}textarea,input{background:#0e0c19;border:1px solid #3a3354;border-radius:10px;color:var(--text);padding:11px 12px;font:inherit;outline:none}textarea:focus,input:focus{border-color:var(--purple);box-shadow:0 0 0 3px #9b7cff22}textarea{width:100%;min-height:110px;resize:vertical}input{min-width:0;flex:1}button{border:0;border-radius:10px;padding:10px 14px;color:white;font-weight:650;cursor:pointer;background:#55418b;transition:.15s}button:hover{filter:brightness(1.15);transform:translateY(-1px)}.primary{background:linear-gradient(110deg,#7658ce,#9b65d8)}.danger{background:#8f344b}.good{background:#176e55}.neutral{background:#39354b}.small{font-size:12px;padding:6px 9px}.field{display:flex;gap:8px;margin-top:10px}.field input{width:100%}.result{margin-top:14px;padding:15px;border-radius:12px;background:#0d0b17;border:1px solid var(--line);display:none}.result.show{display:block}.meter{height:12px;background:#302b40;border-radius:99px;overflow:hidden;margin:8px 0}.meter>div{height:100%;width:0;background:linear-gradient(90deg,#51d6a0,#f4c96b,#ff647c);transition:width .25s}.score{font-size:32px;font-weight:800}.pill{display:inline-block;border-radius:99px;padding:3px 9px;font-size:12px;background:#322a48;color:#d8caff}.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#100e1b;border:1px solid var(--line);border-radius:12px;padding:12px}.stat b{font-size:23px;display:block}.stat span{font-size:12px;color:var(--muted)}.list{display:flex;flex-direction:column;gap:7px;max-height:310px;overflow:auto}.item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:#100e1b;border:1px solid #29243b;border-radius:9px}.item span{overflow-wrap:anywhere}.empty{color:var(--muted);padding:16px;text-align:center;border:1px dashed #39334e;border-radius:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.notice{padding:11px 13px;border-radius:10px;background:#2b2418;border:1px solid #59482b;color:#f5dba2;font-size:13px}.oknotice{background:#14271f;border-color:#275b46;color:#a8f0cf}.hidden{display:none!important}.explain{padding:10px 12px;border:1px solid #38304e;background:#100e1b;border-radius:10px;margin-top:10px}
-@media(max-width:760px){.grid{grid-template-columns:1fr}main{padding:0 12px 30px}header{padding:22px 14px 15px}.panel{padding:15px}.statgrid{grid-template-columns:repeat(3,1fr)}}
+:root{color-scheme:dark;--bg:#090c14;--panel:#141b2a;--line:#2b3850;--text:#edf2ff;--muted:#9ba9c2;--accent:#8b7cff;--green:#45d6a1;--red:#ff7181}
+*{box-sizing:border-box}body{margin:0;padding:22px;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1050px;margin:auto}h1{margin:0;font-size:27px}.lead{margin:4px 0 20px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{min-width:0;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:15px}
+h2{margin:0 0 13px;font-size:18px}.picker{display:block;padding:19px;text-align:center;border:1px dashed #657394;border-radius:11px;background:#0d1422;cursor:pointer}.picker:hover{border-color:var(--accent)}
+input[type=file]{display:none}.preview{min-height:190px;margin-top:12px;padding:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--line);border-radius:10px;background-color:#0e1420;background-image:linear-gradient(45deg,#263147 25%,transparent 25%),linear-gradient(-45deg,#263147 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#263147 75%),linear-gradient(-45deg,transparent 75%,#263147 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+.preview img{display:block;max-width:100%;max-height:340px;object-fit:contain;image-rendering:auto}.placeholder{color:var(--muted);font-size:13px;text-align:center}
+.meta{margin-top:8px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+textarea{display:block;width:100%;min-height:165px;margin-top:12px;padding:12px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:#090f1b;color:#e4ebff;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button{padding:10px 15px;border:0;border-radius:9px;background:var(--accent);color:white;font-weight:700;cursor:pointer}button.secondary{background:#2a3852}button:disabled{opacity:.45;cursor:not-allowed}
+.status{margin-top:10px;padding:10px 12px;border-radius:9px;background:#1c273b;color:var(--muted);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.status.good{color:var(--green)}.status.bad{color:var(--red)}
+.note{margin-top:16px;color:var(--muted);font-size:12px}
+@media(max-width:760px){body{padding:13px}.grid{grid-template-columns:1fr}h1{font-size:23px}.panel{padding:14px}}
 </style>
 </head>
 <body>
-<header><div class="tag">100% LOCAL · NO EXTERNAL API</div><h1>Moderation AI Lab</h1><p>文脈学習型・暴言判定テスト</p></header>
 <main>
-<div class="notice">これは外部APIを使わないJavaScript製の学習型テキスト分類器です。LLMそのものではありません。単語だけでなく前後の文字・文字の組み合わせを学習し、処罰なしのフィードバックから誤検出しやすい文脈も覚えます。判定は参考情報として扱ってください。</div>
-<section class="grid">
-<div class="panel">
-<h2>① メッセージを判定</h2><textarea id="message" placeholder="判定したいDiscordのメッセージを入力..."></textarea>
-<div class="row" style="justify-content:space-between;margin-top:10px"><span class="muted">Ctrl / ⌘ + Enter でも判定できます</span><button class="primary" id="analyze">AI判定する</button></div>
-<div class="result" id="result"><div class="row" style="justify-content:space-between"><strong id="verdict">判定結果</strong><span class="pill" id="confidenceLabel">しきい値</span></div>
-<div class="row" style="align-items:baseline;gap:5px"><span class="score" id="score">0%</span><span class="muted">暴言である推定確率</span></div><div class="meter"><div id="meterFill"></div></div><p class="muted" id="reason"></p><div class="explain muted" id="contextInfo"></div>
-<div class="actions"><button class="danger" id="punish">処罰する（暴言）</button><button class="good" id="noPunish">処罰しない（問題なし）</button></div>
-<p class="muted">判定結果を確認して正しい方を押してください。文章と前後の文脈を学習します。</p></div></div>
-<div class="panel"><h2>② 学習状況</h2><div class="statgrid"><div class="stat"><b id="samples">0</b><span>学習データ</span></div><div class="stat"><b id="wordsCount">0</b><span>暴言リスト</span></div><div class="stat"><b id="accuracy">—</b><span>直近の正解率</span></div></div>
-<p class="muted" style="margin-top:13px">正解率はフィードバック前の判定と選択した正解ラベルが一致した割合です。学習データが少ない間は参考値です。</p><div class="notice oknotice">学習データ・重み・文脈例外はこのブラウザに保存されます。JSONでバックアップできます。</div></div>
-</section>
-<section class="grid">
-<div class="panel"><h2>③ 暴言リスト管理</h2><p class="muted">単語・フレーズを追加できます。短い表現は文脈も考慮します。</p><div class="field"><input id="wordInput" placeholder="例：消えろ、役立たず"><button class="primary" id="addWord">追加</button></div><div class="list" id="wordList" style="margin-top:12px"></div></div>
-<div class="panel"><h2>④ 判定設定</h2><label class="muted" for="threshold">暴言と判定するしきい値：<b id="thresholdText">65%</b></label><input id="threshold" type="range" min="30" max="90" value="65" style="width:100%;margin:12px 0"><p class="muted">下げると暴言判定が増え、上げると慎重になります。</p><label class="muted" for="weight">暴言リストの影響度：<b id="weightText">45%</b></label><input id="weight" type="range" min="0" max="100" value="45" style="width:100%;margin:12px 0"><p class="muted">残りの割合は学習済みモデルの判定に使います。</p><button class="neutral small" id="resetSettings">設定を初期値に戻す</button></div>
-</section>
-<section class="grid">
-<div class="panel"><h2>⑤ 学習した文脈の例外</h2><p class="muted">「処罰しない」と教えたとき、暴言リストに一致した部分の前後関係を保存します。同じ使い方を次回以降に見つけると誤検出を抑えます。</p><div class="list" id="patternList"></div></div>
-<div class="panel"><h2>⑥ JSON・学習履歴</h2><p class="muted">学習例、暴言リスト、学習済み重み、文脈例外、設定をまとめて保存します。</p><div class="actions"><button class="primary" id="export">JSONを書き出す</button><button class="neutral" id="importBtn">JSONを読み込む</button><button class="danger" id="clearData">全データ削除</button><input type="file" id="importFile" accept=".json,application/json" class="hidden"></div><div class="list" id="history" style="margin-top:14px;max-height:250px"></div></div>
-</section>
-<footer style="text-align:center;color:#77718c;font-size:12px;padding:10px">Moderation AI Lab · Context Learning Prototype</footer>
+  <h1>PixelCode</h1>
+  <p class="lead">画像を画質そのままコード化。コードから元ファイルを復元できます。</p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>① 画像を選択してコード化</h2>
+      <label class="picker" for="imageFile">画像を選択する<br><span class="meta">PNG / WebP / JPEG / GIF など</span></label>
+      <input id="imageFile" type="file" accept="image/*">
+      <div class="preview" id="sourcePreview"><span class="placeholder">ここに選択した画像が表示されます</span></div>
+      <div class="meta" id="sourceInfo">まだ画像は選択されていません。</div>
+      <div class="actions">
+        <button id="encodeButton" disabled>コードに変換</button>
+        <button id="copyButton" class="secondary" disabled>コードをコピー</button>
+      </div>
+      <textarea id="encodedCode" spellcheck="false" placeholder="変換後のコードがここに表示されます。"></textarea>
+      <div class="status" id="encodeStatus">まず画像を選択してください。</div>
+    </section>
+
+    <section class="panel">
+      <h2>② コードから画像を復元</h2>
+      <textarea id="inputCode" spellcheck="false" placeholder="PCD2: から始まるコードをここに貼り付けてください。"></textarea>
+      <div class="actions">
+        <button id="decodeButton">デコード</button>
+        <button id="saveButton" class="secondary" disabled>復元画像を保存</button>
+      </div>
+      <div class="preview" id="resultPreview"><span class="placeholder">復元した画像がここに表示されます</span></div>
+      <div class="meta" id="resultInfo">まだ画像は復元されていません。</div>
+      <div class="status" id="decodeStatus">コードを貼り付けて「デコード」を押してください。</div>
+    </section>
+  </div>
+
+  <p class="note">画像ファイルの元データをそのまま可逆圧縮します。画像の再描画・リサイズ・減色は行いません。透過情報や元ファイルの画素データを保持します。Base64は使用しません。50,000文字を超えた場合も、画質を落とさずコードを表示します。</p>
 </main>
+
 <script>
+"use strict";
 (() => {
-'use strict';
-const STORAGE_KEY='moderation_ai_lab_context_v2';
-const DEFAULT_WORDS=['死ね','しね','消えろ','殺す','ぶっ殺す','ゴミ','クズ','カス','バカ','ばか','アホ','あほ','雑魚','ざこ','無能','きもい','キモい','うざい','うぜえ','黙れ','失せろ','お前のせい','頭おかしい','使えない'];
-const $=id=>document.getElementById(id);
-const fresh=()=>({words:[...DEFAULT_WORDS],examples:[],settings:{threshold:65,weight:45},weights:{},bias:0,history:[],recent:[],benignPatterns:[]});
-let data=load(),lastAnalysis=null;
-function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return fresh();const p=JSON.parse(raw),d=fresh();return {...d,...p,settings:{...d.settings,...p.settings},words:Array.isArray(p.words)?p.words:d.words,examples:Array.isArray(p.examples)?p.examples:[],weights:p.weights&&typeof p.weights==='object'?p.weights:{},history:Array.isArray(p.history)?p.history:[],recent:Array.isArray(p.recent)?p.recent:[],benignPatterns:Array.isArray(p.benignPatterns)?p.benignPatterns:[]};}catch(e){return fresh();}}
-function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){alert('ブラウザの保存容量が不足しています。先にJSONを書き出してください。');}}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function norm(s){return String(s).normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));}
-function features(text){
- const s=norm(text),out={},chars=Array.from(s).filter(c=>!/\s/.test(c));
- for(let n=1;n<=4;n++)for(let i=0;i<=chars.length-n;i++){const k='c'+n+':'+chars.slice(i,i+n).join('');out[k]=(out[k]||0)+1;}
- const words=s.match(/[a-z0-9_]+|[\u3040-\u30ff\u3400-\u9fff]+/g)||[];
- for(const w of words){const k='w:'+w;out[k]=(out[k]||0)+1;if(w.length>=3)for(let i=0;i<w.length-1;i++){const q='b:'+w.slice(i,i+2);out[q]=(out[q]||0)+1;}}
- const len=Math.sqrt(Math.max(1,Object.values(out).reduce((a,b)=>a+b,0)));
- for(const k of Object.keys(out))out[k]=Math.min(3,out[k])/len;
- return out;
-}
-function sigmoid(x){return 1/(1+Math.exp(-Math.max(-18,Math.min(18,x))));}
-function findMatches(text){
- const s=norm(text),matches=[];
- for(const original of data.words){const term=norm(original).trim();if(!term)continue;let from=0,index;
-  while((index=s.indexOf(term,from))!==-1){
-   const left=Array.from(s.slice(0,index)).slice(-1)[0]||'',right=Array.from(s.slice(index+term.length))[0]||'';
-   let safe=false,why='';
-   if(term==='しね'&&left==='だ'){safe=true;why='「だしね」という接続表現';}
-   if(!safe){const learned=data.benignPatterns.find(p=>p.term===term&&p.left===left&&p.right===right);if(learned){safe=true;why='過去に問題なしと学習した文脈';}}
-   matches.push({term,original,index,left,right,safe,why});from=index+Math.max(1,term.length);
+  const MAX_CODE_LENGTH = 50000;
+  const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
+  const $ = id => document.getElementById(id);
+
+  let selectedFile = null;
+  let selectedObjectURL = null;
+  let restoredBlob = null;
+  let restoredObjectURL = null;
+  let restoredFileName = "restored-image";
+
+  function status(id, message, kind = "") {
+    const el = $(id);
+    el.textContent = message;
+    el.className = "status" + (kind ? " " + kind : "");
   }
- }
- return matches;
-}
-function predict(text){
- const f=features(text);let z=Number(data.bias)||0,used=0;
- for(const [k,v] of Object.entries(f)){const w=Number(data.weights[k]);if(Number.isFinite(w)){z+=w*v;used++;}}
- const learned=sigmoid(z),all=findMatches(text),active=all.filter(x=>!x.safe),suppressed=all.filter(x=>x.safe);
- const listScore=active.length?Math.min(.97,.78+Math.min(active.length-1,3)*.045):.035;
- const listWeight=data.settings.weight/100;
- let probability=learned*(1-listWeight)+listScore*listWeight;
- // A direct active lexicon match should be visible even before the model has training examples.
- if(active.length>0)probability=Math.max(probability,Math.min(.96,.82+Math.min(active.length-1,3)*.035));
- if(active.length===0&&suppressed.length>0)probability=Math.min(probability,.25);
- if(data.examples.length===0&&active.length===0)probability=.06;
- probability=Math.max(.01,Math.min(.99,probability));
- const reasons=[];if(active.length)reasons.push('暴言リスト一致：'+active.map(x=>x.original).join('、'));if(suppressed.length)reasons.push('文脈で除外：'+suppressed.map(x=>x.why).join('、'));if(used)reasons.push('学習済み特徴 '+used+' 種類を参照');if(!reasons.length)reasons.push('暴言リストとの一致なし');
- return {probability,active,suppressed,used,reasons};
-}
-function train(text,label){
- const f=features(text),keys=Object.keys(f);if(!keys.length)return;
- let z=Number(data.bias)||0;for(const [k,v] of Object.entries(f))z+=(Number(data.weights[k])||0)*v;
- const p=sigmoid(z),error=(label?1:0)-p,rate=.65/Math.sqrt(1+data.examples.length*.08);
- data.bias=Math.max(-5,Math.min(5,(Number(data.bias)||0)+rate*error));
- for(const [k,v] of Object.entries(f)){const old=Number(data.weights[k])||0;data.weights[k]=Math.max(-5,Math.min(5,old+rate*error*v-old*.001));}
- if(label===false){
-  for(const m of findMatches(text)){if(m.safe)continue;const ptn={term:m.term,left:m.left,right:m.right};if(!data.benignPatterns.some(x=>x.term===ptn.term&&x.left===ptn.left&&x.right===ptn.right))data.benignPatterns.push(ptn);}
- }
- const allKeys=Object.keys(data.weights);
- if(allKeys.length>22000){allKeys.sort((a,b)=>Math.abs(data.weights[a])-Math.abs(data.weights[b]));for(const k of allKeys.slice(0,allKeys.length-18000))delete data.weights[k];}
-}
-function render(){
- $('samples').textContent=data.examples.length;$('wordsCount').textContent=data.words.length;
- const r=data.recent.slice(-30);$('accuracy').textContent=r.length?Math.round(r.filter(x=>x.correct).length/r.length*100)+'%':'—';
- $('threshold').value=data.settings.threshold;$('thresholdText').textContent=data.settings.threshold+'%';$('weight').value=data.settings.weight;$('weightText').textContent=data.settings.weight+'%';
- $('wordList').innerHTML=data.words.length?data.words.map((w,i)=>`<div class="item"><span>${esc(w)}</span><button class="danger small" data-del="${i}">削除</button></div>`).join(''):'<div class="empty">登録語はありません</div>';
- $('patternList').innerHTML=data.benignPatterns.length?data.benignPatterns.slice(-50).map(p=>`<div class="item"><span>「${esc(p.left||'')} <b>${esc(p.term)}</b> ${esc(p.right||'')}」</span><span class="pill">問題なし</span></div>`).join(''):'<div class="empty">まだ文脈例外はありません。暴言リストに一致した文章を「処罰しない」と学習させると登録されます。</div>';
- $('history').innerHTML=data.history.length?data.history.slice(-30).reverse().map(x=>`<div class="item"><div><b>${x.label?'処罰':'処罰なし'}</b> <span class="muted">判定 ${x.before}%</span><div>${esc(x.text.slice(0,100))}</div></div><span class="pill">${new Date(x.at).toLocaleString('ja-JP')}</span></div>`).join(''):'<div class="empty">まだ学習履歴はありません</div>';
-}
-function analyze(){
- const text=$('message').value.trim();if(!text){alert('判定する文章を入力してください');return;}
- const r=predict(text),percent=Math.round(r.probability*100);lastAnalysis={text,...r,percent};
- $('result').classList.add('show');$('score').textContent=percent+'%';$('meterFill').style.width=percent+'%';
- const flagged=percent>=data.settings.threshold;$('verdict').textContent=flagged?'暴言の可能性あり':'暴言の可能性は低め';$('verdict').style.color=flagged?'#ff8194':'#70dfb2';
- $('confidenceLabel').textContent='しきい値 '+data.settings.threshold+'%';$('reason').textContent=r.reasons.join(' ／ ');
- $('contextInfo').textContent=r.suppressed.length?'文脈によって暴言リストの一致を無効化しました。':r.active.length?'一致した語の前後関係も確認しています。':'登録語に一致していません。学習データも判定に使用します。';
-}
-function feedback(label){
- if(!lastAnalysis){alert('先に文章を判定してください');return;}
- const {text,percent}=lastAnalysis,old=data.examples.find(x=>x.text===text);
- if(old){old.label=label;old.updatedAt=new Date().toISOString();}else data.examples.push({text,label,createdAt:new Date().toISOString()});
- train(text,label);
- data.recent.push({correct:(percent>=data.settings.threshold)===label,at:new Date().toISOString()});if(data.recent.length>100)data.recent=data.recent.slice(-100);
- data.history.push({text,label,before:percent,at:new Date().toISOString()});if(data.history.length>300)data.history=data.history.slice(-300);
- save();render();$('result').classList.remove('show');lastAnalysis=null;$('message').value='';
- alert(label?'暴言として学習しました。':'問題なしとして学習しました。文脈例外も更新しました。');
-}
-$('analyze').addEventListener('click',analyze);
-$('message').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')analyze();});
-$('punish').addEventListener('click',()=>feedback(true));$('noPunish').addEventListener('click',()=>feedback(false));
-$('addWord').addEventListener('click',()=>{const w=$('wordInput').value.trim();if(!w)return;if(data.words.some(x=>norm(x)===norm(w))){alert('その言葉は登録済みです');return;}data.words.push(w);$('wordInput').value='';save();render();});
-$('wordInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('addWord').click();});
-$('wordList').addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(!b)return;const i=Number(b.dataset.del);if(confirm('「'+data.words[i]+'」を削除しますか？')){data.words.splice(i,1);save();render();}});
-$('threshold').addEventListener('input',e=>{data.settings.threshold=Number(e.target.value);$('thresholdText').textContent=e.target.value+'%';save();});
-$('weight').addEventListener('input',e=>{data.settings.weight=Number(e.target.value);$('weightText').textContent=e.target.value+'%';save();});
-$('resetSettings').addEventListener('click',()=>{data.settings={threshold:65,weight:45};save();render();});
-$('export').addEventListener('click',()=>{const payload={format:'moderation-ai-lab-context',version:2,exportedAt:new Date().toISOString(),...data};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='moderation-ai-context-training.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-$('importBtn').addEventListener('click',()=>$('importFile').click());
-$('importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const obj=JSON.parse(await file.text());if(!['moderation-ai-lab-context','moderation-ai-lab'].includes(obj.format)||!Array.isArray(obj.words)||!Array.isArray(obj.examples)||!obj.weights||typeof obj.weights!=='object')throw new Error('対応していないJSON形式です');if(!confirm('現在のデータを読み込んだJSONで置き換えますか？'))return;data={...fresh(),...obj,settings:{...fresh().settings,...obj.settings},benignPatterns:Array.isArray(obj.benignPatterns)?obj.benignPatterns:[]};save();render();alert('JSONを読み込みました');}catch(err){alert('読み込み失敗：'+err.message);}finally{e.target.value='';}});
-$('clearData').addEventListener('click',()=>{if(!confirm('暴言リスト・学習データ・重み・文脈例外をすべて削除しますか？'))return;data=fresh();lastAnalysis=null;save();$('result').classList.remove('show');render();});
-render();
+
+  function bytesTo85(bytes) {
+    let output = "";
+    for (let offset = 0; offset < bytes.length; offset += 4) {
+      const count = Math.min(4, bytes.length - offset);
+      let value = 0n;
+      for (let i = 0; i < 4; i++) {
+        value = (value << 8n) | BigInt(i < count ? bytes[offset + i] : 0);
+      }
+      let encoded = "";
+      for (let i = 0; i < 5; i++) {
+        encoded = ALPHABET[Number(value % 85n)] + encoded;
+        value /= 85n;
+      }
+      output += String(count) + encoded;
+    }
+    return output;
+  }
+
+  function base85ToBytes(text) {
+    const clean = text.replace(/\s+/g, "");
+    if (!clean || clean.length % 6 !== 0) {
+      throw new Error("コードの文字数または形式が正しくありません。");
+    }
+    const output = [];
+    for (let offset = 0; offset < clean.length; offset += 6) {
+      const count = Number(clean[offset]);
+      if (!Number.isInteger(count) || count < 1 || count > 4) {
+        throw new Error("コード内のブロック情報が不正です。");
+      }
+      if (offset + 6 < clean.length && count !== 4) {
+        throw new Error("途中のブロック長が不正です。");
+      }
+      let value = 0n;
+      for (let i = 1; i <= 5; i++) {
+        const digit = ALPHABET.indexOf(clean[offset + i]);
+        if (digit < 0) throw new Error("コードに使用できない文字があります。");
+        value = value * 85n + BigInt(digit);
+      }
+      if (value > 0xffffffffn) throw new Error("コードの数値が範囲外です。");
+      const block = new Uint8Array(4);
+      for (let i = 3; i >= 0; i--) {
+        block[i] = Number(value & 255n);
+        value >>= 8n;
+      }
+      for (let i = 0; i < count; i++) output.push(block[i]);
+    }
+    return new Uint8Array(output);
+  }
+
+  async function deflate(bytes) {
+    if (!("CompressionStream" in window)) {
+      throw new Error("このブラウザは圧縮機能に対応していません。Safari / Chromeを最新版にしてください。");
+    }
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  async function inflate(bytes) {
+    if (!("DecompressionStream" in window)) {
+      throw new Error("このブラウザは解凍機能に対応していません。Safari / Chromeを最新版にしてください。");
+    }
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  function buildPayload(file) {
+    const mime = new TextEncoder().encode(file.type || "application/octet-stream");
+    const name = new TextEncoder().encode(file.name || "image");
+    if (mime.length > 255 || name.length > 65535) throw new Error("ファイル情報が長すぎます。");
+    return file.arrayBuffer().then(buffer => {
+      const data = new Uint8Array(buffer);
+      const headerLength = 4 + 1 + 2 + 4;
+      const output = new Uint8Array(headerLength + mime.length + name.length + data.length);
+      output.set([80, 67, 68, 50], 0);
+      output[4] = mime.length;
+      const view = new DataView(output.buffer);
+      view.setUint16(5, name.length, false);
+      view.setUint32(7, data.length, false);
+      let position = headerLength;
+      output.set(mime, position); position += mime.length;
+      output.set(name, position); position += name.length;
+      output.set(data, position);
+      return output;
+    });
+  }
+
+  function parsePayload(bytes) {
+    if (bytes.length < 11 || bytes[0] !== 80 || bytes[1] !== 67 || bytes[2] !== 68 || bytes[3] !== 50) {
+      throw new Error("データ識別子が違います。コードが正しいか確認してください。");
+    }
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const mimeLength = bytes[4];
+    const nameLength = view.getUint16(5, false);
+    const dataLength = view.getUint32(7, false);
+    const expectedLength = 11 + mimeLength + nameLength + dataLength;
+    if (expectedLength !== bytes.length) {
+      throw new Error("データサイズが一致しません。コードが途中で欠けている可能性があります。");
+    }
+    let position = 11;
+    const decoder = new TextDecoder();
+    const mime = decoder.decode(bytes.slice(position, position + mimeLength)); position += mimeLength;
+    const name = decoder.decode(bytes.slice(position, position + nameLength)); position += nameLength;
+    const data = bytes.slice(position);
+    return { mime: mime || "application/octet-stream", name: name || "restored-image", data };
+  }
+
+  function showImage(container, url) {
+    container.replaceChildren();
+    const image = document.createElement("img");
+    image.alt = "選択または復元した画像";
+    image.src = url;
+    container.appendChild(image);
+  }
+
+  $("imageFile").addEventListener("change", () => {
+    const file = $("imageFile").files && $("imageFile").files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      status("encodeStatus", "画像ファイルを選択してください。", "bad");
+      return;
+    }
+    selectedFile = file;
+    if (selectedObjectURL) URL.revokeObjectURL(selectedObjectURL);
+    selectedObjectURL = URL.createObjectURL(file);
+    showImage($("sourcePreview"), selectedObjectURL);
+    $("sourceInfo").textContent =
+      `選択中：${file.name} / ${file.type || "形式不明"} / ${file.size.toLocaleString()} bytes`;
+    $("encodeButton").disabled = false;
+    $("encodedCode").value = "";
+    $("copyButton").disabled = true;
+    status("encodeStatus", "選択した画像をプレビューに表示しました。コードに変換できます。", "good");
+  });
+
+  $("encodeButton").addEventListener("click", async () => {
+    if (!selectedFile) return;
+    const button = $("encodeButton");
+    button.disabled = true;
+    try {
+      status("encodeStatus", "元画像データを読み込み、可逆圧縮しています...");
+      const payload = await buildPayload(selectedFile);
+      const compressed = await deflate(payload);
+      const code = "PCD2:" + bytesTo85(compressed);
+      $("encodedCode").value = code;
+      $("copyButton").disabled = false;
+      const length = code.length;
+      const limitMessage = length <= MAX_CODE_LENGTH
+        ? "50,000文字以内です。"
+        : "50,000文字を超えています。画質を維持したまま短縮できるとは限りません。";
+      status("encodeStatus",
+        `変換完了！\n画像：${selectedFile.name}\n元ファイル：${selectedFile.size.toLocaleString()} bytes\n圧縮後コード：${length.toLocaleString()} 文字\n${limitMessage}`,
+        length <= MAX_CODE_LENGTH ? "good" : "bad");
+    } catch (error) {
+      status("encodeStatus", error.message || String(error), "bad");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  $("copyButton").addEventListener("click", async () => {
+    const code = $("encodedCode").value;
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      status("encodeStatus", "コードをコピーしました！", "good");
+    } catch {
+      $("encodedCode").focus();
+      $("encodedCode").select();
+      status("encodeStatus", "コードを選択しました。コピー操作をしてください。");
+    }
+  });
+
+  $("decodeButton").addEventListener("click", async () => {
+    const button = $("decodeButton");
+    button.disabled = true;
+    try {
+      status("decodeStatus", "コードを確認して画像データを復元しています...");
+      const input = $("inputCode").value.trim();
+      if (!input.startsWith("PCD2:")) throw new Error("PCD2: から始まるコードを貼り付けてください。");
+      const compressed = base85ToBytes(input.slice(5));
+      const payload = await inflate(compressed);
+      const result = parsePayload(payload);
+      restoredBlob = new Blob([result.data], { type: result.mime });
+      restoredFileName = result.name;
+      if (restoredObjectURL) URL.revokeObjectURL(restoredObjectURL);
+      restoredObjectURL = URL.createObjectURL(restoredBlob);
+      showImage($("resultPreview"), restoredObjectURL);
+      $("resultInfo").textContent =
+        `復元完了：${result.name} / ${result.mime} / ${result.data.length.toLocaleString()} bytes`;
+      $("saveButton").disabled = false;
+      status("decodeStatus", "デコード成功！元ファイルのバイナリをそのまま復元しました。", "good");
+    } catch (error) {
+      status("decodeStatus", error.message || String(error), "bad");
+      $("saveButton").disabled = true;
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  $("saveButton").addEventListener("click", () => {
+    if (!restoredBlob || !restoredObjectURL) return;
+    const link = document.createElement("a");
+    link.href = restoredObjectURL;
+    link.download = restoredFileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
 })();
 </script>
 </body>
