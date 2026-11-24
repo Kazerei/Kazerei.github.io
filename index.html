@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MC PvP Montage 3D Studio v3</title>
+<title>MC PvP Montage 3D Studio v3.1</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Montserrat:ital,wght@0,800;0,900;1,900&family=Noto+Sans+JP:wght@700;900&display=swap');
 
@@ -225,7 +225,6 @@
   .slider-row span:first-child { width: 78px; font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
   .slider-row span:last-child { width: 38px; font-size: 11px; text-align: right; font-family: monospace; flex-shrink: 0; }
 
-  /* メインキャンバス側 */
   .workspace {
     flex: 1;
     display: flex;
@@ -278,7 +277,6 @@
   }
   #three-canvas:active { cursor: grabbing; }
 
-  /* エフェクト＆オーバーレイ層 */
   #fx-vignette {
     position: absolute;
     inset: 0;
@@ -316,7 +314,6 @@
     overflow: hidden;
   }
 
-  /* ドラッグ可能要素（長押し・ドラッグ視覚フィードバック付き） */
   .draggable-item {
     position: absolute;
     pointer-events: auto;
@@ -337,13 +334,12 @@
     z-index: 50 !important;
   }
 
-  /* ドラッグ中に出る座標ガイドチップ */
   #drag-hud {
     position: absolute;
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.92);
     border: 1px solid #facc15;
     color: #fef08a;
     padding: 4px 12px;
@@ -370,7 +366,6 @@
     color: var(--text-dim);
   }
 
-  /* 2回タップ文字編集モーダル */
   #edit-modal {
     display: none;
     position: fixed;
@@ -420,7 +415,7 @@
 <div class="sidebar">
   <div class="header">
     <h1>MC MONTAGE 3D STUDIO</h1>
-    <span style="font-size:10px; background:#a855f7; padding:2px 6px; border-radius:4px; font-weight:900;">v3.0</span>
+    <span style="font-size:10px; background:#a855f7; padding:2px 6px; border-radius:4px; font-weight:900;">v3.1</span>
   </div>
 
   <div class="tabs">
@@ -437,7 +432,7 @@
       <div class="template-grid">
         <div class="tpl-card selected" id="tpl-cpvp_classic" onclick="applyTemplate('cpvp_classic', this)">
           <div class="tpl-name">CPVP MONTAGE</div>
-          <div class="tpl-desc">巨大クリスタル＋ネザライト＋立体文字</div>
+          <div class="tpl-desc">エンドクリスタル＋ネザライト＋立体文字</div>
         </div>
         <div class="tpl-card" id="tpl-mace_smash" onclick="applyTemplate('mace_smash', this)">
           <div class="tpl-name">MACE SMASH</div>
@@ -497,7 +492,7 @@
       <div class="section-title">Minecraft スキン読み込み</div>
       <label>MCID（Java版ユーザー名）から自動取得</label>
       <div class="row">
-        <input type="text" id="mcid-input" placeholder="例: Marlowww, Dream, Technoblade" value="Marlowww">
+        <input type="text" id="mcid-input" placeholder="例: Marlowww, Dream, Notch" value="Notch">
         <button class="btn" onclick="loadSkinFromMCID()">読込</button>
       </div>
 
@@ -577,7 +572,7 @@
       <div class="section-title">エンドクリスタル配置（3Dモデル）</div>
       <div class="check-item" style="margin-bottom:8px;">
         <input type="checkbox" id="show-crystal" checked onchange="updateCrystal()">
-        <span>巨大3Dエンドクリスタルを表示</span>
+        <span>マイクラ風エンドクリスタルを表示</span>
       </div>
       <div class="slider-row">
         <span>大きさ</span>
@@ -661,7 +656,6 @@
 
   <!-- TAB 4: 文字・画像・FX -->
   <div id="tab-text" class="tab-content">
-    <!-- サブタイトル (CPVP等) -->
     <div class="section">
       <div class="section-title">
         <span>サブテキスト（CPVP など）</span>
@@ -704,7 +698,6 @@
       </div>
     </div>
 
-    <!-- メインタイトル (MONTAGE等) -->
     <div class="section">
       <div class="section-title">
         <span>メインテキスト（MONTAGE など）</span>
@@ -747,7 +740,6 @@
       </div>
     </div>
 
-    <!-- カスタム画像オーバーレイ -->
     <div class="section">
       <div class="section-title">カスタム画像追加（クリスタル画像・ロゴ等）</div>
       <input type="file" id="custom-img-input" accept="image/*" style="display:none;" onchange="addCustomImage(event)">
@@ -779,7 +771,6 @@
       </div>
     </div>
 
-    <!-- 画面エフェクト（集中線・グロー・ビネット） -->
     <div class="section">
       <div class="section-title">サムネイル画面エフェクト (FX)</div>
       <div class="slider-row">
@@ -805,7 +796,6 @@
   </div>
 </div>
 
-<!-- 右側メインプレビュー -->
 <div class="workspace">
   <div class="toolbar">
     <div class="badge-hint">
@@ -832,7 +822,6 @@
   </div>
 </div>
 
-<!-- 2回タップ文字書き換えモーダル -->
 <div id="edit-modal" onclick="if(event.target===this) closeEditModal()">
   <div class="modal-card">
     <h3>テキストを書き換え</h3>
@@ -854,9 +843,6 @@ if (typeof THREE === 'undefined') {
 </script>
 
 <script>
-// ==========================================
-// 1. 安全なDOMヘルパー & グローバル変数
-// ==========================================
 function setVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = val;
@@ -874,7 +860,7 @@ let scene, camera, renderer;
 let playerGroup, headPivot, bodyMesh, rightArmPivot, leftArmPivot, rightLegPivot, leftLegPivot;
 let armorMeshes = { helmet: [], chest: [], legs: [], boots: [] };
 let rightItemGroup, leftItemGroup;
-let crystalGroup, crystalInner, crystalOuter1, crystalOuter2;
+let crystalGroup, crystalCore, crystalOuterGlass, crystalInnerGlass;
 let particleSystem, floorMesh;
 let dirLight, rimLight, ambientLight, crystalLight;
 
@@ -1017,6 +1003,7 @@ function initThree() {
   skinTexture = new THREE.CanvasTexture(currentSkinCanvas);
   skinTexture.magFilter = THREE.NearestFilter;
   skinTexture.minFilter = THREE.NearestFilter;
+  skinTexture.flipY = true;
 
   const canvas = document.getElementById('three-canvas');
   scene = new THREE.Scene();
@@ -1035,7 +1022,7 @@ function initThree() {
 
   setupCameraControls(canvas);
 
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.78);
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
   scene.add(ambientLight);
 
   dirLight = new THREE.DirectionalLight(0xfff5e4, 1.35);
@@ -1046,14 +1033,14 @@ function initThree() {
   rimLight.position.set(-4, 4, -4);
   scene.add(rimLight);
 
-  crystalLight = new THREE.PointLight(0xf472b6, 2.5, 12);
+  crystalLight = new THREE.PointLight(0xe879f9, 2.8, 12);
   scene.add(crystalLight);
 
   createFloor();
   createParticles();
   generateDefaultSkin();
   rebuildPlayer();
-  createEndCrystal();
+  createMinecraftEndCrystal();
 
   applyTemplate('cpvp_classic');
   updateTextOverlays();
@@ -1064,9 +1051,6 @@ function initThree() {
   animate();
 }
 
-// ==========================================
-// 2. 背景・床・パーティクル
-// ==========================================
 function createFloor() {
   const canvas = document.createElement('canvas');
   canvas.width = 128; canvas.height = 128;
@@ -1165,7 +1149,7 @@ function updateLights() {
 }
 
 // ==========================================
-// 3. スキンUVマッピング & 3Dプレイヤー構築
+// スキン描画＆確実な反映処理
 // ==========================================
 function generateDefaultSkin() {
   const ctx = currentSkinCanvas.getContext('2d');
@@ -1181,6 +1165,30 @@ function generateDefaultSkin() {
   ctx.fillStyle = '#9333ea'; ctx.fillRect(22, 20, 4, 12);
   ctx.fillStyle = '#312e81'; ctx.fillRect(40, 16, 16, 16); ctx.fillRect(32, 48, 16, 16);
   ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 16, 16, 16); ctx.fillRect(16, 48, 16, 16);
+  refreshSkinTexture();
+}
+
+function applyLoadedSkinImage(img, labelText) {
+  const ctx = currentSkinCanvas.getContext('2d');
+  ctx.clearRect(0, 0, 64, 64);
+  ctx.drawImage(img, 0, 0, 64, img.height === 32 ? 32 : 64);
+  if (img.height === 32) {
+    ctx.drawImage(img, 0, 16, 16, 16, 16, 48, 16, 16);
+    ctx.drawImage(img, 40, 16, 16, 16, 32, 48, 16, 16);
+  }
+  refreshSkinTexture();
+  rebuildPlayer();
+  if (labelText) showToast(labelText);
+}
+
+function refreshSkinTexture() {
+  if (!skinTexture) {
+    skinTexture = new THREE.CanvasTexture(currentSkinCanvas);
+  } else {
+    skinTexture.image = currentSkinCanvas;
+  }
+  skinTexture.magFilter = THREE.NearestFilter;
+  skinTexture.minFilter = THREE.NearestFilter;
   skinTexture.needsUpdate = true;
 }
 
@@ -1188,24 +1196,30 @@ function loadSkinFromMCID(silent = false) {
   const mcid = document.getElementById('mcid-input').value.trim();
   if (!mcid) return;
 
-  const img = new Image();
-  img.crossOrigin = 'Anonymous';
-  img.src = `https://minotar.net/skin/${encodeURIComponent(mcid)}`;
+  const endpoints = [
+    `https://minotar.net/skin/${encodeURIComponent(mcid)}`,
+    `https://mc-heads.net/skin/${encodeURIComponent(mcid)}`,
+    `https://crafatar.com/skins/${encodeURIComponent(mcid)}`
+  ];
 
-  img.onload = () => {
-    const ctx = currentSkinCanvas.getContext('2d');
-    ctx.clearRect(0, 0, 64, 64);
-    ctx.drawImage(img, 0, 0);
-    if (img.height === 32) {
-      ctx.drawImage(img, 0, 16, 16, 16, 16, 48, 16, 16);
-      ctx.drawImage(img, 40, 16, 16, 16, 32, 48, 16, 16);
+  let idx = 0;
+  function tryNext() {
+    if (idx >= endpoints.length) {
+      if (!silent) showToast('スキン取得失敗（MCIDを確認するかPNGを選択してください）', true);
+      return;
     }
-    skinTexture.needsUpdate = true;
-    if (!silent) showToast(`${mcid} のスキンを読み込みました！`);
-  };
-  img.onerror = () => {
-    if (!silent) showToast('スキン取得失敗（MCIDを確認してください）', true);
-  };
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      applyLoadedSkinImage(img, silent ? null : `${mcid} のスキンを反映しました！`);
+    };
+    img.onerror = () => {
+      idx++;
+      tryNext();
+    };
+    img.src = endpoints[idx] + (endpoints[idx].includes('?') ? '&' : '?') + 't=' + Date.now();
+  }
+  tryNext();
 }
 
 function loadSkinFromFile(e) {
@@ -1215,15 +1229,7 @@ function loadSkinFromFile(e) {
   reader.onload = (ev) => {
     const img = new Image();
     img.onload = () => {
-      const ctx = currentSkinCanvas.getContext('2d');
-      ctx.clearRect(0, 0, 64, 64);
-      ctx.drawImage(img, 0, 0);
-      if (img.height === 32) {
-        ctx.drawImage(img, 0, 16, 16, 16, 16, 48, 16, 16);
-        ctx.drawImage(img, 40, 16, 16, 16, 32, 48, 16, 16);
-      }
-      skinTexture.needsUpdate = true;
-      showToast('スキン画像を適用しました！');
+      applyLoadedSkinImage(img, 'スキン画像を反映しました！');
     };
     img.src = ev.target.result;
   };
@@ -1231,7 +1237,7 @@ function loadSkinFromFile(e) {
 }
 
 function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
-  const scale = isOverlay ? 1.07 : 1.0;
+  const scale = isOverlay ? 1.075 : 1.0;
   const geo = new THREE.BoxGeometry(w * scale, h * scale, d * scale);
   const uvAttr = geo.attributes.uv;
   const texW = 64, texH = 64;
@@ -1259,9 +1265,9 @@ function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
   const mat = new THREE.MeshStandardMaterial({
     map: skinTexture,
     transparent: isOverlay,
-    alphaTest: isOverlay ? 0.1 : 0,
+    alphaTest: isOverlay ? 0.15 : 0,
     side: isOverlay ? THREE.DoubleSide : THREE.FrontSide,
-    roughness: 0.65,
+    roughness: 0.6,
     metalness: 0.05
   });
 
@@ -1269,6 +1275,7 @@ function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
 }
 
 function rebuildPlayer() {
+  if (!scene) return;
   if (playerGroup) scene.remove(playerGroup);
 
   const isSlim = document.getElementById('arm-type').value === 'slim';
@@ -1329,9 +1336,6 @@ function rebuildPlayer() {
   applyManualPose();
 }
 
-// ==========================================
-// 4. 防具＆手持ちアイテム
-// ==========================================
 function getArmorMaterial(type, enchant) {
   const styles = {
     netherite: { color: 0x3b353b, metalness: 0.75, roughness: 0.35 },
@@ -1350,6 +1354,7 @@ function getArmorMaterial(type, enchant) {
 }
 
 function updateArmor() {
+  if (!playerGroup) return;
   Object.values(armorMeshes).flat().forEach(m => { if (m.parent) m.parent.remove(m); });
   armorMeshes = { helmet: [], chest: [], legs: [], boots: [] };
 
@@ -1467,12 +1472,12 @@ function buildItemMesh(itemType) {
   }
   else if (itemType === 'crystal') {
     const cMat = new THREE.MeshStandardMaterial({
-      color: 0xf472b6, emissive: 0xdb2777, emissiveIntensity: 0.8, transparent: true, opacity: 0.9
+      color: 0xf472b6, emissive: 0xdb2777, emissiveIntensity: 0.85, transparent: true, opacity: 0.9
     });
-    const cube = new THREE.Mesh(new THREE.OctahedronGeometry(0.22, 0), cMat);
+    const cube = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), cMat);
     const frame = new THREE.Mesh(
       new THREE.BoxGeometry(0.32, 0.32, 0.32),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+      new THREE.MeshBasicMaterial({ color: 0xe879f9, wireframe: true })
     );
     group.add(cube, frame);
     group.position.set(0, -0.65, 0.15);
@@ -1487,6 +1492,7 @@ function buildItemMesh(itemType) {
 }
 
 function updateHeldItems() {
+  if (!rightArmPivot || !leftArmPivot) return;
   if (rightItemGroup && rightItemGroup.parent) rightItemGroup.parent.remove(rightItemGroup);
   if (leftItemGroup && leftItemGroup.parent) leftItemGroup.parent.remove(leftItemGroup);
 
@@ -1498,42 +1504,92 @@ function updateHeldItems() {
 }
 
 // ==========================================
-// 5. 巨大3Dエンドクリスタル
+// 本格マイクラ風エンドクリスタル生成
+// （外キューブ・内キューブ・回転コア・紫ピンク発光）
 // ==========================================
-function createEndCrystal() {
+function createCrystalGridTexture(baseHex, lineHex) {
+  const c = document.createElement('canvas');
+  c.width = 64; c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = baseHex;
+  ctx.fillRect(0, 0, 64, 64);
+
+  // ピクセル風の枠＆ハイライト
+  ctx.strokeStyle = lineHex;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(2, 2, 60, 60);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.fillRect(6, 6, 14, 14);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  return tex;
+}
+
+function createMinecraftEndCrystal() {
   crystalGroup = new THREE.Group();
 
-  const coreMat = new THREE.MeshStandardMaterial({
-    color: 0xff77e9,
-    emissive: 0xe11d48,
-    emissiveIntensity: 0.9,
-    roughness: 0.1,
-    metalness: 0.3
-  });
-  crystalInner = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), coreMat);
-
-  const glassMat = new THREE.MeshBasicMaterial({
+  // 1. 最外殻のガラスキューブ
+  const outerTex = createCrystalGridTexture('rgba(244, 114, 182, 0.22)', '#f5d0fe');
+  const outerMat = new THREE.MeshStandardMaterial({
+    map: outerTex,
     color: 0xfbcfe8,
+    emissive: 0xc026d3,
+    emissiveIntensity: 0.35,
     transparent: true,
-    opacity: 0.35,
-    side: THREE.DoubleSide
+    opacity: 0.52,
+    roughness: 0.15,
+    metalness: 0.2,
+    side: THREE.DoubleSide,
+    depthWrite: false
   });
-  const wireMat = new THREE.LineBasicMaterial({ color: 0xf472b6 });
+  const outerGeo = new THREE.BoxGeometry(0.96, 0.96, 0.96);
+  crystalOuterGlass = new THREE.Mesh(outerGeo, outerMat);
+  crystalOuterGlass.add(new THREE.LineSegments(
+    new THREE.EdgesGeometry(outerGeo),
+    new THREE.LineBasicMaterial({ color: 0xf5d0fe, transparent: true, opacity: 0.85 })
+  ));
 
-  const boxGeo1 = new THREE.BoxGeometry(0.75, 0.75, 0.75);
-  crystalOuter1 = new THREE.Mesh(boxGeo1, glassMat);
-  crystalOuter1.add(new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo1), wireMat));
+  // 2. 中間の回転キューブ
+  const innerTex = createCrystalGridTexture('rgba(232, 121, 249, 0.35)', '#fae8ff');
+  const innerMat = new THREE.MeshStandardMaterial({
+    map: innerTex,
+    color: 0xe879f9,
+    emissive: 0xa855f7,
+    emissiveIntensity: 0.55,
+    transparent: true,
+    opacity: 0.72,
+    roughness: 0.15,
+    metalness: 0.3,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  });
+  const innerGeo = new THREE.BoxGeometry(0.68, 0.68, 0.68);
+  crystalInnerGlass = new THREE.Mesh(innerGeo, innerMat);
+  crystalInnerGlass.add(new THREE.LineSegments(
+    new THREE.EdgesGeometry(innerGeo),
+    new THREE.LineBasicMaterial({ color: 0xe879f9 })
+  ));
 
-  const boxGeo2 = new THREE.BoxGeometry(0.88, 0.88, 0.88);
-  crystalOuter2 = new THREE.Mesh(boxGeo2, glassMat);
-  crystalOuter2.add(new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo2), wireMat));
+  // 3. 中心のネザー/エンドコアキューブ
+  const coreMat = new THREE.MeshStandardMaterial({
+    color: 0xff80ff,
+    emissive: 0xd946ef,
+    emissiveIntensity: 1.15,
+    roughness: 0.2,
+    metalness: 0.2
+  });
+  crystalCore = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), coreMat);
 
-  crystalGroup.add(crystalInner, crystalOuter1, crystalOuter2);
+  crystalGroup.add(crystalOuterGlass, crystalInnerGlass, crystalCore);
   scene.add(crystalGroup);
   updateCrystal();
 }
 
 function updateCrystal() {
+  if (!crystalGroup) return;
   const show = document.getElementById('show-crystal').checked;
   const s = parseFloat(document.getElementById('crys-scale').value);
   const x = parseFloat(document.getElementById('crys-x').value);
@@ -1549,13 +1605,14 @@ function updateCrystal() {
   crystalLight.visible = show;
   crystalGroup.scale.set(s, s, s);
   crystalGroup.position.set(x, y, z);
-  crystalLight.position.set(x, y, z + 0.8);
+  crystalLight.position.set(x, y, z + 0.9);
 }
 
 // ==========================================
-// 6. ポーズ制御＆テンプレート一括適用
+// ポーズ制御＆テンプレート一括適用
 // ==========================================
 function applyManualPose() {
+  if (!playerGroup) return;
   const deg = Math.PI / 180;
   const px = parseFloat(document.getElementById('player-pos-x').value) || 0;
   const py = parseFloat(document.getElementById('player-pos-y').value) || 0;
@@ -1782,9 +1839,6 @@ function resetCamera() {
   updateCameraPosition();
 }
 
-// ==========================================
-// 7. 文字・角度・FX・画像オーバーレイ（長押し移動＆2回タップ編集）
-// ==========================================
 function updateTextOverlays() {
   const subEl = document.getElementById('overlay-sub');
   const mainEl = document.getElementById('overlay-main');
@@ -1939,7 +1993,6 @@ function deleteSelectedImage() {
   }
 }
 
-// 2回タップ文字書き換えモーダル
 function openEditModal(inputId) {
   const targetInput = document.getElementById(inputId);
   if (!targetInput) return;
@@ -1976,7 +2029,6 @@ function makeElementDraggable(el) {
 
   const onStart = (clientX, clientY) => {
     const now = Date.now();
-    // 2回タップ（350ms以内）で文字書き換えモーダルを開く
     if (el.dataset.inputId && (now - lastTapTime < 350)) {
       lastTapTime = 0;
       openEditModal(el.dataset.inputId);
@@ -2040,9 +2092,6 @@ function makeElementDraggable(el) {
   window.addEventListener('touchend', onEnd);
 }
 
-// ==========================================
-// 8. 高解像度(1920x1080) PNG画像書き出し合成
-// ==========================================
 function exportThumbnail() {
   selectOverlayElement(null);
   const outW = 1920, outH = 1080;
@@ -2165,20 +2214,21 @@ function exportThumbnail() {
   showToast('1920x1080 PNG画像を保存しました！');
 }
 
-// ==========================================
-// 9. アニメーションループ
-// ==========================================
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
 
+  // マイクラのエンドクリスタル特有の「外枠・内枠・コア」の独立回転＆浮遊
   if (crystalGroup && crystalGroup.visible) {
-    crystalInner.rotation.y = t * 1.4;
-    crystalOuter1.rotation.x = t * 0.9;
-    crystalOuter1.rotation.y = t * 1.1;
-    crystalOuter2.rotation.z = -t * 0.8;
-    crystalOuter2.rotation.x = t * 0.7;
-    crystalInner.position.y = Math.sin(t * 2.5) * 0.08;
+    crystalCore.rotation.y = t * 1.6;
+    crystalCore.rotation.x = t * 0.9;
+    crystalCore.position.y = Math.sin(t * 2.4) * 0.09;
+
+    crystalInnerGlass.rotation.y = -t * 1.1;
+    crystalInnerGlass.rotation.z = t * 0.6;
+
+    crystalOuterGlass.rotation.y = t * 0.55;
+    crystalOuterGlass.rotation.x = Math.sin(t * 0.8) * 0.25;
   }
 
   if (particleSystem && particleSystem.visible) {
