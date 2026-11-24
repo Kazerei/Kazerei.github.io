@@ -2,23 +2,24 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MC PvP Montage 3D Thumbnail Studio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MC PvP Montage 3D Studio v2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Montserrat:ital,wght@0,800;0,900;1,900&family=Noto+Sans+JP:wght@700;900&display=swap');
 
   :root {
-    --bg-dark: #0f1117;
-    --panel-bg: #181b24;
-    --border: #2a2f3d;
+    --bg-dark: #0b0d13;
+    --panel-bg: #151822;
+    --card-bg: #1e2230;
+    --border: #2c3246;
     --accent: #a855f7;
     --accent-hover: #9333ea;
     --cyan: #06b6d4;
-    --text: #f1f5f9;
+    --text: #f8fafc;
     --text-dim: #94a3b8;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
     background-color: var(--bg-dark);
@@ -29,20 +30,27 @@
     overflow: hidden;
   }
 
-  /* 左側サイドバー（コントロール） */
+  /* レスポンシブ対応（縦画面・スマホ/iPadでも操作しやすく） */
+  @media (max-width: 900px) {
+    body { flex-direction: column-reverse; }
+    .sidebar { width: 100% !important; height: 54vh !important; border-right: none !important; border-top: 1px solid var(--border); }
+    .workspace { height: 46vh !important; }
+  }
+
+  /* 左側コントロールパネル */
   .sidebar {
-    width: 380px;
+    width: 400px;
     background: var(--panel-bg);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     height: 100vh;
-    z-index: 10;
+    z-index: 20;
   }
 
   .header {
-    padding: 14px 18px;
-    background: linear-gradient(135deg, #1e1b4b, #3b0764);
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #1e1b4b, #4c1d95);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -51,17 +59,16 @@
 
   .header h1 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 900;
-    letter-spacing: 0.5px;
-    background: linear-gradient(to right, #38bdf8, #e879f9);
+    background: linear-gradient(to right, #38bdf8, #f0abfc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .tabs {
     display: flex;
-    background: #12141c;
+    background: #0f1119;
     border-bottom: 1px solid var(--border);
   }
 
@@ -75,45 +82,41 @@
     font-weight: 700;
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: 0.2s;
+    transition: 0.15s;
   }
 
   .tab-btn.active {
     color: #fff;
     border-bottom-color: var(--accent);
-    background: rgba(168, 85, 247, 0.1);
+    background: rgba(168, 85, 247, 0.15);
   }
 
   .tab-content {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
+    padding: 14px;
     display: none;
   }
-
   .tab-content.active { display: block; }
-
-  /* スクロールバー */
-  .tab-content::-webkit-scrollbar { width: 6px; }
+  .tab-content::-webkit-scrollbar { width: 5px; }
   .tab-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 
   .section {
-    background: #12141c;
+    background: #10131c;
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
 
   .section-title {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 900;
     color: var(--cyan);
     margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
@@ -123,7 +126,6 @@
     margin-bottom: 8px;
     align-items: center;
   }
-
   .row:last-child { margin-bottom: 0; }
 
   label {
@@ -133,9 +135,9 @@
     margin-bottom: 4px;
   }
 
-  input[type="text"], input[type="number"], select {
+  input[type="text"], select {
     width: 100%;
-    background: #1e222d;
+    background: var(--card-bg);
     border: 1px solid #334155;
     color: #fff;
     padding: 7px 10px;
@@ -143,15 +145,16 @@
     font-size: 12px;
     outline: none;
   }
-
   input[type="text"]:focus, select:focus { border-color: var(--accent); }
 
   input[type="color"] {
-    width: 36px;
+    width: 100%;
     height: 30px;
-    border: none;
-    background: none;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    background: var(--card-bg);
     cursor: pointer;
+    padding: 2px;
   }
 
   input[type="range"] {
@@ -166,13 +169,11 @@
     border: none;
     padding: 8px 12px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
-    transition: 0.15s;
     white-space: nowrap;
   }
-
   .btn:hover { background: var(--accent-hover); }
   .btn-secondary { background: #334155; }
   .btn-secondary:hover { background: #475569; }
@@ -186,19 +187,18 @@
   }
 
   .tpl-card {
-    background: #1e222d;
-    border: 2px solid #2a2f3d;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
     border-radius: 8px;
-    padding: 10px;
+    padding: 9px;
     cursor: pointer;
     text-align: center;
-    transition: 0.2s;
+    transition: 0.15s;
   }
-
   .tpl-card:hover { border-color: var(--cyan); }
-  .tpl-card.selected { border-color: var(--accent); background: rgba(168, 85, 247, 0.15); }
-  .tpl-card .tpl-name { font-size: 12px; font-weight: 900; margin-bottom: 3px; }
-  .tpl-card .tpl-desc { font-size: 10px; color: var(--text-dim); }
+  .tpl-card.selected { border-color: var(--accent); background: rgba(168, 85, 247, 0.2); }
+  .tpl-name { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+  .tpl-desc { font-size: 10px; color: var(--text-dim); }
 
   .toggle-grid {
     display: grid;
@@ -210,13 +210,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #1e222d;
+    background: var(--card-bg);
     padding: 6px 8px;
     border-radius: 6px;
     font-size: 11px;
     cursor: pointer;
   }
-
   .check-item input { accent-color: var(--accent); }
 
   .slider-row {
@@ -225,26 +224,28 @@
     gap: 8px;
     margin-bottom: 6px;
   }
-  .slider-row span:first-child { width: 75px; font-size: 11px; color: var(--text-dim); }
-  .slider-row span:last-child { width: 34px; font-size: 11px; text-align: right; font-family: monospace; }
+  .slider-row span:first-child { width: 78px; font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+  .slider-row span:last-child { width: 38px; font-size: 11px; text-align: right; font-family: monospace; flex-shrink: 0; }
 
-  /* メインキャンバスエリア */
+  /* メインキャンバス側 */
   .workspace {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #090a0f;
+    background: #07080c;
     position: relative;
   }
 
   .toolbar {
-    height: 48px;
+    min-height: 44px;
     background: var(--panel-bg);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 6px 14px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .canvas-wrapper {
@@ -252,9 +253,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
     background-image: radial-gradient(#1e293b 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-size: 18px 18px;
     overflow: hidden;
   }
 
@@ -264,20 +265,53 @@
     width: 100%;
     max-width: 1120px;
     aspect-ratio: 16 / 9;
-    background: #000;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    background: #140c24;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.85);
     border: 2px solid #334155;
     border-radius: 6px;
     overflow: hidden;
+    touch-action: none;
   }
 
   #three-canvas {
     width: 100%;
     height: 100%;
     display: block;
+    cursor: grab;
+  }
+  #three-canvas:active { cursor: grabbing; }
+
+  /* エフェクト＆オーバーレイ層 */
+  #fx-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, transparent 45%, rgba(0,0,0,0.75) 100%);
+    opacity: 0.7;
   }
 
-  /* オーバーレイレイヤー（ドラッグ移動可能） */
+  #fx-speedlines {
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.14) 0deg 1.2deg,
+      transparent 1.2deg 6deg
+    );
+    -webkit-mask-image: radial-gradient(circle, transparent 35%, black 75%);
+    mask-image: radial-gradient(circle, transparent 35%, black 75%);
+    opacity: 0;
+  }
+
+  #fx-glow-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background: radial-gradient(circle at 28% 35%, rgba(232, 121, 249, 0.35), transparent 60%);
+  }
+
   #overlay-layer {
     position: absolute;
     inset: 0;
@@ -290,11 +324,14 @@
     pointer-events: auto;
     cursor: grab;
     transform-origin: center center;
+    user-select: none;
   }
   .draggable-item:active { cursor: grabbing; }
-  .draggable-item.selected-overlay { outline: 2px dashed #38bdf8; outline-offset: 4px; }
+  .draggable-item.selected-overlay {
+    outline: 2px dashed #38bdf8;
+    outline-offset: 6px;
+  }
 
-  /* 3D風Montage文字スタイル */
   .montage-text {
     font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
     font-weight: 900;
@@ -309,19 +346,33 @@
     color: var(--text-dim);
   }
 
+  #error-banner {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    background: #dc2626;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    z-index: 100;
+  }
+
   #status-toast {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 18px;
+    right: 18px;
     background: #10b981;
     color: #fff;
-    padding: 10px 16px;
+    padding: 9px 14px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.25s;
     pointer-events: none;
     z-index: 999;
   }
@@ -332,14 +383,14 @@
 <div class="sidebar">
   <div class="header">
     <h1>MC MONTAGE 3D STUDIO</h1>
-    <span style="font-size:10px; background:#a855f7; padding:2px 6px; border-radius:4px; font-weight:900;">PRO</span>
+    <span style="font-size:10px; background:#a855f7; padding:2px 6px; border-radius:4px; font-weight:900;">v2.0 FIXED</span>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('tab-tpl')">1. テンプレ</button>
-    <button class="tab-btn" onclick="switchTab('tab-skin')">2. スキン/装備</button>
-    <button class="tab-btn" onclick="switchTab('tab-pose')">3. ポーズ/3D</button>
-    <button class="tab-btn" onclick="switchTab('tab-text')">4. 文字/画像</button>
+    <button class="tab-btn active" data-tab="tab-tpl" onclick="switchTab(this)">1. テンプレ</button>
+    <button class="tab-btn" data-tab="tab-skin" onclick="switchTab(this)">2. スキン/装備</button>
+    <button class="tab-btn" data-tab="tab-pose" onclick="switchTab(this)">3. ポーズ/3D</button>
+    <button class="tab-btn" data-tab="tab-text" onclick="switchTab(this)">4. 文字/角度/FX</button>
   </div>
 
   <!-- TAB 1: テンプレート -->
@@ -349,34 +400,34 @@
       <div class="template-grid">
         <div class="tpl-card selected" onclick="applyTemplate('cpvp_classic', this)">
           <div class="tpl-name">CPVP MONTAGE</div>
-          <div class="tpl-desc">巨大クリスタル＋ネザライト構え＋立体ロゴ</div>
+          <div class="tpl-desc">巨大クリスタル＋ネザライト＋立体文字</div>
         </div>
         <div class="tpl-card" onclick="applyTemplate('mace_smash', this)">
           <div class="tpl-name">MACE SMASH</div>
-          <div class="tpl-desc">メイス振り下ろし＋紫の衝撃オーラ</div>
+          <div class="tpl-desc">メイス振り下ろし＋集中線エフェクト</div>
         </div>
         <div class="tpl-card" onclick="applyTemplate('crystal_pop', this)">
           <div class="tpl-name">CRYSTAL COMBO</div>
-          <div class="tpl-desc">クリスタル爆破パンチ＋超広角アングル</div>
+          <div class="tpl-desc">クリスタル爆破パンチ＋超広角</div>
         </div>
         <div class="tpl-card" onclick="applyTemplate('totem_clutch', this)">
           <div class="tpl-name">TOTEM CLUTCH</div>
-          <div class="tpl-desc">不死のトーテム持ち＋黄金パーティクル</div>
+          <div class="tpl-desc">不死のトーテム持ち＋黄金オーラ</div>
         </div>
         <div class="tpl-card" onclick="applyTemplate('sword_duel', this)">
           <div class="tpl-name">1v1 SWORD DUEL</div>
-          <div class="tpl-desc">ダイヤ/ネザライト剣＋クールな俯瞰</div>
+          <div class="tpl-desc">ダイヤ剣＋クールブルー構図</div>
         </div>
         <div class="tpl-card" onclick="applyTemplate('clean_render', this)">
           <div class="tpl-name">CLEAN SKIN ONLY</div>
-          <div class="tpl-desc">装備なし・シンプル立ち姿（素材用）</div>
+          <div class="tpl-desc">装備なし・透過PNG切り抜き用</div>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title">背景・ライティング環境</div>
-      <label>背景スタイル</label>
+      <div class="section-title">背景・ライティング設定</div>
+      <label>背景環境プリセット</label>
       <select id="bg-preset" onchange="updateEnvironment()">
         <option value="cpvp_sunset">CPvP シェーダー夕焼け＋黒曜石床</option>
         <option value="end_void">ジ・エンド風 パープルネオン空間</option>
@@ -388,12 +439,12 @@
       <div style="margin-top:10px;">
         <div class="slider-row">
           <span>リムライト強さ</span>
-          <input type="range" id="rim-intensity" min="0" max="5" step="0.2" value="2.8" oninput="updateLights()">
-          <span id="rim-val">2.8</span>
+          <input type="range" id="rim-intensity" min="0" max="6" step="0.2" value="3.2" oninput="updateLights()">
+          <span id="rim-val">3.2</span>
         </div>
         <div class="row">
           <label style="margin:0; flex:1;">リムライト色（輪郭の発光）</label>
-          <input type="color" id="rim-color" value="#e879f9" oninput="updateLights()">
+          <input type="color" id="rim-color" value="#e879f9" style="width:70px;" oninput="updateLights()">
         </div>
         <div class="check-item" style="margin-top:6px;">
           <input type="checkbox" id="toggle-particles" checked onchange="toggleParticles()">
@@ -409,7 +460,7 @@
       <div class="section-title">Minecraft スキン読み込み</div>
       <label>MCID（Java版ユーザー名）から自動取得</label>
       <div class="row">
-        <input type="text" id="mcid-input" placeholder="例: Dream, Technoblade, Marlowww" value="Marlowww">
+        <input type="text" id="mcid-input" placeholder="例: Marlowww, Dream, Technoblade" value="Marlowww">
         <button class="btn" onclick="loadSkinFromMCID()">読込</button>
       </div>
 
@@ -420,7 +471,7 @@
 
       <div class="row" style="margin-top:8px;">
         <label style="margin:0; flex:1;">腕の太さ（モデルタイプ）</label>
-        <select id="arm-type" style="width:140px;" onchange="rebuildPlayer()">
+        <select id="arm-type" style="width:150px;" onchange="rebuildPlayer()">
           <option value="classic">Classic (Steve / 4px)</option>
           <option value="slim">Slim (Alex / 3px)</option>
         </select>
@@ -435,7 +486,7 @@
       <div class="section-title">防具（装備）カスタマイズ</div>
       <div class="row">
         <label style="margin:0; flex:1;">防具の素材</label>
-        <select id="armor-material" style="width:150px;" onchange="updateArmor()">
+        <select id="armor-material" style="width:155px;" onchange="updateArmor()">
           <option value="netherite">ネザライト (Netherite)</option>
           <option value="diamond">ダイヤモンド (Diamond)</option>
           <option value="gold">金 (Golden)</option>
@@ -459,7 +510,7 @@
     <div class="section">
       <div class="section-title">手持ちアイテム（武器・PvPアイテム）</div>
       <div class="row">
-        <label style="margin:0; width:60px;">右手</label>
+        <label style="margin:0; width:50px;">右手</label>
         <select id="right-item" onchange="updateHeldItems()">
           <option value="none">なし（素手）</option>
           <option value="netherite_sword" selected>ネザライトの剣</option>
@@ -471,7 +522,7 @@
         </select>
       </div>
       <div class="row">
-        <label style="margin:0; width:60px;">左手</label>
+        <label style="margin:0; width:50px;">左手</label>
         <select id="left-item" onchange="updateHeldItems()">
           <option value="none">なし</option>
           <option value="totem" selected>不死のトーテム</option>
@@ -489,54 +540,69 @@
       <div class="section-title">エンドクリスタル配置（3Dモデル）</div>
       <div class="check-item" style="margin-bottom:8px;">
         <input type="checkbox" id="show-crystal" checked onchange="updateCrystal()">
-        <span>背景に巨大3Dエンドクリスタルを表示</span>
+        <span>巨大3Dエンドクリスタルを表示</span>
       </div>
       <div class="slider-row">
         <span>大きさ</span>
-        <input type="range" id="crys-scale" min="0.5" max="3.5" step="0.1" value="2.1" oninput="updateCrystal()">
-        <span id="crys-scale-val">2.1</span>
+        <input type="range" id="crys-scale" min="0.4" max="3.8" step="0.1" value="2.3" oninput="updateCrystal()">
+        <span id="crys-scale-val">2.3</span>
       </div>
       <div class="slider-row">
         <span>横位置 X</span>
-        <input type="range" id="crys-x" min="-5" max="5" step="0.1" value="-1.6" oninput="updateCrystal()">
-        <span id="crys-x-val">-1.6</span>
+        <input type="range" id="crys-x" min="-5" max="5" step="0.1" value="-1.3" oninput="updateCrystal()">
+        <span id="crys-x-val">-1.3</span>
       </div>
       <div class="slider-row">
         <span>高さ Y</span>
-        <input type="range" id="crys-y" min="-1" max="5" step="0.1" value="1.8" oninput="updateCrystal()">
-        <span id="crys-y-val">1.8</span>
+        <input type="range" id="crys-y" min="-1" max="5" step="0.1" value="1.9" oninput="updateCrystal()">
+        <span id="crys-y-val">1.9</span>
       </div>
       <div class="slider-row">
         <span>奥行き Z</span>
-        <input type="range" id="crys-z" min="-6" max="2" step="0.1" value="-1.8" oninput="updateCrystal()">
-        <span id="crys-z-val">-1.8</span>
+        <input type="range" id="crys-z" min="-6" max="2" step="0.1" value="-1.4" oninput="updateCrystal()">
+        <span id="crys-z-val">-1.4</span>
       </div>
     </div>
 
     <div class="section">
       <div class="section-title">
-        <span>プレイヤー関節微調整</span>
+        <span>プレイヤー位置＆関節角度</span>
         <button class="btn btn-secondary" style="padding:2px 6px; font-size:10px;" onclick="resetPose()">リセット</button>
       </div>
       <div class="slider-row">
+        <span>プレイヤーX</span>
+        <input type="range" id="player-pos-x" min="-3" max="3" step="0.05" value="1.05" oninput="applyManualPose()">
+        <span id="val-ppos-x">1.05</span>
+      </div>
+      <div class="slider-row">
+        <span>プレイヤーY</span>
+        <input type="range" id="player-pos-y" min="-1" max="2.5" step="0.05" value="0" oninput="applyManualPose()">
+        <span id="val-ppos-y">0.00</span>
+      </div>
+      <div class="slider-row">
+        <span>体の向き</span>
+        <input type="range" id="pose-body-y" min="-180" max="180" value="-28" oninput="applyManualPose()">
+        <span id="val-body-y">-28</span>
+      </div>
+      <div class="slider-row">
         <span>頭 上下</span>
-        <input type="range" id="pose-head-x" min="-60" max="60" value="-10" oninput="applyManualPose()">
-        <span id="val-head-x">-10</span>
+        <input type="range" id="pose-head-x" min="-60" max="60" value="-8" oninput="applyManualPose()">
+        <span id="val-head-x">-8</span>
       </div>
       <div class="slider-row">
         <span>頭 左右</span>
-        <input type="range" id="pose-head-y" min="-70" max="70" value="18" oninput="applyManualPose()">
-        <span id="val-head-y">18</span>
+        <input type="range" id="pose-head-y" min="-70" max="70" value="15" oninput="applyManualPose()">
+        <span id="val-head-y">15</span>
       </div>
       <div class="slider-row">
         <span>右腕 前後</span>
-        <input type="range" id="pose-rarm-x" min="-160" max="90" value="-55" oninput="applyManualPose()">
-        <span id="val-rarm-x">-55</span>
+        <input type="range" id="pose-rarm-x" min="-160" max="90" value="-60" oninput="applyManualPose()">
+        <span id="val-rarm-x">-60</span>
       </div>
       <div class="slider-row">
         <span>右腕 開き</span>
-        <input type="range" id="pose-rarm-z" min="-90" max="20" value="-15" oninput="applyManualPose()">
-        <span id="val-rarm-z">-15</span>
+        <input type="range" id="pose-rarm-z" min="-90" max="20" value="-18" oninput="applyManualPose()">
+        <span id="val-rarm-z">-18</span>
       </div>
       <div class="slider-row">
         <span>左腕 前後</span>
@@ -553,66 +619,127 @@
         <input type="range" id="pose-lleg-x" min="-70" max="70" value="-25" oninput="applyManualPose()">
         <span id="val-lleg-x">-25</span>
       </div>
-      <div class="slider-row">
-        <span>体の向き</span>
-        <input type="range" id="pose-body-y" min="-180" max="180" value="-25" oninput="applyManualPose()">
-        <span id="val-body-y">-25</span>
-      </div>
     </div>
   </div>
 
-  <!-- TAB 4: 文字＆画像オーバーレイ -->
+  <!-- TAB 4: 文字・角度・エフェクト・画像 -->
   <div id="tab-text" class="tab-content">
+    <!-- サブタイトル (CPVP等) 詳細調整 -->
     <div class="section">
-      <div class="section-title">3D風 タイトルロゴ配置</div>
-      <label>メインテキスト（例: MONTAGE, #1）</label>
-      <div class="row">
-        <input type="text" id="text-main" value="MONTAGE" oninput="updateTextOverlays()">
+      <div class="section-title">
+        <span>サブテキスト（CPVP など）詳細調整</span>
+        <label style="margin:0; display:flex; align-items:center; gap:4px;">
+          <input type="checkbox" id="show-sub" checked onchange="updateTextOverlays()"> 表示
+        </label>
       </div>
-      <label>サブテキスト（例: CPVP, VANILLA & MACE）</label>
       <div class="row">
         <input type="text" id="text-sub" value="CPVP" oninput="updateTextOverlays()">
       </div>
-
-      <div class="row" style="margin-top:8px;">
-        <div style="flex:1;">
-          <label>文字グラデーション上</label>
-          <input type="color" id="text-col1" value="#67e8f9" style="width:100%;" oninput="updateTextOverlays()">
-        </div>
-        <div style="flex:1;">
-          <label>文字グラデーション下</label>
-          <input type="color" id="text-col2" value="#0284c7" style="width:100%;" oninput="updateTextOverlays()">
-        </div>
-        <div style="flex:1;">
-          <label>立体影・縁取り色</label>
-          <input type="color" id="text-shadow-col" value="#1e1b4b" style="width:100%;" oninput="updateTextOverlays()">
-        </div>
-      </div>
-
-      <div class="slider-row" style="margin-top:8px;">
-        <span>メイン文字サイズ</span>
-        <input type="range" id="text-main-size" min="30" max="160" value="96" oninput="updateTextOverlays()">
-        <span id="text-main-size-val">96</span>
+      <div class="row">
+        <div style="flex:1;"><label>グラデ上</label><input type="color" id="sub-col1" value="#e0f2fe" oninput="updateTextOverlays()"></div>
+        <div style="flex:1;"><label>グラデ下</label><input type="color" id="sub-col2" value="#7dd3fc" oninput="updateTextOverlays()"></div>
+        <div style="flex:1;"><label>影・縁色</label><input type="color" id="sub-shadow" value="#1e1b4b" oninput="updateTextOverlays()"></div>
       </div>
       <div class="slider-row">
-        <span>サブ文字サイズ</span>
-        <input type="range" id="text-sub-size" min="20" max="120" value="64" oninput="updateTextOverlays()">
-        <span id="text-sub-size-val">64</span>
+        <span>サイズ</span>
+        <input type="range" id="sub-size" min="20" max="150" value="68" oninput="updateTextOverlays()">
+        <span id="sub-size-val">68</span>
       </div>
-      <div class="check-item" style="margin-top:6px;">
-        <input type="checkbox" id="toggle-text" checked onchange="updateTextOverlays()">
-        <span>タイトルテキストを表示する</span>
+      <div class="slider-row">
+        <span>横位置 X%</span>
+        <input type="range" id="sub-x" min="-10" max="90" value="58" oninput="updateTextOverlays()">
+        <span id="sub-x-val">58</span>
+      </div>
+      <div class="slider-row">
+        <span>縦位置 Y%</span>
+        <input type="range" id="sub-y" min="-10" max="90" value="14" oninput="updateTextOverlays()">
+        <span id="sub-y-val">14</span>
+      </div>
+      <div class="slider-row">
+        <span>回転角度</span>
+        <input type="range" id="sub-rot" min="-60" max="60" value="10" oninput="updateTextOverlays()">
+        <span id="sub-rot-val">10°</span>
+      </div>
+      <div class="slider-row">
+        <span>斜体傾き</span>
+        <input type="range" id="sub-skew" min="-35" max="35" value="-8" oninput="updateTextOverlays()">
+        <span id="sub-skew-val">-8°</span>
       </div>
     </div>
 
+    <!-- メインタイトル (MONTAGE等) 詳細調整 -->
+    <div class="section">
+      <div class="section-title">
+        <span>メインテキスト（MONTAGE など）詳細調整</span>
+        <label style="margin:0; display:flex; align-items:center; gap:4px;">
+          <input type="checkbox" id="show-main" checked onchange="updateTextOverlays()"> 表示
+        </label>
+      </div>
+      <div class="row">
+        <input type="text" id="text-main" value="MONTAGE" oninput="updateTextOverlays()">
+      </div>
+      <div class="row">
+        <div style="flex:1;"><label>グラデ上</label><input type="color" id="main-col1" value="#67e8f9" oninput="updateTextOverlays()"></div>
+        <div style="flex:1;"><label>グラデ下</label><input type="color" id="main-col2" value="#0284c7" oninput="updateTextOverlays()"></div>
+        <div style="flex:1;"><label>影・縁色</label><input type="color" id="main-shadow" value="#0f172a" oninput="updateTextOverlays()"></div>
+      </div>
+      <div class="slider-row">
+        <span>サイズ</span>
+        <input type="range" id="main-size" min="25" max="180" value="98" oninput="updateTextOverlays()">
+        <span id="main-size-val">98</span>
+      </div>
+      <div class="slider-row">
+        <span>横位置 X%</span>
+        <input type="range" id="main-x" min="-10" max="90" value="12" oninput="updateTextOverlays()">
+        <span id="main-x-val">12</span>
+      </div>
+      <div class="slider-row">
+        <span>縦位置 Y%</span>
+        <input type="range" id="main-y" min="-10" max="90" value="65" oninput="updateTextOverlays()">
+        <span id="main-y-val">65</span>
+      </div>
+      <div class="slider-row">
+        <span>回転角度</span>
+        <input type="range" id="main-rot" min="-60" max="60" value="-3" oninput="updateTextOverlays()">
+        <span id="main-rot-val">-3°</span>
+      </div>
+      <div class="slider-row">
+        <span>斜体傾き</span>
+        <input type="range" id="main-skew" min="-35" max="35" value="-10" oninput="updateTextOverlays()">
+        <span id="main-skew-val">-10°</span>
+      </div>
+    </div>
+
+    <!-- 画面エフェクト（集中線・グロー・ビネット） -->
+    <div class="section">
+      <div class="section-title">サムネイル画面エフェクト (FX)</div>
+      <div class="slider-row">
+        <span>集中線(スピード)</span>
+        <input type="range" id="fx-speed-val" min="0" max="1" step="0.05" value="0.25" oninput="updateScreenFX()">
+        <span id="fx-speed-disp">0.25</span>
+      </div>
+      <div class="slider-row">
+        <span>周囲の暗さ(ビネット)</span>
+        <input type="range" id="fx-vig-val" min="0" max="1" step="0.05" value="0.65" oninput="updateScreenFX()">
+        <span id="fx-vig-disp">0.65</span>
+      </div>
+      <div class="slider-row">
+        <span>発光オーラ強さ</span>
+        <input type="range" id="fx-glow-val" min="0" max="1" step="0.05" value="0.6" oninput="updateScreenFX()">
+        <span id="fx-glow-disp">0.60</span>
+      </div>
+      <div class="row">
+        <label style="margin:0; flex:1;">発光オーラ色</label>
+        <input type="color" id="fx-glow-color" value="#e879f9" style="width:70px;" oninput="updateScreenFX()">
+      </div>
+    </div>
+
+    <!-- カスタム画像オーバーレイ -->
     <div class="section">
       <div class="section-title">カスタム画像追加（クリスタル画像・ロゴ等）</div>
-      <p style="font-size:11px; color:var(--text-dim); margin-bottom:8px;">
-        好きな透過PNGや画像を何枚でも追加でき、プレビュー上でドラッグ移動できます。
-      </p>
       <input type="file" id="custom-img-input" accept="image/*" style="display:none;" onchange="addCustomImage(event)">
       <div class="row">
-        <button class="btn btn-cyan" style="width:100%;" onclick="document.getElementById('custom-img-input').click()">＋ 画像ファイルをアップロード追加</button>
+        <button class="btn btn-cyan" style="width:100%;" onclick="document.getElementById('custom-img-input').click()">＋ 画像をアップロードして重ねる</button>
       </div>
 
       <div id="selected-img-controls" style="display:none; margin-top:10px; border-top:1px solid var(--border); padding-top:10px;">
@@ -625,12 +752,12 @@
         <div class="slider-row">
           <span>回転角度</span>
           <input type="range" id="img-rot" min="-180" max="180" value="0" oninput="updateSelectedImage()">
-          <span id="img-rot-val">0</span>
+          <span id="img-rot-val">0°</span>
         </div>
         <div class="slider-row">
           <span>発光グロー</span>
-          <input type="range" id="img-glow" min="0" max="40" value="10" oninput="updateSelectedImage()">
-          <span id="img-glow-val">10</span>
+          <input type="range" id="img-glow" min="0" max="40" value="12" oninput="updateSelectedImage()">
+          <span id="img-glow-val">12</span>
         </div>
         <button class="btn" style="background:#ef4444; width:100%; margin-top:4px;" onclick="deleteSelectedImage()">選択中の画像を削除</button>
       </div>
@@ -638,26 +765,30 @@
   </div>
 </div>
 
-<!-- 右側メインビュー -->
+<!-- 右側メインプレビュー -->
 <div class="workspace">
   <div class="toolbar">
     <div class="badge-hint">
-      🖱️ <b>左ドラッグ:</b> カメラ回転 / <b>右ドラッグ:</b> 視点移動 / <b>ホイール:</b> ズーム / <b>文字・画像:</b> 直接ドラッグで配置
+      🖱️/👆 <b>背景ドラッグ:</b> カメラ回転 / <b>文字・画像ドラッグ:</b> 自由配置
     </div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn btn-secondary" onclick="resetCamera()">カメラ位置リセット</button>
-      <button class="btn" style="background:linear-gradient(135deg, #ec4899, #8b5cf6); padding:8px 18px;" onclick="exportThumbnail()">⬇ サムネイル画像を保存 (1920x1080 PNG)</button>
+    <div style="display:flex; gap:6px;">
+      <button class="btn btn-secondary" onclick="resetCamera()">カメラリセット</button>
+      <button class="btn" style="background:linear-gradient(135deg, #ec4899, #8b5cf6); padding:8px 14px;" onclick="exportThumbnail()">⬇ PNG保存 (1920x1080)</button>
     </div>
   </div>
 
   <div class="canvas-wrapper">
     <div id="preview-box">
+      <div id="error-banner"></div>
       <canvas id="three-canvas"></canvas>
+      <!-- 画面エフェクト層 -->
+      <div id="fx-glow-overlay"></div>
+      <div id="fx-speedlines"></div>
+      <div id="fx-vignette"></div>
+      <!-- 文字・画像ドラッグ層 -->
       <div id="overlay-layer">
-        <!-- サブタイトル -->
-        <div id="overlay-sub" class="draggable-item montage-text" style="left: 58%; top: 16%; transform: rotate(8deg);">CPVP</div>
-        <!-- メインタイトル -->
-        <div id="overlay-main" class="draggable-item montage-text" style="left: 14%; top: 66%; transform: rotate(-3deg);">MONTAGE</div>
+        <div id="overlay-sub" class="draggable-item montage-text">CPVP</div>
+        <div id="overlay-main" class="draggable-item montage-text">MONTAGE</div>
       </div>
     </div>
   </div>
@@ -665,15 +796,20 @@
 
 <div id="status-toast">完了しました</div>
 
-<!-- Three.js & OrbitControls CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<!-- Three.js 本体（信頼性の高いjsdelivr / unpkgフォールバック付き） -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+// Three.js読み込み失敗時のフォールバック
+if (typeof THREE === 'undefined') {
+  document.write('<script src="https://unpkg.com/three@0.128.0/build/three.min.js"><\/script>');
+}
+</script>
 
 <script>
 // ==========================================
-// 1. グローバル変数 & Three.js セットアップ
+// 1. グローバル変数 & カメラオービット自前制御
 // ==========================================
-let scene, camera, renderer, controls;
+let scene, camera, renderer;
 let playerGroup, headPivot, bodyMesh, rightArmPivot, leftArmPivot, rightLegPivot, leftLegPivot;
 let armorMeshes = { helmet: [], chest: [], legs: [], boots: [] };
 let rightItemGroup, leftItemGroup;
@@ -681,15 +817,22 @@ let crystalGroup, crystalInner, crystalOuter1, crystalOuter2;
 let particleSystem, floorMesh;
 let dirLight, rimLight, ambientLight, crystalLight;
 
+// 自前カメラ制御パラメータ（外部OrbitControls不要で確実に動作）
+let camState = {
+  theta: 0.32,      // 水平角度
+  phi: 1.38,        // 垂直角度
+  radius: 4.5,      // 距離
+  targetX: -0.15,
+  targetY: 1.45,
+  targetZ: 0
+};
+
 let currentSkinCanvas = document.createElement('canvas');
 currentSkinCanvas.width = 64;
 currentSkinCanvas.height = 64;
-let skinTexture = new THREE.CanvasTexture(currentSkinCanvas);
-skinTexture.magFilter = THREE.NearestFilter;
-skinTexture.minFilter = THREE.NearestFilter;
-
+let skinTexture = null;
 let selectedOverlayEl = null;
-const clock = new THREE.Clock();
+let clock = null;
 
 function showToast(msg, isError = false) {
   const toast = document.getElementById('status-toast');
@@ -699,90 +842,190 @@ function showToast(msg, isError = false) {
   setTimeout(() => { toast.style.opacity = '0'; }, 2500);
 }
 
-function switchTab(tabId) {
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  b.style.display = 'block';
+  b.textContent = 'エラー: ' + msg;
+}
+
+function switchTab(btnEl) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById(tabId).classList.add('active');
+  btnEl.classList.add('active');
+  const targetId = btnEl.getAttribute('data-tab');
+  document.getElementById(targetId).classList.add('active');
+}
+
+function updateCameraPosition() {
+  if (!camera) return;
+  const sinPhi = Math.sin(camState.phi);
+  const cosPhi = Math.cos(camState.phi);
+  const sinTheta = Math.sin(camState.theta);
+  const cosTheta = Math.cos(camState.theta);
+
+  camera.position.set(
+    camState.targetX + camState.radius * sinPhi * sinTheta,
+    camState.targetY + camState.radius * cosPhi,
+    camState.targetZ + camState.radius * sinPhi * cosTheta
+  );
+  camera.lookAt(camState.targetX, camState.targetY, camState.targetZ);
+}
+
+function setupCameraControls(canvas) {
+  let isDragging = false;
+  let isPanning = false;
+  let prevX = 0, prevY = 0;
+
+  canvas.addEventListener('mousedown', (e) => {
+    selectOverlayElement(null);
+    isDragging = true;
+    isPanning = (e.button === 2 || e.shiftKey);
+    prevX = e.clientX;
+    prevY = e.clientY;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - prevX;
+    const dy = e.clientY - prevY;
+    prevX = e.clientX;
+    prevY = e.clientY;
+
+    if (isPanning) {
+      camState.targetX -= dx * 0.005;
+      camState.targetY += dy * 0.005;
+    } else {
+      camState.theta -= dx * 0.008;
+      camState.phi = Math.max(0.2, Math.min(Math.PI - 0.15, camState.phi - dy * 0.008));
+    }
+    updateCameraPosition();
+  });
+
+  window.addEventListener('mouseup', () => { isDragging = false; });
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    camState.radius = Math.max(1.5, Math.min(12, camState.radius + e.deltaY * 0.004));
+    updateCameraPosition();
+  }, { passive: false });
+
+  // タッチ操作（iPhone / iPad対応）
+  let touchStartDist = 0;
+  canvas.addEventListener('touchstart', (e) => {
+    selectOverlayElement(null);
+    if (e.touches.length === 1) {
+      isDragging = true;
+      prevX = e.touches[0].clientX;
+      prevY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      isDragging = false;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchStartDist = Math.hypot(dx, dy);
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1 && isDragging) {
+      const dx = e.touches[0].clientX - prevX;
+      const dy = e.touches[0].clientY - prevY;
+      prevX = e.touches[0].clientX;
+      prevY = e.touches[0].clientY;
+      camState.theta -= dx * 0.01;
+      camState.phi = Math.max(0.2, Math.min(Math.PI - 0.15, camState.phi - dy * 0.01));
+      updateCameraPosition();
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      if (touchStartDist > 0) {
+        camState.radius = Math.max(1.5, Math.min(12, camState.radius - (dist - touchStartDist) * 0.015));
+        updateCameraPosition();
+      }
+      touchStartDist = dist;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchend', () => { isDragging = false; touchStartDist = 0; });
 }
 
 function initThree() {
-  const canvas = document.getElementById('three-canvas');
-  scene = new THREE.Scene();
+  try {
+    if (typeof THREE === 'undefined') {
+      showError('Three.jsの読み込みに失敗しました。インターネット接続を確認してください。');
+      return;
+    }
 
-  camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 100);
-  camera.position.set(1.4, 2.1, 4.6);
+    clock = new THREE.Clock();
+    skinTexture = new THREE.CanvasTexture(currentSkinCanvas);
+    skinTexture.magFilter = THREE.NearestFilter;
+    skinTexture.minFilter = THREE.NearestFilter;
 
-  renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    antialias: true,
-    alpha: true,
-    preserveDrawingBuffer: true
-  });
-  renderer.setSize(1280, 720, false);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+    const canvas = document.getElementById('three-canvas');
+    scene = new THREE.Scene();
 
-  controls = new THREE.OrbitControls(camera, canvas);
-  controls.target.set(-0.2, 1.45, 0);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.06;
-  controls.update();
+    camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 100);
+    updateCameraPosition();
 
-  // ライティング設定
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
-  scene.add(ambientLight);
+    renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true
+    });
+    renderer.setSize(1280, 720, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-  dirLight = new THREE.DirectionalLight(0xfff5e4, 1.3);
-  dirLight.position.set(4, 7, 5);
-  dirLight.castShadow = true;
-  scene.add(dirLight);
+    setupCameraControls(canvas);
 
-  rimLight = new THREE.DirectionalLight(0xe879f9, 2.8);
-  rimLight.position.set(-4, 4, -5);
-  scene.add(rimLight);
+    // ライティング
+    ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    scene.add(ambientLight);
 
-  crystalLight = new THREE.PointLight(0xf472b6, 2.2, 10);
-  scene.add(crystalLight);
+    dirLight = new THREE.DirectionalLight(0xfff5e4, 1.35);
+    dirLight.position.set(4, 7, 5);
+    scene.add(dirLight);
 
-  // 床（黒曜石風の反射フロア）
-  createFloor();
+    rimLight = new THREE.DirectionalLight(0xe879f9, 3.2);
+    rimLight.position.set(-4, 4, -4);
+    scene.add(rimLight);
 
-  // パーティクル
-  createParticles();
+    crystalLight = new THREE.PointLight(0xf472b6, 2.5, 12);
+    scene.add(crystalLight);
 
-  // デフォルトスキン生成＆プレイヤー構築
-  generateDefaultSkin();
-  rebuildPlayer();
+    createFloor();
+    createParticles();
+    generateDefaultSkin();
+    rebuildPlayer();
+    createEndCrystal();
 
-  // エンドクリスタル生成
-  createEndCrystal();
+    applyTemplate('cpvp_classic');
+    updateTextOverlays();
+    updateScreenFX();
+    initDraggableOverlays();
 
-  // 初期テンプレート適用
-  applyTemplate('cpvp_classic');
-  updateTextOverlays();
-  initDraggableOverlays();
+    // 初回MCIDスキン取得
+    loadSkinFromMCID(true);
 
-  // MCID初期ロード試行
-  loadSkinFromMCID(true);
-
-  animate();
+    animate();
+  } catch (err) {
+    console.error(err);
+    showError(err.message);
+  }
 }
 
 // ==========================================
-// 2. 背景・環境・パーティクル
+// 2. 背景・床・パーティクル
 // ==========================================
 function createFloor() {
   const canvas = document.createElement('canvas');
   canvas.width = 128; canvas.height = 128;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#120d1d';
+  ctx.fillStyle = '#140e24';
   ctx.fillRect(0, 0, 128, 128);
-  // 黒曜石風ノイズ
-  for (let i = 0; i < 400; i++) {
-    ctx.fillStyle = Math.random() > 0.5 ? '#261742' : '#090612';
+  for (let i = 0; i < 300; i++) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#2e1b4b' : '#090612';
     ctx.fillRect(Math.floor(Math.random()*16)*8, Math.floor(Math.random()*16)*8, 8, 8);
   }
   const tex = new THREE.CanvasTexture(canvas);
@@ -792,14 +1035,9 @@ function createFloor() {
   tex.magFilter = THREE.NearestFilter;
 
   const geo = new THREE.PlaneGeometry(30, 30);
-  const mat = new THREE.MeshStandardMaterial({
-    map: tex,
-    roughness: 0.35,
-    metalness: 0.4
-  });
+  const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4, metalness: 0.3 });
   floorMesh = new THREE.Mesh(geo, mat);
   floorMesh.rotation.x = -Math.PI / 2;
-  floorMesh.receiveShadow = true;
   scene.add(floorMesh);
 }
 
@@ -810,9 +1048,9 @@ function createParticles() {
   const col = new Float32Array(count * 3);
 
   for (let i = 0; i < count; i++) {
-    pos[i * 3] = (Math.random() - 0.5) * 12;
-    pos[i * 3 + 1] = Math.random() * 6;
-    pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    pos[i * 3] = (Math.random() - 0.5) * 11;
+    pos[i * 3 + 1] = Math.random() * 5.5;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 9;
 
     const isPink = Math.random() > 0.4;
     col[i * 3] = isPink ? 0.96 : 0.22;
@@ -823,10 +1061,10 @@ function createParticles() {
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
 
   const mat = new THREE.PointsMaterial({
-    size: 0.12,
+    size: 0.13,
     vertexColors: true,
     transparent: true,
-    opacity: 0.85,
+    opacity: 0.9,
     blending: THREE.AdditiveBlending
   });
   particleSystem = new THREE.Points(geo, mat);
@@ -834,7 +1072,7 @@ function createParticles() {
 }
 
 function toggleParticles() {
-  particleSystem.visible = document.getElementById('toggle-particles').checked;
+  if (particleSystem) particleSystem.visible = document.getElementById('toggle-particles').checked;
 }
 
 function updateEnvironment() {
@@ -846,23 +1084,23 @@ function updateEnvironment() {
     scene.fog = null;
     floorMesh.visible = false;
   } else if (preset === 'cpvp_sunset') {
-    scene.background = new THREE.Color('#271636');
-    scene.fog = new THREE.FogExp2('#271636', 0.065);
+    scene.background = new THREE.Color('#28163b');
+    scene.fog = new THREE.FogExp2('#28163b', 0.06);
     dirLight.color.set('#ffedd5');
     rimLight.color.set('#e879f9');
   } else if (preset === 'end_void') {
     scene.background = new THREE.Color('#0c0618');
-    scene.fog = new THREE.FogExp2('#0c0618', 0.07);
+    scene.fog = new THREE.FogExp2('#0c0618', 0.065);
     dirLight.color.set('#c4b5fd');
     rimLight.color.set('#a855f7');
   } else if (preset === 'nether_crimson') {
-    scene.background = new THREE.Color('#2b0909');
-    scene.fog = new THREE.FogExp2('#2b0909', 0.075);
+    scene.background = new THREE.Color('#2d0909');
+    scene.fog = new THREE.FogExp2('#2d0909', 0.07);
     dirLight.color.set('#fca5a5');
     rimLight.color.set('#f97316');
   } else if (preset === 'cyber_blue') {
     scene.background = new THREE.Color('#081a2e');
-    scene.fog = new THREE.FogExp2('#081a2e', 0.065);
+    scene.fog = new THREE.FogExp2('#081a2e', 0.06);
     dirLight.color.set('#e0f2fe');
     rimLight.color.set('#06b6d4');
   }
@@ -883,20 +1121,15 @@ function updateLights() {
 function generateDefaultSkin() {
   const ctx = currentSkinCanvas.getContext('2d');
   ctx.clearRect(0, 0, 64, 64);
-  // ベース肌色＋紫パーカー風デフォルトスキン
-  ctx.fillStyle = '#f5cba7';
-  ctx.fillRect(8, 8, 8, 8); // 顔
-  ctx.fillStyle = '#2e1065';
-  ctx.fillRect(0, 0, 32, 16); // 髪
   ctx.fillStyle = '#f5cba7';
   ctx.fillRect(8, 8, 8, 8);
-  // 目
+  ctx.fillStyle = '#3b0764';
+  ctx.fillRect(0, 0, 32, 8);
+  ctx.fillRect(8, 8, 8, 2);
   ctx.fillStyle = '#ffffff'; ctx.fillRect(9, 11, 2, 2); ctx.fillRect(13, 11, 2, 2);
-  ctx.fillStyle = '#a855f7'; ctx.fillRect(10, 11, 1, 2); ctx.fillRect(13, 11, 1, 2);
-  // 胴体（黒＆紫）
+  ctx.fillStyle = '#c084fc'; ctx.fillRect(10, 11, 1, 2); ctx.fillRect(13, 11, 1, 2);
   ctx.fillStyle = '#1e1b4b'; ctx.fillRect(16, 16, 24, 16);
-  ctx.fillStyle = '#7e22ce'; ctx.fillRect(22, 20, 4, 12);
-  // 腕・脚
+  ctx.fillStyle = '#9333ea'; ctx.fillRect(22, 20, 4, 12);
   ctx.fillStyle = '#312e81'; ctx.fillRect(40, 16, 16, 16); ctx.fillRect(32, 48, 16, 16);
   ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 16, 16, 16); ctx.fillRect(16, 48, 16, 16);
   skinTexture.needsUpdate = true;
@@ -908,14 +1141,12 @@ function loadSkinFromMCID(silent = false) {
 
   const img = new Image();
   img.crossOrigin = 'Anonymous';
-  // Minotar APIはCORS対応で高速にスキンを返す
   img.src = `https://minotar.net/skin/${encodeURIComponent(mcid)}`;
 
   img.onload = () => {
     const ctx = currentSkinCanvas.getContext('2d');
     ctx.clearRect(0, 0, 64, 64);
     ctx.drawImage(img, 0, 0);
-    // 旧64x32スキン対応
     if (img.height === 32) {
       ctx.drawImage(img, 0, 16, 16, 16, 16, 48, 16, 16);
       ctx.drawImage(img, 40, 16, 16, 16, 32, 48, 16, 16);
@@ -924,7 +1155,7 @@ function loadSkinFromMCID(silent = false) {
     if (!silent) showToast(`${mcid} のスキンを読み込みました！`);
   };
   img.onerror = () => {
-    if (!silent) showToast('スキンの取得に失敗しました（MCIDを確認してください）', true);
+    if (!silent) showToast('スキン取得失敗（MCIDを確認してください）', true);
   };
 }
 
@@ -950,14 +1181,12 @@ function loadSkinFromFile(e) {
   reader.readAsDataURL(file);
 }
 
-// MinecraftスキンUV設定ヘルパー
 function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
   const scale = isOverlay ? 1.07 : 1.0;
   const geo = new THREE.BoxGeometry(w * scale, h * scale, d * scale);
   const uvAttr = geo.attributes.uv;
-
-  // BoxGeometryの面順: Right(+X), Left(-X), Top(+Y), Bottom(-Y), Front(+Z), Back(-Z)
   const texW = 64, texH = 64;
+
   function setFaceUV(faceIdx, x, y, width, height) {
     const u0 = x / texW;
     const v1 = 1 - y / texH;
@@ -970,14 +1199,12 @@ function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
     uvAttr.setXY(idx + 3, u1, v0);
   }
 
-  // Minecraft スキン展開図レイアウト
-  setFaceUV(0, uvX, uvY + d, d, h);                 // Right
-  setFaceUV(1, uvX + d + w, uvY + d, d, h);         // Left
-  setFaceUV(2, uvX + d, uvY, w, d);                 // Top
-  setFaceUV(3, uvX + d + w, uvY, w, d);             // Bottom
-  setFaceUV(4, uvX + d, uvY + d, w, h);             // Front
-  setFaceUV(5, uvX + d + w + d, uvY + d, w, h);     // Back
-
+  setFaceUV(0, uvX, uvY + d, d, h);
+  setFaceUV(1, uvX + d + w, uvY + d, d, h);
+  setFaceUV(2, uvX + d, uvY, w, d);
+  setFaceUV(3, uvX + d + w, uvY, w, d);
+  setFaceUV(4, uvX + d, uvY + d, w, h);
+  setFaceUV(5, uvX + d + w + d, uvY + d, w, h);
   uvAttr.needsUpdate = true;
 
   const mat = new THREE.MeshStandardMaterial({
@@ -989,46 +1216,32 @@ function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
     metalness: 0.05
   });
 
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
+  return new THREE.Mesh(geo, mat);
 }
 
 function rebuildPlayer() {
-  const oldPos = playerGroup ? playerGroup.position.clone() : new THREE.Vector3(0.75, 0, 0.3);
-  const oldRot = playerGroup ? playerGroup.rotation.clone() : new THREE.Euler(0, -0.45, 0);
-
   if (playerGroup) scene.remove(playerGroup);
 
   const isSlim = document.getElementById('arm-type').value === 'slim';
   const showHat = document.getElementById('toggle-hat').checked;
   const armW = isSlim ? 3 : 4;
-  const u = 0.0625; // 1ピクセル = 0.0625ユニット (16px = 1.0)
+  const u = 0.0625;
 
   playerGroup = new THREE.Group();
-  playerGroup.position.copy(oldPos);
-  playerGroup.rotation.copy(oldRot);
 
-  // 胴体 (8x12x4)
+  // 胴体
   bodyMesh = createSkinBox(8*u, 12*u, 4*u, 16, 16, false);
   bodyMesh.position.y = 18 * u;
   playerGroup.add(bodyMesh);
-  if (showHat) {
-    const jacket = createSkinBox(8*u, 12*u, 4*u, 16, 32, true);
-    bodyMesh.add(jacket);
-  }
+  if (showHat) bodyMesh.add(createSkinBox(8*u, 12*u, 4*u, 16, 32, true));
 
-  // 頭 (8x8x8)
+  // 頭
   headPivot = new THREE.Group();
   headPivot.position.set(0, 24 * u, 0);
   const headMesh = createSkinBox(8*u, 8*u, 8*u, 0, 0, false);
   headMesh.position.y = 4 * u;
   headPivot.add(headMesh);
-  if (showHat) {
-    const hat = createSkinBox(8*u, 8*u, 8*u, 32, 0, true);
-    headMesh.add(hat);
-  }
+  if (showHat) headMesh.add(createSkinBox(8*u, 8*u, 8*u, 32, 0, true));
   playerGroup.add(headPivot);
 
   // 右腕
@@ -1037,10 +1250,7 @@ function rebuildPlayer() {
   const rArmMesh = createSkinBox(armW*u, 12*u, 4*u, 40, 16, false);
   rArmMesh.position.y = -4 * u;
   rightArmPivot.add(rArmMesh);
-  if (showHat) {
-    const rSleeve = createSkinBox(armW*u, 12*u, 4*u, 40, 32, true);
-    rArmMesh.add(rSleeve);
-  }
+  if (showHat) rArmMesh.add(createSkinBox(armW*u, 12*u, 4*u, 40, 32, true));
   playerGroup.add(rightArmPivot);
 
   // 左腕
@@ -1049,10 +1259,7 @@ function rebuildPlayer() {
   const lArmMesh = createSkinBox(armW*u, 12*u, 4*u, 32, 48, false);
   lArmMesh.position.y = -4 * u;
   leftArmPivot.add(lArmMesh);
-  if (showHat) {
-    const lSleeve = createSkinBox(armW*u, 12*u, 4*u, 48, 48, true);
-    lArmMesh.add(lSleeve);
-  }
+  if (showHat) lArmMesh.add(createSkinBox(armW*u, 12*u, 4*u, 48, 48, true));
   playerGroup.add(leftArmPivot);
 
   // 右脚
@@ -1061,10 +1268,7 @@ function rebuildPlayer() {
   const rLegMesh = createSkinBox(4*u, 12*u, 4*u, 0, 16, false);
   rLegMesh.position.y = -6 * u;
   rightLegPivot.add(rLegMesh);
-  if (showHat) {
-    const rPants = createSkinBox(4*u, 12*u, 4*u, 0, 32, true);
-    rLegMesh.add(rPants);
-  }
+  if (showHat) rLegMesh.add(createSkinBox(4*u, 12*u, 4*u, 0, 32, true));
   playerGroup.add(rightLegPivot);
 
   // 左脚
@@ -1073,21 +1277,17 @@ function rebuildPlayer() {
   const lLegMesh = createSkinBox(4*u, 12*u, 4*u, 16, 48, false);
   lLegMesh.position.y = -6 * u;
   leftLegPivot.add(lLegMesh);
-  if (showHat) {
-    const lPants = createSkinBox(4*u, 12*u, 4*u, 0, 48, true);
-    lLegMesh.add(lPants);
-  }
+  if (showHat) lLegMesh.add(createSkinBox(4*u, 12*u, 4*u, 0, 48, true));
   playerGroup.add(leftLegPivot);
 
   scene.add(playerGroup);
-
   updateArmor();
   updateHeldItems();
   applyManualPose();
 }
 
 // ==========================================
-// 4. 装備（ネザライト/ダイヤ等）＆手持ちアイテム
+// 4. 防具＆手持ちアイテム
 // ==========================================
 function getArmorMaterial(type, enchant) {
   const styles = {
@@ -1102,12 +1302,11 @@ function getArmorMaterial(type, enchant) {
     metalness: s.metalness,
     roughness: s.roughness,
     emissive: enchant ? new THREE.Color(0x7e22ce) : new THREE.Color(0x000000),
-    emissiveIntensity: enchant ? 0.55 : 0
+    emissiveIntensity: enchant ? 0.6 : 0
   });
 }
 
 function updateArmor() {
-  // 既存防具削除
   Object.values(armorMeshes).flat().forEach(m => { if (m.parent) m.parent.remove(m); });
   armorMeshes = { helmet: [], chest: [], legs: [], boots: [] };
 
@@ -1118,18 +1317,15 @@ function updateArmor() {
   const u = 0.0625;
   const mat = getArmorMaterial(matType, enchant);
 
-  // ヘルメット
   if (document.getElementById('arm-helmet').checked) {
     const helm = new THREE.Mesh(new THREE.BoxGeometry(9*u, 9*u, 9*u), mat);
     helm.position.y = 4.2*u;
-    // 顔が見えるように前面下部を開ける装飾バイザー風
     const visor = new THREE.Mesh(new THREE.BoxGeometry(9.2*u, 2.5*u, 2*u), mat);
     visor.position.set(0, 7.5*u, 4*u);
     headPivot.add(helm, visor);
     armorMeshes.helmet.push(helm, visor);
   }
 
-  // チェストプレート
   if (document.getElementById('arm-chest').checked) {
     const chest = new THREE.Mesh(new THREE.BoxGeometry(8.8*u, 12.4*u, 4.8*u), mat);
     chest.position.y = 18*u;
@@ -1146,7 +1342,6 @@ function updateArmor() {
     armorMeshes.chest.push(chest, rShoulder, lShoulder);
   }
 
-  // レギンス
   if (document.getElementById('arm-legs').checked) {
     const belt = new THREE.Mesh(new THREE.BoxGeometry(8.5*u, 3.5*u, 4.5*u), mat);
     belt.position.y = 12.5*u;
@@ -1163,7 +1358,6 @@ function updateArmor() {
     armorMeshes.legs.push(belt, rLegArm, lLegArm);
   }
 
-  // ブーツ
   if (document.getElementById('arm-boots').checked) {
     const rBoot = new THREE.Mesh(new THREE.BoxGeometry(4.8*u, 4.5*u, 4.8*u), mat);
     rBoot.position.y = -10*u;
@@ -1177,39 +1371,32 @@ function updateArmor() {
   }
 }
 
-// 3D武器・PvPアイテム生成ビルダー
 function buildItemMesh(itemType) {
   const group = new THREE.Group();
   if (itemType === 'none') return group;
 
   if (itemType === 'netherite_sword' || itemType === 'diamond_sword') {
     const isNeth = itemType === 'netherite_sword';
-    const bladeCol = isNeth ? 0x443d44 : 0x2dd4bf;
-    const emissiveCol = isNeth ? 0x9333ea : 0x06b6d4;
-
     const bladeMat = new THREE.MeshStandardMaterial({
-      color: bladeCol, metalness: 0.85, roughness: 0.2,
-      emissive: emissiveCol, emissiveIntensity: 0.45
+      color: isNeth ? 0x443d44 : 0x2dd4bf,
+      metalness: 0.85, roughness: 0.2,
+      emissive: isNeth ? 0x9333ea : 0x06b6d4, emissiveIntensity: 0.5
     });
     const handleMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.8 });
-
-    // 柄・鍔・刀身
     const grip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, 0.06), handleMat);
     const guard = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.06, 0.08), bladeMat);
     guard.position.y = 0.12;
     const blade = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.72, 0.04), bladeMat);
     blade.position.y = 0.5;
-
     group.add(grip, guard, blade);
     group.rotation.x = Math.PI / 2.2;
     group.position.set(0, -0.58, 0.15);
   }
   else if (itemType === 'mace') {
-    // 重厚なメイス（ハンドル＋ヘビーコアヘッド）
     const rodMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.6, roughness: 0.4 });
     const headMat = new THREE.MeshStandardMaterial({
       color: 0x334155, metalness: 0.9, roughness: 0.2,
-      emissive: 0xa855f7, emissiveIntensity: 0.6
+      emissive: 0xa855f7, emissiveIntensity: 0.65
     });
     const rod = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.75, 0.06), rodMat);
     rod.position.y = 0.25;
@@ -1220,10 +1407,9 @@ function buildItemMesh(itemType) {
     group.position.set(0, -0.58, 0.15);
   }
   else if (itemType === 'totem') {
-    // 不死のトーテム
     const goldMat = new THREE.MeshStandardMaterial({
       color: 0xfacc15, metalness: 0.85, roughness: 0.2,
-      emissive: 0xca8a04, emissiveIntensity: 0.35
+      emissive: 0xca8a04, emissiveIntensity: 0.4
     });
     const gemMat = new THREE.MeshStandardMaterial({
       color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.8
@@ -1237,7 +1423,6 @@ function buildItemMesh(itemType) {
     group.position.set(0, -0.62, 0.15);
   }
   else if (itemType === 'crystal') {
-    // 手持ちエンドクリスタル
     const cMat = new THREE.MeshStandardMaterial({
       color: 0xf472b6, emissive: 0xdb2777, emissiveIntensity: 0.8, transparent: true, opacity: 0.9
     });
@@ -1255,7 +1440,6 @@ function buildItemMesh(itemType) {
     group.add(blk);
     group.position.set(0, -0.65, 0.15);
   }
-
   return group;
 }
 
@@ -1271,31 +1455,27 @@ function updateHeldItems() {
 }
 
 // ==========================================
-// 5. 巨大3Dエンドクリスタル構築
+// 5. 巨大3Dエンドクリスタル
 // ==========================================
 function createEndCrystal() {
   crystalGroup = new THREE.Group();
 
-  // 中心ピンクコア
   const coreMat = new THREE.MeshStandardMaterial({
     color: 0xff77e9,
     emissive: 0xe11d48,
-    emissiveIntensity: 0.85,
+    emissiveIntensity: 0.9,
     roughness: 0.1,
     metalness: 0.3
   });
   crystalInner = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), coreMat);
 
-  // 外側ガラスフレーム1 & 2
-  const glassMat = new THREE.MeshPhysicalMaterial({
+  const glassMat = new THREE.MeshBasicMaterial({
     color: 0xfbcfe8,
     transparent: true,
-    opacity: 0.45,
-    roughness: 0.1,
-    metalness: 0.1,
+    opacity: 0.35,
     side: THREE.DoubleSide
   });
-  const wireMat = new THREE.LineBasicMaterial({ color: 0xf472b6, linewidth: 2 });
+  const wireMat = new THREE.LineBasicMaterial({ color: 0xf472b6 });
 
   const boxGeo1 = new THREE.BoxGeometry(0.75, 0.75, 0.75);
   crystalOuter1 = new THREE.Mesh(boxGeo1, glassMat);
@@ -1330,10 +1510,12 @@ function updateCrystal() {
 }
 
 // ==========================================
-// 6. ポーズ制御＆Montageテンプレート一括適用
+// 6. ポーズ制御＆テンプレート一括適用
 // ==========================================
 function applyManualPose() {
   const deg = Math.PI / 180;
+  const px = parseFloat(document.getElementById('player-pos-x').value);
+  const py = parseFloat(document.getElementById('player-pos-y').value);
   const hx = parseFloat(document.getElementById('pose-head-x').value);
   const hy = parseFloat(document.getElementById('pose-head-y').value);
   const rax = parseFloat(document.getElementById('pose-rarm-x').value);
@@ -1343,6 +1525,8 @@ function applyManualPose() {
   const llx = parseFloat(document.getElementById('pose-lleg-x').value);
   const by = parseFloat(document.getElementById('pose-body-y').value);
 
+  document.getElementById('val-ppos-x').textContent = px.toFixed(2);
+  document.getElementById('val-ppos-y').textContent = py.toFixed(2);
   document.getElementById('val-head-x').textContent = hx;
   document.getElementById('val-head-y').textContent = hy;
   document.getElementById('val-rarm-x').textContent = rax;
@@ -1352,6 +1536,7 @@ function applyManualPose() {
   document.getElementById('val-lleg-x').textContent = llx;
   document.getElementById('val-body-y').textContent = by;
 
+  playerGroup.position.set(px, py, 0.45);
   headPivot.rotation.set(hx * deg, hy * deg, 0);
   rightArmPivot.rotation.set(rax * deg, 0, raz * deg);
   leftArmPivot.rotation.set(lax * deg, 0, 12 * deg);
@@ -1361,10 +1546,12 @@ function applyManualPose() {
 }
 
 function resetPose() {
-  setPoseSliders(0, 0, 0, 0, 0, 0, 0, 0);
+  setPoseSliders(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
-function setPoseSliders(hx, hy, rax, raz, lax, rlx, llx, by) {
+function setPoseSliders(px, py, hx, hy, rax, raz, lax, rlx, llx, by) {
+  document.getElementById('player-pos-x').value = px;
+  document.getElementById('player-pos-y').value = py;
   document.getElementById('pose-head-x').value = hx;
   document.getElementById('pose-head-y').value = hy;
   document.getElementById('pose-rarm-x').value = rax;
@@ -1376,6 +1563,25 @@ function setPoseSliders(hx, hy, rax, raz, lax, rlx, llx, by) {
   applyManualPose();
 }
 
+function setTextParams(subTxt, subX, subY, subRot, subSize, subC1, subC2, mainTxt, mainX, mainY, mainRot, mainSize, mainC1, mainC2) {
+  document.getElementById('text-sub').value = subTxt;
+  document.getElementById('sub-x').value = subX;
+  document.getElementById('sub-y').value = subY;
+  document.getElementById('sub-rot').value = subRot;
+  document.getElementById('sub-size').value = subSize;
+  document.getElementById('sub-col1').value = subC1;
+  document.getElementById('sub-col2').value = subC2;
+
+  document.getElementById('text-main').value = mainTxt;
+  document.getElementById('main-x').value = mainX;
+  document.getElementById('main-y').value = mainY;
+  document.getElementById('main-rot').value = mainRot;
+  document.getElementById('main-size').value = mainSize;
+  document.getElementById('main-col1').value = mainC1;
+  document.getElementById('main-col2').value = mainC2;
+  updateTextOverlays();
+}
+
 function applyTemplate(tplName, cardEl) {
   if (cardEl) {
     document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
@@ -1383,11 +1589,7 @@ function applyTemplate(tplName, cardEl) {
   }
 
   if (tplName === 'cpvp_classic') {
-    // 添付画像風: 右手前にネザライト装備プレイヤー、左奥に巨大クリスタル、手前にCPVP MONTAGE
-    playerGroup.position.set(1.05, 0, 0.5);
-    camera.position.set(1.3, 2.0, 4.3);
-    controls.target.set(-0.2, 1.4, 0);
-
+    camState = { theta: 0.28, phi: 1.40, radius: 4.3, targetX: -0.15, targetY: 1.4, targetZ: 0 };
     document.getElementById('arm-material').value = 'netherite';
     document.getElementById('arm-helmet').checked = false;
     document.getElementById('arm-chest').checked = true;
@@ -1404,19 +1606,14 @@ function applyTemplate(tplName, cardEl) {
     document.getElementById('crys-z').value = -1.4;
 
     document.getElementById('bg-preset').value = 'cpvp_sunset';
-    document.getElementById('text-main').value = 'MONTAGE';
-    document.getElementById('text-sub').value = 'CPVP';
-    document.getElementById('text-col1').value = '#67e8f9';
-    document.getElementById('text-col2').value = '#0284c7';
+    document.getElementById('fx-speed-val').value = 0.25;
+    document.getElementById('fx-glow-color').value = '#e879f9';
 
-    setPoseSliders(-8, 15, -60, -18, -35, 25, -25, -28);
+    setTextParams('CPVP', 58, 14, 10, 68, '#e0f2fe', '#7dd3fc', 'MONTAGE', 12, 65, -3, 98, '#67e8f9', '#0284c7');
+    setPoseSliders(1.05, 0, -8, 15, -60, -18, -35, 25, -25, -28);
   }
   else if (tplName === 'mace_smash') {
-    // メイス強襲アングル
-    playerGroup.position.set(0.3, 0.4, 0.4);
-    camera.position.set(-1.6, 1.1, 3.8);
-    controls.target.set(0, 1.5, 0);
-
+    camState = { theta: -0.35, phi: 1.52, radius: 4.0, targetX: 0, targetY: 1.5, targetZ: 0 };
     document.getElementById('arm-material').value = 'netherite';
     document.getElementById('arm-helmet').checked = true;
     document.getElementById('arm-chest').checked = true;
@@ -1427,24 +1624,19 @@ function applyTemplate(tplName, cardEl) {
 
     document.getElementById('show-crystal').checked = true;
     document.getElementById('crys-scale').value = 1.6;
-    document.getElementById('crys-x').value = 1.8;
+    document.getElementById('crys-x').value = 1.7;
     document.getElementById('crys-y').value = 1.4;
-    document.getElementById('crys-z').value = -1.5;
+    document.getElementById('crys-z').value = -1.4;
 
     document.getElementById('bg-preset').value = 'end_void';
-    document.getElementById('text-main').value = 'MACE PVP';
-    document.getElementById('text-sub').value = 'MONTAGE';
-    document.getElementById('text-col1').value = '#f0abfc';
-    document.getElementById('text-col2').value = '#9333ea';
+    document.getElementById('fx-speed-val').value = 0.55;
+    document.getElementById('fx-glow-color').value = '#a855f7';
 
-    setPoseSliders(15, -15, -145, -10, 40, -35, 35, 22);
+    setTextParams('MACE', 15, 16, -8, 72, '#f5d0fe', '#c084fc', 'MONTAGE', 18, 66, -2, 94, '#e879f9', '#7e22ce');
+    setPoseSliders(0.35, 0.35, 15, -15, -145, -10, 40, -35, 35, 22);
   }
   else if (tplName === 'crystal_pop') {
-    // クリスタル爆破
-    playerGroup.position.set(-0.8, 0, 0.4);
-    camera.position.set(0.5, 1.8, 4.1);
-    controls.target.set(0.2, 1.4, 0);
-
+    camState = { theta: 0.15, phi: 1.42, radius: 4.1, targetX: 0.15, targetY: 1.4, targetZ: 0 };
     document.getElementById('arm-material').value = 'netherite';
     document.getElementById('arm-helmet').checked = false;
     document.getElementById('arm-chest').checked = true;
@@ -1460,19 +1652,14 @@ function applyTemplate(tplName, cardEl) {
     document.getElementById('crys-z').value = 0.2;
 
     document.getElementById('bg-preset').value = 'nether_crimson';
-    document.getElementById('text-main').value = 'CRYSTAL';
-    document.getElementById('text-sub').value = '#1';
-    document.getElementById('text-col1').value = '#fda4af';
-    document.getElementById('text-col2').value = '#e11d48';
+    document.getElementById('fx-speed-val').value = 0.45;
+    document.getElementById('fx-glow-color').value = '#f43f5e';
 
-    setPoseSliders(-5, -35, -85, 10, -45, 30, -20, 45);
+    setTextParams('#1', 68, 12, 12, 82, '#fecdd3', '#fb7185', 'CRYSTAL', 10, 66, -4, 96, '#fda4af', '#e11d48');
+    setPoseSliders(-0.85, 0, -5, -35, -85, 10, -45, 30, -20, 45);
   }
   else if (tplName === 'totem_clutch') {
-    // トーテム発動
-    playerGroup.position.set(0.4, 0.2, 0.5);
-    camera.position.set(0.9, 1.7, 3.8);
-    controls.target.set(0, 1.5, 0);
-
+    camState = { theta: 0.22, phi: 1.44, radius: 3.9, targetX: 0, targetY: 1.5, targetZ: 0 };
     document.getElementById('arm-material').value = 'diamond';
     document.getElementById('arm-helmet').checked = false;
     document.getElementById('arm-chest').checked = true;
@@ -1483,19 +1670,14 @@ function applyTemplate(tplName, cardEl) {
     document.getElementById('show-crystal').checked = false;
 
     document.getElementById('bg-preset').value = 'cpvp_sunset';
-    document.getElementById('text-main').value = 'CLUTCH';
-    document.getElementById('text-sub').value = 'MONTAGE';
-    document.getElementById('text-col1').value = '#fef08a';
-    document.getElementById('text-col2').value = '#eab308';
+    document.getElementById('fx-speed-val').value = 0.35;
+    document.getElementById('fx-glow-color').value = '#facc15';
 
-    setPoseSliders(-20, 10, -110, -25, -105, -20, 25, -15);
+    setTextParams('TOTEM', 55, 16, 6, 64, '#fef9c3', '#fde047', 'CLUTCH', 16, 65, -3, 98, '#fef08a', '#eab308');
+    setPoseSliders(0.35, 0.15, -20, 10, -110, -25, -105, -20, 25, -15);
   }
   else if (tplName === 'sword_duel') {
-    // ソードPvP
-    playerGroup.position.set(0.7, 0, 0.4);
-    camera.position.set(-0.6, 2.2, 4.0);
-    controls.target.set(0.2, 1.4, 0);
-
+    camState = { theta: -0.18, phi: 1.32, radius: 4.1, targetX: 0.15, targetY: 1.4, targetZ: 0 };
     document.getElementById('arm-material').value = 'diamond';
     document.getElementById('arm-helmet').checked = true;
     document.getElementById('arm-chest').checked = true;
@@ -1506,19 +1688,14 @@ function applyTemplate(tplName, cardEl) {
     document.getElementById('show-crystal').checked = false;
 
     document.getElementById('bg-preset').value = 'cyber_blue';
-    document.getElementById('text-main').value = 'SWORD PVP';
-    document.getElementById('text-sub').value = 'HIGHLIGHTS';
-    document.getElementById('text-col1').value = '#bae6fd';
-    document.getElementById('text-col2').value = '#0284c7';
+    document.getElementById('fx-speed-val').value = 0.2;
+    document.getElementById('fx-glow-color').value = '#38bdf8';
 
-    setPoseSliders(10, 25, -45, -15, 25, 20, -20, -35);
+    setTextParams('SWORD', 14, 16, -6, 64, '#e0f2fe', '#7dd3fc', 'PVP #1', 14, 65, -2, 96, '#bae6fd', '#0284c7');
+    setPoseSliders(0.65, 0, 10, 25, -45, -15, 25, 20, -20, -35);
   }
   else if (tplName === 'clean_render') {
-    // 装備なしスキン立ち姿
-    playerGroup.position.set(0, 0, 0);
-    camera.position.set(0.8, 1.7, 3.8);
-    controls.target.set(0, 1.35, 0);
-
+    camState = { theta: 0.2, phi: 1.45, radius: 3.9, targetX: 0, targetY: 1.35, targetZ: 0 };
     document.getElementById('arm-helmet').checked = false;
     document.getElementById('arm-chest').checked = false;
     document.getElementById('arm-legs').checked = false;
@@ -1526,60 +1703,107 @@ function applyTemplate(tplName, cardEl) {
     document.getElementById('right-item').value = 'none';
     document.getElementById('left-item').value = 'none';
     document.getElementById('show-crystal').checked = false;
-
     document.getElementById('bg-preset').value = 'transparent';
-    setPoseSliders(-5, 10, -15, -8, 15, 10, -10, -15);
+    document.getElementById('fx-speed-val').value = 0;
+
+    setPoseSliders(0, 0, -5, 10, -15, -8, 15, 10, -10, -15);
   }
 
+  updateCameraPosition();
   updateEnvironment();
   updateArmor();
   updateHeldItems();
   updateCrystal();
-  updateTextOverlays();
-  controls.update();
+  updateScreenFX();
 }
 
 function resetCamera() {
-  camera.position.set(1.3, 2.0, 4.3);
-  controls.target.set(-0.2, 1.4, 0);
-  controls.update();
+  camState = { theta: 0.28, phi: 1.40, radius: 4.3, targetX: -0.15, targetY: 1.4, targetZ: 0 };
+  updateCameraPosition();
 }
 
 // ==========================================
-// 7. 3D風テキスト＆画像オーバーレイ制御
+// 7. 文字・角度・画面エフェクト・画像オーバーレイ
 // ==========================================
 function updateTextOverlays() {
-  const show = document.getElementById('toggle-text').checked;
-  const mainEl = document.getElementById('overlay-main');
   const subEl = document.getElementById('overlay-sub');
+  const mainEl = document.getElementById('overlay-main');
 
-  mainEl.style.display = show ? 'block' : 'none';
-  subEl.style.display = show ? 'block' : 'none';
-
-  mainEl.textContent = document.getElementById('text-main').value;
+  // サブテキスト
+  subEl.style.display = document.getElementById('show-sub').checked ? 'block' : 'none';
   subEl.textContent = document.getElementById('text-sub').value;
+  const subSize = document.getElementById('sub-size').value;
+  const subX = document.getElementById('sub-x').value;
+  const subY = document.getElementById('sub-y').value;
+  const subRot = document.getElementById('sub-rot').value;
+  const subSkew = document.getElementById('sub-skew').value;
+  const subC1 = document.getElementById('sub-col1').value;
+  const subC2 = document.getElementById('sub-col2').value;
+  const subSh = document.getElementById('sub-shadow').value;
 
-  const c1 = document.getElementById('text-col1').value;
-  const c2 = document.getElementById('text-col2').value;
-  const sh = document.getElementById('text-shadow-col').value;
+  document.getElementById('sub-size-val').textContent = subSize;
+  document.getElementById('sub-x-val').textContent = subX;
+  document.getElementById('sub-y-val').textContent = subY;
+  document.getElementById('sub-rot-val').textContent = subRot + '°';
+  document.getElementById('sub-skew-val').textContent = subSkew + '°';
 
-  const mainSize = document.getElementById('text-main-size').value;
-  const subSize = document.getElementById('text-sub-size').value;
-  document.getElementById('text-main-size-val').textContent = mainSize;
-  document.getElementById('text-sub-size-val').textContent = subSize;
+  subEl.style.fontSize = subSize + 'px';
+  subEl.style.left = subX + '%';
+  subEl.style.top = subY + '%';
+  subEl.style.transform = `rotate(${subRot}deg) skewX(${subSkew}deg)`;
+  subEl.style.background = `linear-gradient(180deg, ${subC1} 20%, ${subC2} 90%)`;
+  subEl.style.webkitBackgroundClip = 'text';
+  subEl.style.webkitTextFillColor = 'transparent';
+  subEl.style.filter = `drop-shadow(0px 3px 0px ${subSh}) drop-shadow(0px 6px 0px ${subSh}) drop-shadow(0px 10px 14px rgba(0,0,0,0.85))`;
+  subEl.dataset.rot = subRot;
+  subEl.dataset.skew = subSkew;
 
-  [mainEl, subEl].forEach((el, idx) => {
-    el.style.fontSize = (idx === 0 ? mainSize : subSize) + 'px';
-    el.style.background = `linear-gradient(180deg, ${c1} 20%, ${c2} 90%)`;
-    el.style.webkitBackgroundClip = 'text';
-    el.style.webkitTextFillColor = 'transparent';
-    // 3D押し出し風の多重ドロップシャドウ
-    el.style.filter = `
-      drop-shadow(0px 3px 0px ${sh})
-      drop-shadow(0px 6px 0px ${sh})
-      drop-shadow(0px 10px 15px rgba(0,0,0,0.85))
-    `;
-  });
+  // メインテキスト
+  mainEl.style.display = document.getElementById('show-main').checked ? 'block' : 'none';
+  mainEl.textContent = document.getElementById('text-main').value;
+  const mainSize = document.getElementById('main-size').value;
+  const mainX = document.getElementById('main-x').value;
+  const mainY = document.getElementById('main-y').value;
+  const mainRot = document.getElementById('main-rot').value;
+  const mainSkew = document.getElementById('main-skew').value;
+  const mainC1 = document.getElementById('main-col1').value;
+  const mainC2 = document.getElementById('main-col2').value;
+  const mainSh = document.getElementById('main-shadow').value;
+
+  document.getElementById('main-size-val').textContent = mainSize;
+  document.getElementById('main-x-val').textContent = mainX;
+  document.getElementById('main-y-val').textContent = mainY;
+  document.getElementById('main-rot-val').textContent = mainRot + '°';
+  document.getElementById('main-skew-val').textContent = mainSkew + '°';
+
+  mainEl.style.fontSize = mainSize + 'px';
+  mainEl.style.left = mainX + '%';
+  mainEl.style.top = mainY + '%';
+  mainEl.style.transform = `rotate(${mainRot}deg) skewX(${mainSkew}deg)`;
+  mainEl.style.background = `linear-gradient(180deg, ${mainC1} 20%, ${mainC2} 90%)`;
+  mainEl.style.webkitBackgroundClip = 'text';
+  mainEl.style.webkitTextFillColor = 'transparent';
+  mainEl.style.filter = `drop-shadow(0px 4px 0px ${mainSh}) drop-shadow(0px 8px 0px ${mainSh}) drop-shadow(0px 12px 16px rgba(0,0,0,0.9))`;
+  mainEl.dataset.rot = mainRot;
+  mainEl.dataset.skew = mainSkew;
+}
+
+function updateScreenFX() {
+  const speedOp = parseFloat(document.getElementById('fx-speed-val').value);
+  const vigOp = parseFloat(document.getElementById('fx-vig-val').value);
+  const glowOp = parseFloat(document.getElementById('fx-glow-val').value);
+  const glowCol = document.getElementById('fx-glow-color').value;
+
+  document.getElementById('fx-speed-disp').textContent = speedOp.toFixed(2);
+  document.getElementById('fx-vig-disp').textContent = vigOp.toFixed(2);
+  document.getElementById('fx-glow-disp').textContent = glowOp.toFixed(2);
+
+  document.getElementById('fx-speedlines').style.opacity = speedOp;
+  document.getElementById('fx-vignette').style.opacity = vigOp;
+
+  const glowEl = document.getElementById('fx-glow-overlay');
+  glowEl.style.opacity = glowOp;
+  glowEl.style.background = `radial-gradient(circle at 28% 35%, ${glowCol}99, transparent 62%)`;
 }
 
 function addCustomImage(event) {
@@ -1594,13 +1818,13 @@ function addCustomImage(event) {
     img.style.top = '25%';
     img.style.width = '200px';
     img.dataset.rot = '0';
-    img.dataset.glow = '10';
-    img.style.filter = 'drop-shadow(0 0 10px rgba(232,121,249,0.8))';
+    img.dataset.glow = '12';
+    img.style.filter = 'drop-shadow(0 0 12px rgba(232,121,249,0.85))';
 
     document.getElementById('overlay-layer').appendChild(img);
     makeElementDraggable(img);
     selectOverlayElement(img);
-    showToast('画像を追加しました！ドラッグで位置を動かせます');
+    showToast('画像を追加しました！ドラッグ移動できます');
   };
   reader.readAsDataURL(file);
   event.target.value = '';
@@ -1615,9 +1839,9 @@ function selectOverlayElement(el) {
     document.getElementById('img-scale').value = parseInt(el.style.width) || 200;
     document.getElementById('img-scale-val').textContent = parseInt(el.style.width) || 200;
     document.getElementById('img-rot').value = el.dataset.rot || 0;
-    document.getElementById('img-rot-val').textContent = el.dataset.rot || 0;
-    document.getElementById('img-glow').value = el.dataset.glow || 10;
-    document.getElementById('img-glow-val').textContent = el.dataset.glow || 10;
+    document.getElementById('img-rot-val').textContent = (el.dataset.rot || 0) + '°';
+    document.getElementById('img-glow').value = el.dataset.glow || 12;
+    document.getElementById('img-glow-val').textContent = el.dataset.glow || 12;
   } else {
     document.getElementById('selected-img-controls').style.display = 'none';
   }
@@ -1630,7 +1854,7 @@ function updateSelectedImage() {
   const g = document.getElementById('img-glow').value;
 
   document.getElementById('img-scale-val').textContent = w;
-  document.getElementById('img-rot-val').textContent = r;
+  document.getElementById('img-rot-val').textContent = r + '°';
   document.getElementById('img-glow-val').textContent = g;
 
   selectedOverlayEl.style.width = w + 'px';
@@ -1651,32 +1875,56 @@ function deleteSelectedImage() {
 
 function initDraggableOverlays() {
   document.querySelectorAll('.draggable-item').forEach(makeElementDraggable);
-  document.getElementById('three-canvas').addEventListener('mousedown', () => selectOverlayElement(null));
 }
 
 function makeElementDraggable(el) {
   let isDragging = false, startX, startY, origLeft, origTop;
 
-  el.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
+  const onStart = (clientX, clientY) => {
     isDragging = true;
     selectOverlayElement(el);
-    startX = e.clientX;
-    startY = e.clientY;
+    startX = clientX;
+    startY = clientY;
     origLeft = el.offsetLeft;
     origTop = el.offsetTop;
-  });
+  };
 
-  window.addEventListener('mousemove', (e) => {
+  const onMove = (clientX, clientY) => {
     if (!isDragging) return;
     const box = document.getElementById('preview-box');
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    el.style.left = ((origLeft + dx) / box.clientWidth * 100) + '%';
-    el.style.top = ((origTop + dy) / box.clientHeight * 100) + '%';
-  });
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    const pctX = Math.round((origLeft + dx) / box.clientWidth * 100);
+    const pctY = Math.round((origTop + dy) / box.clientHeight * 100);
+    el.style.left = pctX + '%';
+    el.style.top = pctY + '%';
 
+    // スライダー側とも数値同期
+    if (el.id === 'overlay-sub') {
+      document.getElementById('sub-x').value = pctX;
+      document.getElementById('sub-y').value = pctY;
+      document.getElementById('sub-x-val').textContent = pctX;
+      document.getElementById('sub-y-val').textContent = pctY;
+    } else if (el.id === 'overlay-main') {
+      document.getElementById('main-x').value = pctX;
+      document.getElementById('main-y').value = pctY;
+      document.getElementById('main-x-val').textContent = pctX;
+      document.getElementById('main-y-val').textContent = pctY;
+    }
+  };
+
+  el.addEventListener('mousedown', (e) => { e.stopPropagation(); onStart(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
   window.addEventListener('mouseup', () => { isDragging = false; });
+
+  el.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+    if (e.touches.length === 1) onStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (isDragging && e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  window.addEventListener('touchend', () => { isDragging = false; });
 }
 
 // ==========================================
@@ -1686,7 +1934,6 @@ function exportThumbnail() {
   selectOverlayElement(null);
   const outW = 1920, outH = 1080;
 
-  // 1. 3Dシーンを1920x1080でレンダリング
   renderer.setSize(outW, outH, false);
   renderer.render(scene, camera);
 
@@ -1695,15 +1942,44 @@ function exportThumbnail() {
   exportCanvas.height = outH;
   const ctx = exportCanvas.getContext('2d');
 
-  // 3Dキャンバス転写
+  // 1. 3Dシーン転写
   ctx.drawImage(renderer.domElement, 0, 0, outW, outH);
 
-  // プレビュー枠との比率
+  // 2. 画面エフェクト（グロー＆ビネット）合成
+  const isTransparent = document.getElementById('bg-preset').value === 'transparent';
+  if (!isTransparent) {
+    const glowOp = parseFloat(document.getElementById('fx-glow-val').value);
+    const glowCol = document.getElementById('fx-glow-color').value;
+    if (glowOp > 0) {
+      ctx.save();
+      ctx.globalAlpha = glowOp;
+      ctx.globalCompositeOperation = 'screen';
+      const g = ctx.createRadialGradient(outW * 0.28, outH * 0.35, 10, outW * 0.28, outH * 0.35, outW * 0.6);
+      g.addColorStop(0, glowCol);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, outW, outH);
+      ctx.restore();
+    }
+
+    const vigOp = parseFloat(document.getElementById('fx-vig-val').value);
+    if (vigOp > 0) {
+      ctx.save();
+      ctx.globalAlpha = vigOp;
+      const vg = ctx.createRadialGradient(outW/2, outH/2, outW*0.25, outW/2, outH/2, outW*0.65);
+      vg.addColorStop(0, 'transparent');
+      vg.addColorStop(1, 'rgba(0,0,0,0.85)');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, outW, outH);
+      ctx.restore();
+    }
+  }
+
   const previewBox = document.getElementById('preview-box');
   const scaleX = outW / previewBox.clientWidth;
   const scaleY = outH / previewBox.clientHeight;
 
-  // 2. カスタム画像オーバーレイの合成
+  // 3. カスタム画像オーバーレイ合成
   document.querySelectorAll('.custom-overlay-img').forEach(img => {
     const rect = img.getBoundingClientRect();
     const boxRect = previewBox.getBoundingClientRect();
@@ -1724,52 +2000,60 @@ function exportThumbnail() {
     ctx.restore();
   });
 
-  // 3. 3D風Montageテキストの合成
-  if (document.getElementById('toggle-text').checked) {
-    const c1 = document.getElementById('text-col1').value;
-    const c2 = document.getElementById('text-col2').value;
-    const sh = document.getElementById('text-shadow-col').value;
+  // 4. 3D風テキスト合成（回転・傾き・色反映）
+  const textConfigs = [
+    { id: 'overlay-sub', show: 'show-sub', c1: 'sub-col1', c2: 'sub-col2', sh: 'sub-shadow' },
+    { id: 'overlay-main', show: 'show-main', c1: 'main-col1', c2: 'main-col2', sh: 'main-shadow' }
+  ];
 
-    ['overlay-sub', 'overlay-main'].forEach(id => {
-      const el = document.getElementById(id);
-      const text = el.textContent;
-      if (!text) return;
+  textConfigs.forEach(cfg => {
+    if (!document.getElementById(cfg.show).checked) return;
+    const el = document.getElementById(cfg.id);
+    const text = el.textContent;
+    if (!text) return;
 
-      const rect = el.getBoundingClientRect();
-      const boxRect = previewBox.getBoundingClientRect();
-      const fontSize = parseFloat(el.style.fontSize) * scaleX;
-      const x = (rect.left - boxRect.left) * scaleX;
-      const y = (rect.top - boxRect.top) * scaleY + fontSize * 0.85;
+    const rect = el.getBoundingClientRect();
+    const boxRect = previewBox.getBoundingClientRect();
+    const fontSize = parseFloat(el.style.fontSize) * scaleX;
+    const cx = (rect.left - boxRect.left + rect.width / 2) * scaleX;
+    const cy = (rect.top - boxRect.top + rect.height / 2) * scaleY;
+    const rot = (parseFloat(el.dataset.rot) || 0) * Math.PI / 180;
+    const skew = Math.tan((parseFloat(el.dataset.skew) || 0) * Math.PI / 180);
 
-      ctx.save();
-      ctx.font = `italic 900 ${fontSize}px 'Montserrat', 'Noto Sans JP', sans-serif`;
+    const c1 = document.getElementById(cfg.c1).value;
+    const c2 = document.getElementById(cfg.c2).value;
+    const sh = document.getElementById(cfg.sh).value;
 
-      // 立体的な黒/濃紺の縁取りと押し出し影
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = fontSize * 0.14;
-      ctx.strokeStyle = sh;
-      ctx.strokeText(text, x, y + fontSize * 0.08);
-      ctx.strokeText(text, x, y);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.transform(1, 0, skew, 1, 0, 0);
 
-      // グラデーション塗り
-      const grad = ctx.createLinearGradient(0, y - fontSize * 0.8, 0, y + fontSize * 0.1);
-      grad.addColorStop(0.2, c1);
-      grad.addColorStop(0.9, c2);
-      ctx.fillStyle = grad;
-      ctx.fillText(text, x, y);
-      ctx.restore();
-    });
-  }
+    ctx.font = `italic 900 ${fontSize}px 'Montserrat', 'Noto Sans JP', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-  // 元サイズへ戻す
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = fontSize * 0.14;
+    ctx.strokeStyle = sh;
+    ctx.strokeText(text, 0, fontSize * 0.08);
+    ctx.strokeText(text, 0, 0);
+
+    const grad = ctx.createLinearGradient(0, -fontSize * 0.45, 0, fontSize * 0.45);
+    grad.addColorStop(0.2, c1);
+    grad.addColorStop(0.9, c2);
+    ctx.fillStyle = grad;
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  });
+
   renderer.setSize(1280, 720, false);
 
-  // ダウンロード発火
   const link = document.createElement('a');
   link.download = `mc_montage_${Date.now()}.png`;
   link.href = exportCanvas.toDataURL('image/png');
   link.click();
-  showToast('1920x1080 の高画質PNGを保存しました！');
+  showToast('1920x1080 PNG画像を保存しました！');
 }
 
 // ==========================================
@@ -1779,7 +2063,6 @@ function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
 
-  // エンドクリスタルの浮遊・回転アニメーション
   if (crystalGroup && crystalGroup.visible) {
     crystalInner.rotation.y = t * 1.4;
     crystalOuter1.rotation.x = t * 0.9;
@@ -1789,16 +2072,14 @@ function animate() {
     crystalInner.position.y = Math.sin(t * 2.5) * 0.08;
   }
 
-  // パーティクルの緩やかな上昇
   if (particleSystem && particleSystem.visible) {
     particleSystem.rotation.y = t * 0.05;
   }
 
-  controls.update();
   renderer.render(scene, camera);
 }
 
-window.onload = initThree;
+window.addEventListener('DOMContentLoaded', initThree);
 </script>
 </body>
 </html>
