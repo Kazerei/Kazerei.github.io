@@ -1,289 +1,1804 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PixelCode - 画像コード変換</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC PvP Montage 3D Thumbnail Studio</title>
 <style>
-:root{color-scheme:dark;--bg:#090c14;--panel:#141b2a;--line:#2b3850;--text:#edf2ff;--muted:#9ba9c2;--accent:#8b7cff;--green:#45d6a1;--red:#ff7181}
-*{box-sizing:border-box}body{margin:0;padding:22px;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:1050px;margin:auto}h1{margin:0;font-size:27px}.lead{margin:4px 0 20px;color:var(--muted)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{min-width:0;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:15px}
-h2{margin:0 0 13px;font-size:18px}.picker{display:block;padding:19px;text-align:center;border:1px dashed #657394;border-radius:11px;background:#0d1422;cursor:pointer}.picker:hover{border-color:var(--accent)}
-input[type=file]{display:none}.preview{min-height:190px;margin-top:12px;padding:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--line);border-radius:10px;background-color:#0e1420;background-image:linear-gradient(45deg,#263147 25%,transparent 25%),linear-gradient(-45deg,#263147 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#263147 75%),linear-gradient(-45deg,transparent 75%,#263147 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
-.preview img{display:block;max-width:100%;max-height:340px;object-fit:contain;image-rendering:auto}.placeholder{color:var(--muted);font-size:13px;text-align:center}
-.meta{margin-top:8px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
-textarea{display:block;width:100%;min-height:165px;margin-top:12px;padding:12px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:#090f1b;color:#e4ebff;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button{padding:10px 15px;border:0;border-radius:9px;background:var(--accent);color:white;font-weight:700;cursor:pointer}button.secondary{background:#2a3852}button:disabled{opacity:.45;cursor:not-allowed}
-.status{margin-top:10px;padding:10px 12px;border-radius:9px;background:#1c273b;color:var(--muted);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}.status.good{color:var(--green)}.status.bad{color:var(--red)}
-.note{margin-top:16px;color:var(--muted);font-size:12px}
-@media(max-width:760px){body{padding:13px}.grid{grid-template-columns:1fr}h1{font-size:23px}.panel{padding:14px}}
+  @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Montserrat:ital,wght@0,800;0,900;1,900&family=Noto+Sans+JP:wght@700;900&display=swap');
+
+  :root {
+    --bg-dark: #0f1117;
+    --panel-bg: #181b24;
+    --border: #2a2f3d;
+    --accent: #a855f7;
+    --accent-hover: #9333ea;
+    --cyan: #06b6d4;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* 左側サイドバー（コントロール） */
+  .sidebar {
+    width: 380px;
+    background: var(--panel-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    z-index: 10;
+  }
+
+  .header {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #1e1b4b, #3b0764);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    background: linear-gradient(to right, #38bdf8, #e879f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tabs {
+    display: flex;
+    background: #12141c;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 4px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: 0.2s;
+  }
+
+  .tab-btn.active {
+    color: #fff;
+    border-bottom-color: var(--accent);
+    background: rgba(168, 85, 247, 0.1);
+  }
+
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: none;
+  }
+
+  .tab-content.active { display: block; }
+
+  /* スクロールバー */
+  .tab-content::-webkit-scrollbar { width: 6px; }
+  .tab-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+  .section {
+    background: #12141c;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--cyan);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .row:last-child { margin-bottom: 0; }
+
+  label {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  input[type="text"], input[type="number"], select {
+    width: 100%;
+    background: #1e222d;
+    border: 1px solid #334155;
+    color: #fff;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+  }
+
+  input[type="text"]:focus, select:focus { border-color: var(--accent); }
+
+  input[type="color"] {
+    width: 36px;
+    height: 30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+
+  input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--accent-hover); }
+  .btn-secondary { background: #334155; }
+  .btn-secondary:hover { background: #475569; }
+  .btn-cyan { background: #0891b2; }
+  .btn-cyan:hover { background: #0e7490; }
+
+  .template-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tpl-card {
+    background: #1e222d;
+    border: 2px solid #2a2f3d;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s;
+  }
+
+  .tpl-card:hover { border-color: var(--cyan); }
+  .tpl-card.selected { border-color: var(--accent); background: rgba(168, 85, 247, 0.15); }
+  .tpl-card .tpl-name { font-size: 12px; font-weight: 900; margin-bottom: 3px; }
+  .tpl-card .tpl-desc { font-size: 10px; color: var(--text-dim); }
+
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #1e222d;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .check-item input { accent-color: var(--accent); }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .slider-row span:first-child { width: 75px; font-size: 11px; color: var(--text-dim); }
+  .slider-row span:last-child { width: 34px; font-size: 11px; text-align: right; font-family: monospace; }
+
+  /* メインキャンバスエリア */
+  .workspace {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #090a0f;
+    position: relative;
+  }
+
+  .toolbar {
+    height: 48px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+
+  .canvas-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-image: radial-gradient(#1e293b 1px, transparent 1px);
+    background-size: 20px 20px;
+    overflow: hidden;
+  }
+
+  /* 16:9 サムネイルプレビュー枠 */
+  #preview-box {
+    position: relative;
+    width: 100%;
+    max-width: 1120px;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    border: 2px solid #334155;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  #three-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* オーバーレイレイヤー（ドラッグ移動可能） */
+  #overlay-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .draggable-item {
+    position: absolute;
+    pointer-events: auto;
+    cursor: grab;
+    transform-origin: center center;
+  }
+  .draggable-item:active { cursor: grabbing; }
+  .draggable-item.selected-overlay { outline: 2px dashed #38bdf8; outline-offset: 4px; }
+
+  /* 3D風Montage文字スタイル */
+  .montage-text {
+    font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 0.95;
+    white-space: nowrap;
+    letter-spacing: -1px;
+  }
+
+  .badge-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  #status-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #10b981;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 999;
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>PixelCode</h1>
-  <p class="lead">画像を画質そのままコード化。コードから元ファイルを復元できます。</p>
 
-  <div class="grid">
-    <section class="panel">
-      <h2>① 画像を選択してコード化</h2>
-      <label class="picker" for="imageFile">画像を選択する<br><span class="meta">PNG / WebP / JPEG / GIF など</span></label>
-      <input id="imageFile" type="file" accept="image/*">
-      <div class="preview" id="sourcePreview"><span class="placeholder">ここに選択した画像が表示されます</span></div>
-      <div class="meta" id="sourceInfo">まだ画像は選択されていません。</div>
-      <div class="actions">
-        <button id="encodeButton" disabled>コードに変換</button>
-        <button id="copyButton" class="secondary" disabled>コードをコピー</button>
-      </div>
-      <textarea id="encodedCode" spellcheck="false" placeholder="変換後のコードがここに表示されます。"></textarea>
-      <div class="status" id="encodeStatus">まず画像を選択してください。</div>
-    </section>
-
-    <section class="panel">
-      <h2>② コードから画像を復元</h2>
-      <textarea id="inputCode" spellcheck="false" placeholder="PCD2: から始まるコードをここに貼り付けてください。"></textarea>
-      <div class="actions">
-        <button id="decodeButton">デコード</button>
-        <button id="saveButton" class="secondary" disabled>復元画像を保存</button>
-      </div>
-      <div class="preview" id="resultPreview"><span class="placeholder">復元した画像がここに表示されます</span></div>
-      <div class="meta" id="resultInfo">まだ画像は復元されていません。</div>
-      <div class="status" id="decodeStatus">コードを貼り付けて「デコード」を押してください。</div>
-    </section>
+<div class="sidebar">
+  <div class="header">
+    <h1>MC MONTAGE 3D STUDIO</h1>
+    <span style="font-size:10px; background:#a855f7; padding:2px 6px; border-radius:4px; font-weight:900;">PRO</span>
   </div>
 
-  <p class="note">画像ファイルの元データをそのまま可逆圧縮します。画像の再描画・リサイズ・減色は行いません。透過情報や元ファイルの画素データを保持します。Base64は使用しません。50,000文字を超えた場合も、画質を落とさずコードを表示します。</p>
-</main>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-tpl')">1. テンプレ</button>
+    <button class="tab-btn" onclick="switchTab('tab-skin')">2. スキン/装備</button>
+    <button class="tab-btn" onclick="switchTab('tab-pose')">3. ポーズ/3D</button>
+    <button class="tab-btn" onclick="switchTab('tab-text')">4. 文字/画像</button>
+  </div>
+
+  <!-- TAB 1: テンプレート -->
+  <div id="tab-tpl" class="tab-content active">
+    <div class="section">
+      <div class="section-title">Montage プリセット一括適用</div>
+      <div class="template-grid">
+        <div class="tpl-card selected" onclick="applyTemplate('cpvp_classic', this)">
+          <div class="tpl-name">CPVP MONTAGE</div>
+          <div class="tpl-desc">巨大クリスタル＋ネザライト構え＋立体ロゴ</div>
+        </div>
+        <div class="tpl-card" onclick="applyTemplate('mace_smash', this)">
+          <div class="tpl-name">MACE SMASH</div>
+          <div class="tpl-desc">メイス振り下ろし＋紫の衝撃オーラ</div>
+        </div>
+        <div class="tpl-card" onclick="applyTemplate('crystal_pop', this)">
+          <div class="tpl-name">CRYSTAL COMBO</div>
+          <div class="tpl-desc">クリスタル爆破パンチ＋超広角アングル</div>
+        </div>
+        <div class="tpl-card" onclick="applyTemplate('totem_clutch', this)">
+          <div class="tpl-name">TOTEM CLUTCH</div>
+          <div class="tpl-desc">不死のトーテム持ち＋黄金パーティクル</div>
+        </div>
+        <div class="tpl-card" onclick="applyTemplate('sword_duel', this)">
+          <div class="tpl-name">1v1 SWORD DUEL</div>
+          <div class="tpl-desc">ダイヤ/ネザライト剣＋クールな俯瞰</div>
+        </div>
+        <div class="tpl-card" onclick="applyTemplate('clean_render', this)">
+          <div class="tpl-name">CLEAN SKIN ONLY</div>
+          <div class="tpl-desc">装備なし・シンプル立ち姿（素材用）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">背景・ライティング環境</div>
+      <label>背景スタイル</label>
+      <select id="bg-preset" onchange="updateEnvironment()">
+        <option value="cpvp_sunset">CPvP シェーダー夕焼け＋黒曜石床</option>
+        <option value="end_void">ジ・エンド風 パープルネオン空間</option>
+        <option value="nether_crimson">ネザー真紅のハイコントラスト</option>
+        <option value="cyber_blue">クールブルー・氷結アリーナ</option>
+        <option value="transparent">背景透過（PNG素材書き出し用）</option>
+      </select>
+
+      <div style="margin-top:10px;">
+        <div class="slider-row">
+          <span>リムライト強さ</span>
+          <input type="range" id="rim-intensity" min="0" max="5" step="0.2" value="2.8" oninput="updateLights()">
+          <span id="rim-val">2.8</span>
+        </div>
+        <div class="row">
+          <label style="margin:0; flex:1;">リムライト色（輪郭の発光）</label>
+          <input type="color" id="rim-color" value="#e879f9" oninput="updateLights()">
+        </div>
+        <div class="check-item" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-particles" checked onchange="toggleParticles()">
+          <span>3D発光パーティクル（火の粉・クリスタル片）を表示</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: スキン＆装備 -->
+  <div id="tab-skin" class="tab-content">
+    <div class="section">
+      <div class="section-title">Minecraft スキン読み込み</div>
+      <label>MCID（Java版ユーザー名）から自動取得</label>
+      <div class="row">
+        <input type="text" id="mcid-input" placeholder="例: Dream, Technoblade, Marlowww" value="Marlowww">
+        <button class="btn" onclick="loadSkinFromMCID()">読込</button>
+      </div>
+
+      <label style="margin-top:8px;">または スキン画像ファイル (.png) を選択</label>
+      <div class="row">
+        <input type="file" id="skin-file" accept="image/png" style="font-size:11px; color:#cbd5e1;" onchange="loadSkinFromFile(event)">
+      </div>
+
+      <div class="row" style="margin-top:8px;">
+        <label style="margin:0; flex:1;">腕の太さ（モデルタイプ）</label>
+        <select id="arm-type" style="width:140px;" onchange="rebuildPlayer()">
+          <option value="classic">Classic (Steve / 4px)</option>
+          <option value="slim">Slim (Alex / 3px)</option>
+        </select>
+      </div>
+      <div class="check-item" style="margin-top:6px;">
+        <input type="checkbox" id="toggle-hat" checked onchange="rebuildPlayer()">
+        <span>スキンの外レイヤー（帽子・ジャケット・袖）を表示</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">防具（装備）カスタマイズ</div>
+      <div class="row">
+        <label style="margin:0; flex:1;">防具の素材</label>
+        <select id="armor-material" style="width:150px;" onchange="updateArmor()">
+          <option value="netherite">ネザライト (Netherite)</option>
+          <option value="diamond">ダイヤモンド (Diamond)</option>
+          <option value="gold">金 (Golden)</option>
+          <option value="iron">鉄 (Iron)</option>
+        </select>
+      </div>
+
+      <div class="toggle-grid" style="margin-top:8px;">
+        <label class="check-item"><input type="checkbox" id="arm-helmet" onchange="updateArmor()"> ヘルメット (頭)</label>
+        <label class="check-item"><input type="checkbox" id="arm-chest" checked onchange="updateArmor()"> チェストプレート (胴)</label>
+        <label class="check-item"><input type="checkbox" id="arm-legs" checked onchange="updateArmor()"> レギンス (脚)</label>
+        <label class="check-item"><input type="checkbox" id="arm-boots" checked onchange="updateArmor()"> ブーツ (足)</label>
+      </div>
+
+      <div class="check-item" style="margin-top:8px;">
+        <input type="checkbox" id="arm-enchant" checked onchange="updateArmor()">
+        <span>エンチャントの紫オーラ発光（Glint）を付与</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">手持ちアイテム（武器・PvPアイテム）</div>
+      <div class="row">
+        <label style="margin:0; width:60px;">右手</label>
+        <select id="right-item" onchange="updateHeldItems()">
+          <option value="none">なし（素手）</option>
+          <option value="netherite_sword" selected>ネザライトの剣</option>
+          <option value="diamond_sword">ダイヤモンドの剣</option>
+          <option value="mace">メイス (Mace)</option>
+          <option value="crystal">エンドクリスタル</option>
+          <option value="totem">不死のトーテム</option>
+          <option value="obsidian">黒曜石ブロック</option>
+        </select>
+      </div>
+      <div class="row">
+        <label style="margin:0; width:60px;">左手</label>
+        <select id="left-item" onchange="updateHeldItems()">
+          <option value="none">なし</option>
+          <option value="totem" selected>不死のトーテム</option>
+          <option value="crystal">エンドクリスタル</option>
+          <option value="obsidian">黒曜石ブロック</option>
+          <option value="netherite_sword">ネザライトの剣</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: ポーズ＆3Dオブジェクト -->
+  <div id="tab-pose" class="tab-content">
+    <div class="section">
+      <div class="section-title">エンドクリスタル配置（3Dモデル）</div>
+      <div class="check-item" style="margin-bottom:8px;">
+        <input type="checkbox" id="show-crystal" checked onchange="updateCrystal()">
+        <span>背景に巨大3Dエンドクリスタルを表示</span>
+      </div>
+      <div class="slider-row">
+        <span>大きさ</span>
+        <input type="range" id="crys-scale" min="0.5" max="3.5" step="0.1" value="2.1" oninput="updateCrystal()">
+        <span id="crys-scale-val">2.1</span>
+      </div>
+      <div class="slider-row">
+        <span>横位置 X</span>
+        <input type="range" id="crys-x" min="-5" max="5" step="0.1" value="-1.6" oninput="updateCrystal()">
+        <span id="crys-x-val">-1.6</span>
+      </div>
+      <div class="slider-row">
+        <span>高さ Y</span>
+        <input type="range" id="crys-y" min="-1" max="5" step="0.1" value="1.8" oninput="updateCrystal()">
+        <span id="crys-y-val">1.8</span>
+      </div>
+      <div class="slider-row">
+        <span>奥行き Z</span>
+        <input type="range" id="crys-z" min="-6" max="2" step="0.1" value="-1.8" oninput="updateCrystal()">
+        <span id="crys-z-val">-1.8</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <span>プレイヤー関節微調整</span>
+        <button class="btn btn-secondary" style="padding:2px 6px; font-size:10px;" onclick="resetPose()">リセット</button>
+      </div>
+      <div class="slider-row">
+        <span>頭 上下</span>
+        <input type="range" id="pose-head-x" min="-60" max="60" value="-10" oninput="applyManualPose()">
+        <span id="val-head-x">-10</span>
+      </div>
+      <div class="slider-row">
+        <span>頭 左右</span>
+        <input type="range" id="pose-head-y" min="-70" max="70" value="18" oninput="applyManualPose()">
+        <span id="val-head-y">18</span>
+      </div>
+      <div class="slider-row">
+        <span>右腕 前後</span>
+        <input type="range" id="pose-rarm-x" min="-160" max="90" value="-55" oninput="applyManualPose()">
+        <span id="val-rarm-x">-55</span>
+      </div>
+      <div class="slider-row">
+        <span>右腕 開き</span>
+        <input type="range" id="pose-rarm-z" min="-90" max="20" value="-15" oninput="applyManualPose()">
+        <span id="val-rarm-z">-15</span>
+      </div>
+      <div class="slider-row">
+        <span>左腕 前後</span>
+        <input type="range" id="pose-larm-x" min="-160" max="90" value="-35" oninput="applyManualPose()">
+        <span id="val-larm-x">-35</span>
+      </div>
+      <div class="slider-row">
+        <span>右脚 前後</span>
+        <input type="range" id="pose-rleg-x" min="-70" max="70" value="25" oninput="applyManualPose()">
+        <span id="val-rleg-x">25</span>
+      </div>
+      <div class="slider-row">
+        <span>左脚 前後</span>
+        <input type="range" id="pose-lleg-x" min="-70" max="70" value="-25" oninput="applyManualPose()">
+        <span id="val-lleg-x">-25</span>
+      </div>
+      <div class="slider-row">
+        <span>体の向き</span>
+        <input type="range" id="pose-body-y" min="-180" max="180" value="-25" oninput="applyManualPose()">
+        <span id="val-body-y">-25</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: 文字＆画像オーバーレイ -->
+  <div id="tab-text" class="tab-content">
+    <div class="section">
+      <div class="section-title">3D風 タイトルロゴ配置</div>
+      <label>メインテキスト（例: MONTAGE, #1）</label>
+      <div class="row">
+        <input type="text" id="text-main" value="MONTAGE" oninput="updateTextOverlays()">
+      </div>
+      <label>サブテキスト（例: CPVP, VANILLA & MACE）</label>
+      <div class="row">
+        <input type="text" id="text-sub" value="CPVP" oninput="updateTextOverlays()">
+      </div>
+
+      <div class="row" style="margin-top:8px;">
+        <div style="flex:1;">
+          <label>文字グラデーション上</label>
+          <input type="color" id="text-col1" value="#67e8f9" style="width:100%;" oninput="updateTextOverlays()">
+        </div>
+        <div style="flex:1;">
+          <label>文字グラデーション下</label>
+          <input type="color" id="text-col2" value="#0284c7" style="width:100%;" oninput="updateTextOverlays()">
+        </div>
+        <div style="flex:1;">
+          <label>立体影・縁取り色</label>
+          <input type="color" id="text-shadow-col" value="#1e1b4b" style="width:100%;" oninput="updateTextOverlays()">
+        </div>
+      </div>
+
+      <div class="slider-row" style="margin-top:8px;">
+        <span>メイン文字サイズ</span>
+        <input type="range" id="text-main-size" min="30" max="160" value="96" oninput="updateTextOverlays()">
+        <span id="text-main-size-val">96</span>
+      </div>
+      <div class="slider-row">
+        <span>サブ文字サイズ</span>
+        <input type="range" id="text-sub-size" min="20" max="120" value="64" oninput="updateTextOverlays()">
+        <span id="text-sub-size-val">64</span>
+      </div>
+      <div class="check-item" style="margin-top:6px;">
+        <input type="checkbox" id="toggle-text" checked onchange="updateTextOverlays()">
+        <span>タイトルテキストを表示する</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">カスタム画像追加（クリスタル画像・ロゴ等）</div>
+      <p style="font-size:11px; color:var(--text-dim); margin-bottom:8px;">
+        好きな透過PNGや画像を何枚でも追加でき、プレビュー上でドラッグ移動できます。
+      </p>
+      <input type="file" id="custom-img-input" accept="image/*" style="display:none;" onchange="addCustomImage(event)">
+      <div class="row">
+        <button class="btn btn-cyan" style="width:100%;" onclick="document.getElementById('custom-img-input').click()">＋ 画像ファイルをアップロード追加</button>
+      </div>
+
+      <div id="selected-img-controls" style="display:none; margin-top:10px; border-top:1px solid var(--border); padding-top:10px;">
+        <div style="font-size:11px; font-weight:700; color:#38bdf8; margin-bottom:6px;">選択中の画像を調整:</div>
+        <div class="slider-row">
+          <span>サイズ</span>
+          <input type="range" id="img-scale" min="20" max="800" value="200" oninput="updateSelectedImage()">
+          <span id="img-scale-val">200</span>
+        </div>
+        <div class="slider-row">
+          <span>回転角度</span>
+          <input type="range" id="img-rot" min="-180" max="180" value="0" oninput="updateSelectedImage()">
+          <span id="img-rot-val">0</span>
+        </div>
+        <div class="slider-row">
+          <span>発光グロー</span>
+          <input type="range" id="img-glow" min="0" max="40" value="10" oninput="updateSelectedImage()">
+          <span id="img-glow-val">10</span>
+        </div>
+        <button class="btn" style="background:#ef4444; width:100%; margin-top:4px;" onclick="deleteSelectedImage()">選択中の画像を削除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 右側メインビュー -->
+<div class="workspace">
+  <div class="toolbar">
+    <div class="badge-hint">
+      🖱️ <b>左ドラッグ:</b> カメラ回転 / <b>右ドラッグ:</b> 視点移動 / <b>ホイール:</b> ズーム / <b>文字・画像:</b> 直接ドラッグで配置
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-secondary" onclick="resetCamera()">カメラ位置リセット</button>
+      <button class="btn" style="background:linear-gradient(135deg, #ec4899, #8b5cf6); padding:8px 18px;" onclick="exportThumbnail()">⬇ サムネイル画像を保存 (1920x1080 PNG)</button>
+    </div>
+  </div>
+
+  <div class="canvas-wrapper">
+    <div id="preview-box">
+      <canvas id="three-canvas"></canvas>
+      <div id="overlay-layer">
+        <!-- サブタイトル -->
+        <div id="overlay-sub" class="draggable-item montage-text" style="left: 58%; top: 16%; transform: rotate(8deg);">CPVP</div>
+        <!-- メインタイトル -->
+        <div id="overlay-main" class="draggable-item montage-text" style="left: 14%; top: 66%; transform: rotate(-3deg);">MONTAGE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="status-toast">完了しました</div>
+
+<!-- Three.js & OrbitControls CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-"use strict";
-(() => {
-  const MAX_CODE_LENGTH = 50000;
-  const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
-  const $ = id => document.getElementById(id);
+// ==========================================
+// 1. グローバル変数 & Three.js セットアップ
+// ==========================================
+let scene, camera, renderer, controls;
+let playerGroup, headPivot, bodyMesh, rightArmPivot, leftArmPivot, rightLegPivot, leftLegPivot;
+let armorMeshes = { helmet: [], chest: [], legs: [], boots: [] };
+let rightItemGroup, leftItemGroup;
+let crystalGroup, crystalInner, crystalOuter1, crystalOuter2;
+let particleSystem, floorMesh;
+let dirLight, rimLight, ambientLight, crystalLight;
 
-  let selectedFile = null;
-  let selectedObjectURL = null;
-  let restoredBlob = null;
-  let restoredObjectURL = null;
-  let restoredFileName = "restored-image";
+let currentSkinCanvas = document.createElement('canvas');
+currentSkinCanvas.width = 64;
+currentSkinCanvas.height = 64;
+let skinTexture = new THREE.CanvasTexture(currentSkinCanvas);
+skinTexture.magFilter = THREE.NearestFilter;
+skinTexture.minFilter = THREE.NearestFilter;
 
-  function status(id, message, kind = "") {
-    const el = $(id);
-    el.textContent = message;
-    el.className = "status" + (kind ? " " + kind : "");
+let selectedOverlayEl = null;
+const clock = new THREE.Clock();
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('status-toast');
+  toast.textContent = msg;
+  toast.style.background = isError ? '#ef4444' : '#10b981';
+  toast.style.opacity = '1';
+  setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+function initThree() {
+  const canvas = document.getElementById('three-canvas');
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 100);
+  camera.position.set(1.4, 2.1, 4.6);
+
+  renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    alpha: true,
+    preserveDrawingBuffer: true
+  });
+  renderer.setSize(1280, 720, false);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+
+  controls = new THREE.OrbitControls(camera, canvas);
+  controls.target.set(-0.2, 1.45, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.update();
+
+  // ライティング設定
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+  scene.add(ambientLight);
+
+  dirLight = new THREE.DirectionalLight(0xfff5e4, 1.3);
+  dirLight.position.set(4, 7, 5);
+  dirLight.castShadow = true;
+  scene.add(dirLight);
+
+  rimLight = new THREE.DirectionalLight(0xe879f9, 2.8);
+  rimLight.position.set(-4, 4, -5);
+  scene.add(rimLight);
+
+  crystalLight = new THREE.PointLight(0xf472b6, 2.2, 10);
+  scene.add(crystalLight);
+
+  // 床（黒曜石風の反射フロア）
+  createFloor();
+
+  // パーティクル
+  createParticles();
+
+  // デフォルトスキン生成＆プレイヤー構築
+  generateDefaultSkin();
+  rebuildPlayer();
+
+  // エンドクリスタル生成
+  createEndCrystal();
+
+  // 初期テンプレート適用
+  applyTemplate('cpvp_classic');
+  updateTextOverlays();
+  initDraggableOverlays();
+
+  // MCID初期ロード試行
+  loadSkinFromMCID(true);
+
+  animate();
+}
+
+// ==========================================
+// 2. 背景・環境・パーティクル
+// ==========================================
+function createFloor() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#120d1d';
+  ctx.fillRect(0, 0, 128, 128);
+  // 黒曜石風ノイズ
+  for (let i = 0; i < 400; i++) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#261742' : '#090612';
+    ctx.fillRect(Math.floor(Math.random()*16)*8, Math.floor(Math.random()*16)*8, 8, 8);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(16, 16);
+  tex.magFilter = THREE.NearestFilter;
+
+  const geo = new THREE.PlaneGeometry(30, 30);
+  const mat = new THREE.MeshStandardMaterial({
+    map: tex,
+    roughness: 0.35,
+    metalness: 0.4
+  });
+  floorMesh = new THREE.Mesh(geo, mat);
+  floorMesh.rotation.x = -Math.PI / 2;
+  floorMesh.receiveShadow = true;
+  scene.add(floorMesh);
+}
+
+function createParticles() {
+  const count = 160;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  const col = new Float32Array(count * 3);
+
+  for (let i = 0; i < count; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 12;
+    pos[i * 3 + 1] = Math.random() * 6;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+
+    const isPink = Math.random() > 0.4;
+    col[i * 3] = isPink ? 0.96 : 0.22;
+    col[i * 3 + 1] = isPink ? 0.45 : 0.85;
+    col[i * 3 + 2] = isPink ? 0.85 : 0.98;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.12,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending
+  });
+  particleSystem = new THREE.Points(geo, mat);
+  scene.add(particleSystem);
+}
+
+function toggleParticles() {
+  particleSystem.visible = document.getElementById('toggle-particles').checked;
+}
+
+function updateEnvironment() {
+  const preset = document.getElementById('bg-preset').value;
+  floorMesh.visible = true;
+
+  if (preset === 'transparent') {
+    scene.background = null;
+    scene.fog = null;
+    floorMesh.visible = false;
+  } else if (preset === 'cpvp_sunset') {
+    scene.background = new THREE.Color('#271636');
+    scene.fog = new THREE.FogExp2('#271636', 0.065);
+    dirLight.color.set('#ffedd5');
+    rimLight.color.set('#e879f9');
+  } else if (preset === 'end_void') {
+    scene.background = new THREE.Color('#0c0618');
+    scene.fog = new THREE.FogExp2('#0c0618', 0.07);
+    dirLight.color.set('#c4b5fd');
+    rimLight.color.set('#a855f7');
+  } else if (preset === 'nether_crimson') {
+    scene.background = new THREE.Color('#2b0909');
+    scene.fog = new THREE.FogExp2('#2b0909', 0.075);
+    dirLight.color.set('#fca5a5');
+    rimLight.color.set('#f97316');
+  } else if (preset === 'cyber_blue') {
+    scene.background = new THREE.Color('#081a2e');
+    scene.fog = new THREE.FogExp2('#081a2e', 0.065);
+    dirLight.color.set('#e0f2fe');
+    rimLight.color.set('#06b6d4');
+  }
+  document.getElementById('rim-color').value = '#' + rimLight.color.getHexString();
+}
+
+function updateLights() {
+  const intensity = parseFloat(document.getElementById('rim-intensity').value);
+  const col = document.getElementById('rim-color').value;
+  document.getElementById('rim-val').textContent = intensity.toFixed(1);
+  rimLight.intensity = intensity;
+  rimLight.color.set(col);
+}
+
+// ==========================================
+// 3. スキンUVマッピング & 3Dプレイヤー構築
+// ==========================================
+function generateDefaultSkin() {
+  const ctx = currentSkinCanvas.getContext('2d');
+  ctx.clearRect(0, 0, 64, 64);
+  // ベース肌色＋紫パーカー風デフォルトスキン
+  ctx.fillStyle = '#f5cba7';
+  ctx.fillRect(8, 8, 8, 8); // 顔
+  ctx.fillStyle = '#2e1065';
+  ctx.fillRect(0, 0, 32, 16); // 髪
+  ctx.fillStyle = '#f5cba7';
+  ctx.fillRect(8, 8, 8, 8);
+  // 目
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(9, 11, 2, 2); ctx.fillRect(13, 11, 2, 2);
+  ctx.fillStyle = '#a855f7'; ctx.fillRect(10, 11, 1, 2); ctx.fillRect(13, 11, 1, 2);
+  // 胴体（黒＆紫）
+  ctx.fillStyle = '#1e1b4b'; ctx.fillRect(16, 16, 24, 16);
+  ctx.fillStyle = '#7e22ce'; ctx.fillRect(22, 20, 4, 12);
+  // 腕・脚
+  ctx.fillStyle = '#312e81'; ctx.fillRect(40, 16, 16, 16); ctx.fillRect(32, 48, 16, 16);
+  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 16, 16, 16); ctx.fillRect(16, 48, 16, 16);
+  skinTexture.needsUpdate = true;
+}
+
+function loadSkinFromMCID(silent = false) {
+  const mcid = document.getElementById('mcid-input').value.trim();
+  if (!mcid) return;
+
+  const img = new Image();
+  img.crossOrigin = 'Anonymous';
+  // Minotar APIはCORS対応で高速にスキンを返す
+  img.src = `https://minotar.net/skin/${encodeURIComponent(mcid)}`;
+
+  img.onload = () => {
+    const ctx = currentSkinCanvas.getContext('2d');
+    ctx.clearRect(0, 0, 64, 64);
+    ctx.drawImage(img, 0, 0);
+    // 旧64x32スキン対応
+    if (img.height === 32) {
+      ctx.drawImage(img, 0, 16, 16, 16, 16, 48, 16, 16);
+      ctx.drawImage(img, 40, 16, 16, 16, 32, 48, 16, 16);
+    }
+    skinTexture.needsUpdate = true;
+    if (!silent) showToast(`${mcid} のスキンを読み込みました！`);
+  };
+  img.onerror = () => {
+    if (!silent) showToast('スキンの取得に失敗しました（MCIDを確認してください）', true);
+  };
+}
+
+function loadSkinFromFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const ctx = currentSkinCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 64, 64);
+      ctx.drawImage(img, 0, 0);
+      if (img.height === 32) {
+        ctx.drawImage(img, 0, 16, 16, 16, 16, 48, 16, 16);
+        ctx.drawImage(img, 40, 16, 16, 16, 32, 48, 16, 16);
+      }
+      skinTexture.needsUpdate = true;
+      showToast('スキン画像を適用しました！');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// MinecraftスキンUV設定ヘルパー
+function createSkinBox(w, h, d, uvX, uvY, isOverlay = false) {
+  const scale = isOverlay ? 1.07 : 1.0;
+  const geo = new THREE.BoxGeometry(w * scale, h * scale, d * scale);
+  const uvAttr = geo.attributes.uv;
+
+  // BoxGeometryの面順: Right(+X), Left(-X), Top(+Y), Bottom(-Y), Front(+Z), Back(-Z)
+  const texW = 64, texH = 64;
+  function setFaceUV(faceIdx, x, y, width, height) {
+    const u0 = x / texW;
+    const v1 = 1 - y / texH;
+    const u1 = (x + width) / texW;
+    const v0 = 1 - (y + height) / texH;
+    const idx = faceIdx * 4;
+    uvAttr.setXY(idx + 0, u0, v1);
+    uvAttr.setXY(idx + 1, u1, v1);
+    uvAttr.setXY(idx + 2, u0, v0);
+    uvAttr.setXY(idx + 3, u1, v0);
   }
 
-  function bytesTo85(bytes) {
-    let output = "";
-    for (let offset = 0; offset < bytes.length; offset += 4) {
-      const count = Math.min(4, bytes.length - offset);
-      let value = 0n;
-      for (let i = 0; i < 4; i++) {
-        value = (value << 8n) | BigInt(i < count ? bytes[offset + i] : 0);
-      }
-      let encoded = "";
-      for (let i = 0; i < 5; i++) {
-        encoded = ALPHABET[Number(value % 85n)] + encoded;
-        value /= 85n;
-      }
-      output += String(count) + encoded;
-    }
-    return output;
+  // Minecraft スキン展開図レイアウト
+  setFaceUV(0, uvX, uvY + d, d, h);                 // Right
+  setFaceUV(1, uvX + d + w, uvY + d, d, h);         // Left
+  setFaceUV(2, uvX + d, uvY, w, d);                 // Top
+  setFaceUV(3, uvX + d + w, uvY, w, d);             // Bottom
+  setFaceUV(4, uvX + d, uvY + d, w, h);             // Front
+  setFaceUV(5, uvX + d + w + d, uvY + d, w, h);     // Back
+
+  uvAttr.needsUpdate = true;
+
+  const mat = new THREE.MeshStandardMaterial({
+    map: skinTexture,
+    transparent: isOverlay,
+    alphaTest: isOverlay ? 0.1 : 0,
+    side: isOverlay ? THREE.DoubleSide : THREE.FrontSide,
+    roughness: 0.65,
+    metalness: 0.05
+  });
+
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function rebuildPlayer() {
+  const oldPos = playerGroup ? playerGroup.position.clone() : new THREE.Vector3(0.75, 0, 0.3);
+  const oldRot = playerGroup ? playerGroup.rotation.clone() : new THREE.Euler(0, -0.45, 0);
+
+  if (playerGroup) scene.remove(playerGroup);
+
+  const isSlim = document.getElementById('arm-type').value === 'slim';
+  const showHat = document.getElementById('toggle-hat').checked;
+  const armW = isSlim ? 3 : 4;
+  const u = 0.0625; // 1ピクセル = 0.0625ユニット (16px = 1.0)
+
+  playerGroup = new THREE.Group();
+  playerGroup.position.copy(oldPos);
+  playerGroup.rotation.copy(oldRot);
+
+  // 胴体 (8x12x4)
+  bodyMesh = createSkinBox(8*u, 12*u, 4*u, 16, 16, false);
+  bodyMesh.position.y = 18 * u;
+  playerGroup.add(bodyMesh);
+  if (showHat) {
+    const jacket = createSkinBox(8*u, 12*u, 4*u, 16, 32, true);
+    bodyMesh.add(jacket);
   }
 
-  function base85ToBytes(text) {
-    const clean = text.replace(/\s+/g, "");
-    if (!clean || clean.length % 6 !== 0) {
-      throw new Error("コードの文字数または形式が正しくありません。");
-    }
-    const output = [];
-    for (let offset = 0; offset < clean.length; offset += 6) {
-      const count = Number(clean[offset]);
-      if (!Number.isInteger(count) || count < 1 || count > 4) {
-        throw new Error("コード内のブロック情報が不正です。");
-      }
-      if (offset + 6 < clean.length && count !== 4) {
-        throw new Error("途中のブロック長が不正です。");
-      }
-      let value = 0n;
-      for (let i = 1; i <= 5; i++) {
-        const digit = ALPHABET.indexOf(clean[offset + i]);
-        if (digit < 0) throw new Error("コードに使用できない文字があります。");
-        value = value * 85n + BigInt(digit);
-      }
-      if (value > 0xffffffffn) throw new Error("コードの数値が範囲外です。");
-      const block = new Uint8Array(4);
-      for (let i = 3; i >= 0; i--) {
-        block[i] = Number(value & 255n);
-        value >>= 8n;
-      }
-      for (let i = 0; i < count; i++) output.push(block[i]);
-    }
-    return new Uint8Array(output);
+  // 頭 (8x8x8)
+  headPivot = new THREE.Group();
+  headPivot.position.set(0, 24 * u, 0);
+  const headMesh = createSkinBox(8*u, 8*u, 8*u, 0, 0, false);
+  headMesh.position.y = 4 * u;
+  headPivot.add(headMesh);
+  if (showHat) {
+    const hat = createSkinBox(8*u, 8*u, 8*u, 32, 0, true);
+    headMesh.add(hat);
+  }
+  playerGroup.add(headPivot);
+
+  // 右腕
+  rightArmPivot = new THREE.Group();
+  rightArmPivot.position.set(-(4 + armW/2) * u, 22 * u, 0);
+  const rArmMesh = createSkinBox(armW*u, 12*u, 4*u, 40, 16, false);
+  rArmMesh.position.y = -4 * u;
+  rightArmPivot.add(rArmMesh);
+  if (showHat) {
+    const rSleeve = createSkinBox(armW*u, 12*u, 4*u, 40, 32, true);
+    rArmMesh.add(rSleeve);
+  }
+  playerGroup.add(rightArmPivot);
+
+  // 左腕
+  leftArmPivot = new THREE.Group();
+  leftArmPivot.position.set((4 + armW/2) * u, 22 * u, 0);
+  const lArmMesh = createSkinBox(armW*u, 12*u, 4*u, 32, 48, false);
+  lArmMesh.position.y = -4 * u;
+  leftArmPivot.add(lArmMesh);
+  if (showHat) {
+    const lSleeve = createSkinBox(armW*u, 12*u, 4*u, 48, 48, true);
+    lArmMesh.add(lSleeve);
+  }
+  playerGroup.add(leftArmPivot);
+
+  // 右脚
+  rightLegPivot = new THREE.Group();
+  rightLegPivot.position.set(-2 * u, 12 * u, 0);
+  const rLegMesh = createSkinBox(4*u, 12*u, 4*u, 0, 16, false);
+  rLegMesh.position.y = -6 * u;
+  rightLegPivot.add(rLegMesh);
+  if (showHat) {
+    const rPants = createSkinBox(4*u, 12*u, 4*u, 0, 32, true);
+    rLegMesh.add(rPants);
+  }
+  playerGroup.add(rightLegPivot);
+
+  // 左脚
+  leftLegPivot = new THREE.Group();
+  leftLegPivot.position.set(2 * u, 12 * u, 0);
+  const lLegMesh = createSkinBox(4*u, 12*u, 4*u, 16, 48, false);
+  lLegMesh.position.y = -6 * u;
+  leftLegPivot.add(lLegMesh);
+  if (showHat) {
+    const lPants = createSkinBox(4*u, 12*u, 4*u, 0, 48, true);
+    lLegMesh.add(lPants);
+  }
+  playerGroup.add(leftLegPivot);
+
+  scene.add(playerGroup);
+
+  updateArmor();
+  updateHeldItems();
+  applyManualPose();
+}
+
+// ==========================================
+// 4. 装備（ネザライト/ダイヤ等）＆手持ちアイテム
+// ==========================================
+function getArmorMaterial(type, enchant) {
+  const styles = {
+    netherite: { color: 0x3b353b, metalness: 0.75, roughness: 0.35 },
+    diamond:   { color: 0x2dd4bf, metalness: 0.65, roughness: 0.25 },
+    gold:      { color: 0xfacc15, metalness: 0.85, roughness: 0.2 },
+    iron:      { color: 0xd1d5db, metalness: 0.8,  roughness: 0.3 }
+  };
+  const s = styles[type];
+  return new THREE.MeshStandardMaterial({
+    color: s.color,
+    metalness: s.metalness,
+    roughness: s.roughness,
+    emissive: enchant ? new THREE.Color(0x7e22ce) : new THREE.Color(0x000000),
+    emissiveIntensity: enchant ? 0.55 : 0
+  });
+}
+
+function updateArmor() {
+  // 既存防具削除
+  Object.values(armorMeshes).flat().forEach(m => { if (m.parent) m.parent.remove(m); });
+  armorMeshes = { helmet: [], chest: [], legs: [], boots: [] };
+
+  const matType = document.getElementById('armor-material').value;
+  const enchant = document.getElementById('arm-enchant').checked;
+  const isSlim = document.getElementById('arm-type').value === 'slim';
+  const armW = isSlim ? 3 : 4;
+  const u = 0.0625;
+  const mat = getArmorMaterial(matType, enchant);
+
+  // ヘルメット
+  if (document.getElementById('arm-helmet').checked) {
+    const helm = new THREE.Mesh(new THREE.BoxGeometry(9*u, 9*u, 9*u), mat);
+    helm.position.y = 4.2*u;
+    // 顔が見えるように前面下部を開ける装飾バイザー風
+    const visor = new THREE.Mesh(new THREE.BoxGeometry(9.2*u, 2.5*u, 2*u), mat);
+    visor.position.set(0, 7.5*u, 4*u);
+    headPivot.add(helm, visor);
+    armorMeshes.helmet.push(helm, visor);
   }
 
-  async function deflate(bytes) {
-    if (!("CompressionStream" in window)) {
-      throw new Error("このブラウザは圧縮機能に対応していません。Safari / Chromeを最新版にしてください。");
-    }
-    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
-    return new Uint8Array(await new Response(stream).arrayBuffer());
+  // チェストプレート
+  if (document.getElementById('arm-chest').checked) {
+    const chest = new THREE.Mesh(new THREE.BoxGeometry(8.8*u, 12.4*u, 4.8*u), mat);
+    chest.position.y = 18*u;
+    playerGroup.add(chest);
+
+    const rShoulder = new THREE.Mesh(new THREE.BoxGeometry((armW+0.8)*u, 5.5*u, 4.8*u), mat);
+    rShoulder.position.y = -1*u;
+    rightArmPivot.add(rShoulder);
+
+    const lShoulder = new THREE.Mesh(new THREE.BoxGeometry((armW+0.8)*u, 5.5*u, 4.8*u), mat);
+    lShoulder.position.y = -1*u;
+    leftArmPivot.add(lShoulder);
+
+    armorMeshes.chest.push(chest, rShoulder, lShoulder);
   }
 
-  async function inflate(bytes) {
-    if (!("DecompressionStream" in window)) {
-      throw new Error("このブラウザは解凍機能に対応していません。Safari / Chromeを最新版にしてください。");
-    }
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
-    return new Uint8Array(await new Response(stream).arrayBuffer());
+  // レギンス
+  if (document.getElementById('arm-legs').checked) {
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(8.5*u, 3.5*u, 4.5*u), mat);
+    belt.position.y = 12.5*u;
+    playerGroup.add(belt);
+
+    const rLegArm = new THREE.Mesh(new THREE.BoxGeometry(4.5*u, 8*u, 4.5*u), mat);
+    rLegArm.position.y = -4*u;
+    rightLegPivot.add(rLegArm);
+
+    const lLegArm = new THREE.Mesh(new THREE.BoxGeometry(4.5*u, 8*u, 4.5*u), mat);
+    lLegArm.position.y = -4*u;
+    leftLegPivot.add(lLegArm);
+
+    armorMeshes.legs.push(belt, rLegArm, lLegArm);
   }
 
-  function buildPayload(file) {
-    const mime = new TextEncoder().encode(file.type || "application/octet-stream");
-    const name = new TextEncoder().encode(file.name || "image");
-    if (mime.length > 255 || name.length > 65535) throw new Error("ファイル情報が長すぎます。");
-    return file.arrayBuffer().then(buffer => {
-      const data = new Uint8Array(buffer);
-      const headerLength = 4 + 1 + 2 + 4;
-      const output = new Uint8Array(headerLength + mime.length + name.length + data.length);
-      output.set([80, 67, 68, 50], 0);
-      output[4] = mime.length;
-      const view = new DataView(output.buffer);
-      view.setUint16(5, name.length, false);
-      view.setUint32(7, data.length, false);
-      let position = headerLength;
-      output.set(mime, position); position += mime.length;
-      output.set(name, position); position += name.length;
-      output.set(data, position);
-      return output;
+  // ブーツ
+  if (document.getElementById('arm-boots').checked) {
+    const rBoot = new THREE.Mesh(new THREE.BoxGeometry(4.8*u, 4.5*u, 4.8*u), mat);
+    rBoot.position.y = -10*u;
+    rightLegPivot.add(rBoot);
+
+    const lBoot = new THREE.Mesh(new THREE.BoxGeometry(4.8*u, 4.5*u, 4.8*u), mat);
+    lBoot.position.y = -10*u;
+    leftLegPivot.add(lBoot);
+
+    armorMeshes.boots.push(rBoot, lBoot);
+  }
+}
+
+// 3D武器・PvPアイテム生成ビルダー
+function buildItemMesh(itemType) {
+  const group = new THREE.Group();
+  if (itemType === 'none') return group;
+
+  if (itemType === 'netherite_sword' || itemType === 'diamond_sword') {
+    const isNeth = itemType === 'netherite_sword';
+    const bladeCol = isNeth ? 0x443d44 : 0x2dd4bf;
+    const emissiveCol = isNeth ? 0x9333ea : 0x06b6d4;
+
+    const bladeMat = new THREE.MeshStandardMaterial({
+      color: bladeCol, metalness: 0.85, roughness: 0.2,
+      emissive: emissiveCol, emissiveIntensity: 0.45
+    });
+    const handleMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.8 });
+
+    // 柄・鍔・刀身
+    const grip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, 0.06), handleMat);
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.06, 0.08), bladeMat);
+    guard.position.y = 0.12;
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.72, 0.04), bladeMat);
+    blade.position.y = 0.5;
+
+    group.add(grip, guard, blade);
+    group.rotation.x = Math.PI / 2.2;
+    group.position.set(0, -0.58, 0.15);
+  }
+  else if (itemType === 'mace') {
+    // 重厚なメイス（ハンドル＋ヘビーコアヘッド）
+    const rodMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.6, roughness: 0.4 });
+    const headMat = new THREE.MeshStandardMaterial({
+      color: 0x334155, metalness: 0.9, roughness: 0.2,
+      emissive: 0xa855f7, emissiveIntensity: 0.6
+    });
+    const rod = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.75, 0.06), rodMat);
+    rod.position.y = 0.25;
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), headMat);
+    head.position.y = 0.65;
+    group.add(rod, head);
+    group.rotation.x = Math.PI / 2.2;
+    group.position.set(0, -0.58, 0.15);
+  }
+  else if (itemType === 'totem') {
+    // 不死のトーテム
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xfacc15, metalness: 0.85, roughness: 0.2,
+      emissive: 0xca8a04, emissiveIntensity: 0.35
+    });
+    const gemMat = new THREE.MeshStandardMaterial({
+      color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.8
+    });
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.32, 0.08), goldMat);
+    const wings = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.12, 0.06), goldMat);
+    wings.position.y = 0.04;
+    const eyes = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.09), gemMat);
+    eyes.position.y = 0.08;
+    group.add(body, wings, eyes);
+    group.position.set(0, -0.62, 0.15);
+  }
+  else if (itemType === 'crystal') {
+    // 手持ちエンドクリスタル
+    const cMat = new THREE.MeshStandardMaterial({
+      color: 0xf472b6, emissive: 0xdb2777, emissiveIntensity: 0.8, transparent: true, opacity: 0.9
+    });
+    const cube = new THREE.Mesh(new THREE.OctahedronGeometry(0.22, 0), cMat);
+    const frame = new THREE.Mesh(
+      new THREE.BoxGeometry(0.32, 0.32, 0.32),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+    );
+    group.add(cube, frame);
+    group.position.set(0, -0.65, 0.15);
+  }
+  else if (itemType === 'obsidian') {
+    const obsMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, roughness: 0.5, metalness: 0.3 });
+    const blk = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.32), obsMat);
+    group.add(blk);
+    group.position.set(0, -0.65, 0.15);
+  }
+
+  return group;
+}
+
+function updateHeldItems() {
+  if (rightItemGroup && rightItemGroup.parent) rightItemGroup.parent.remove(rightItemGroup);
+  if (leftItemGroup && leftItemGroup.parent) leftItemGroup.parent.remove(leftItemGroup);
+
+  rightItemGroup = buildItemMesh(document.getElementById('right-item').value);
+  rightArmPivot.add(rightItemGroup);
+
+  leftItemGroup = buildItemMesh(document.getElementById('left-item').value);
+  leftArmPivot.add(leftItemGroup);
+}
+
+// ==========================================
+// 5. 巨大3Dエンドクリスタル構築
+// ==========================================
+function createEndCrystal() {
+  crystalGroup = new THREE.Group();
+
+  // 中心ピンクコア
+  const coreMat = new THREE.MeshStandardMaterial({
+    color: 0xff77e9,
+    emissive: 0xe11d48,
+    emissiveIntensity: 0.85,
+    roughness: 0.1,
+    metalness: 0.3
+  });
+  crystalInner = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), coreMat);
+
+  // 外側ガラスフレーム1 & 2
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfbcfe8,
+    transparent: true,
+    opacity: 0.45,
+    roughness: 0.1,
+    metalness: 0.1,
+    side: THREE.DoubleSide
+  });
+  const wireMat = new THREE.LineBasicMaterial({ color: 0xf472b6, linewidth: 2 });
+
+  const boxGeo1 = new THREE.BoxGeometry(0.75, 0.75, 0.75);
+  crystalOuter1 = new THREE.Mesh(boxGeo1, glassMat);
+  crystalOuter1.add(new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo1), wireMat));
+
+  const boxGeo2 = new THREE.BoxGeometry(0.88, 0.88, 0.88);
+  crystalOuter2 = new THREE.Mesh(boxGeo2, glassMat);
+  crystalOuter2.add(new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo2), wireMat));
+
+  crystalGroup.add(crystalInner, crystalOuter1, crystalOuter2);
+  scene.add(crystalGroup);
+  updateCrystal();
+}
+
+function updateCrystal() {
+  const show = document.getElementById('show-crystal').checked;
+  const s = parseFloat(document.getElementById('crys-scale').value);
+  const x = parseFloat(document.getElementById('crys-x').value);
+  const y = parseFloat(document.getElementById('crys-y').value);
+  const z = parseFloat(document.getElementById('crys-z').value);
+
+  document.getElementById('crys-scale-val').textContent = s.toFixed(1);
+  document.getElementById('crys-x-val').textContent = x.toFixed(1);
+  document.getElementById('crys-y-val').textContent = y.toFixed(1);
+  document.getElementById('crys-z-val').textContent = z.toFixed(1);
+
+  crystalGroup.visible = show;
+  crystalLight.visible = show;
+  crystalGroup.scale.set(s, s, s);
+  crystalGroup.position.set(x, y, z);
+  crystalLight.position.set(x, y, z + 0.8);
+}
+
+// ==========================================
+// 6. ポーズ制御＆Montageテンプレート一括適用
+// ==========================================
+function applyManualPose() {
+  const deg = Math.PI / 180;
+  const hx = parseFloat(document.getElementById('pose-head-x').value);
+  const hy = parseFloat(document.getElementById('pose-head-y').value);
+  const rax = parseFloat(document.getElementById('pose-rarm-x').value);
+  const raz = parseFloat(document.getElementById('pose-rarm-z').value);
+  const lax = parseFloat(document.getElementById('pose-larm-x').value);
+  const rlx = parseFloat(document.getElementById('pose-rleg-x').value);
+  const llx = parseFloat(document.getElementById('pose-lleg-x').value);
+  const by = parseFloat(document.getElementById('pose-body-y').value);
+
+  document.getElementById('val-head-x').textContent = hx;
+  document.getElementById('val-head-y').textContent = hy;
+  document.getElementById('val-rarm-x').textContent = rax;
+  document.getElementById('val-rarm-z').textContent = raz;
+  document.getElementById('val-larm-x').textContent = lax;
+  document.getElementById('val-rleg-x').textContent = rlx;
+  document.getElementById('val-lleg-x').textContent = llx;
+  document.getElementById('val-body-y').textContent = by;
+
+  headPivot.rotation.set(hx * deg, hy * deg, 0);
+  rightArmPivot.rotation.set(rax * deg, 0, raz * deg);
+  leftArmPivot.rotation.set(lax * deg, 0, 12 * deg);
+  rightLegPivot.rotation.set(rlx * deg, 0, 0);
+  leftLegPivot.rotation.set(llx * deg, 0, 0);
+  playerGroup.rotation.y = by * deg;
+}
+
+function resetPose() {
+  setPoseSliders(0, 0, 0, 0, 0, 0, 0, 0);
+}
+
+function setPoseSliders(hx, hy, rax, raz, lax, rlx, llx, by) {
+  document.getElementById('pose-head-x').value = hx;
+  document.getElementById('pose-head-y').value = hy;
+  document.getElementById('pose-rarm-x').value = rax;
+  document.getElementById('pose-rarm-z').value = raz;
+  document.getElementById('pose-larm-x').value = lax;
+  document.getElementById('pose-rleg-x').value = rlx;
+  document.getElementById('pose-lleg-x').value = llx;
+  document.getElementById('pose-body-y').value = by;
+  applyManualPose();
+}
+
+function applyTemplate(tplName, cardEl) {
+  if (cardEl) {
+    document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+  }
+
+  if (tplName === 'cpvp_classic') {
+    // 添付画像風: 右手前にネザライト装備プレイヤー、左奥に巨大クリスタル、手前にCPVP MONTAGE
+    playerGroup.position.set(1.05, 0, 0.5);
+    camera.position.set(1.3, 2.0, 4.3);
+    controls.target.set(-0.2, 1.4, 0);
+
+    document.getElementById('arm-material').value = 'netherite';
+    document.getElementById('arm-helmet').checked = false;
+    document.getElementById('arm-chest').checked = true;
+    document.getElementById('arm-legs').checked = true;
+    document.getElementById('arm-boots').checked = true;
+    document.getElementById('arm-enchant').checked = true;
+    document.getElementById('right-item').value = 'netherite_sword';
+    document.getElementById('left-item').value = 'totem';
+
+    document.getElementById('show-crystal').checked = true;
+    document.getElementById('crys-scale').value = 2.3;
+    document.getElementById('crys-x').value = -1.3;
+    document.getElementById('crys-y').value = 1.9;
+    document.getElementById('crys-z').value = -1.4;
+
+    document.getElementById('bg-preset').value = 'cpvp_sunset';
+    document.getElementById('text-main').value = 'MONTAGE';
+    document.getElementById('text-sub').value = 'CPVP';
+    document.getElementById('text-col1').value = '#67e8f9';
+    document.getElementById('text-col2').value = '#0284c7';
+
+    setPoseSliders(-8, 15, -60, -18, -35, 25, -25, -28);
+  }
+  else if (tplName === 'mace_smash') {
+    // メイス強襲アングル
+    playerGroup.position.set(0.3, 0.4, 0.4);
+    camera.position.set(-1.6, 1.1, 3.8);
+    controls.target.set(0, 1.5, 0);
+
+    document.getElementById('arm-material').value = 'netherite';
+    document.getElementById('arm-helmet').checked = true;
+    document.getElementById('arm-chest').checked = true;
+    document.getElementById('arm-legs').checked = true;
+    document.getElementById('arm-boots').checked = true;
+    document.getElementById('right-item').value = 'mace';
+    document.getElementById('left-item').value = 'crystal';
+
+    document.getElementById('show-crystal').checked = true;
+    document.getElementById('crys-scale').value = 1.6;
+    document.getElementById('crys-x').value = 1.8;
+    document.getElementById('crys-y').value = 1.4;
+    document.getElementById('crys-z').value = -1.5;
+
+    document.getElementById('bg-preset').value = 'end_void';
+    document.getElementById('text-main').value = 'MACE PVP';
+    document.getElementById('text-sub').value = 'MONTAGE';
+    document.getElementById('text-col1').value = '#f0abfc';
+    document.getElementById('text-col2').value = '#9333ea';
+
+    setPoseSliders(15, -15, -145, -10, 40, -35, 35, 22);
+  }
+  else if (tplName === 'crystal_pop') {
+    // クリスタル爆破
+    playerGroup.position.set(-0.8, 0, 0.4);
+    camera.position.set(0.5, 1.8, 4.1);
+    controls.target.set(0.2, 1.4, 0);
+
+    document.getElementById('arm-material').value = 'netherite';
+    document.getElementById('arm-helmet').checked = false;
+    document.getElementById('arm-chest').checked = true;
+    document.getElementById('arm-legs').checked = true;
+    document.getElementById('arm-boots').checked = true;
+    document.getElementById('right-item').value = 'obsidian';
+    document.getElementById('left-item').value = 'totem';
+
+    document.getElementById('show-crystal').checked = true;
+    document.getElementById('crys-scale').value = 2.0;
+    document.getElementById('crys-x').value = 1.1;
+    document.getElementById('crys-y').value = 1.6;
+    document.getElementById('crys-z').value = 0.2;
+
+    document.getElementById('bg-preset').value = 'nether_crimson';
+    document.getElementById('text-main').value = 'CRYSTAL';
+    document.getElementById('text-sub').value = '#1';
+    document.getElementById('text-col1').value = '#fda4af';
+    document.getElementById('text-col2').value = '#e11d48';
+
+    setPoseSliders(-5, -35, -85, 10, -45, 30, -20, 45);
+  }
+  else if (tplName === 'totem_clutch') {
+    // トーテム発動
+    playerGroup.position.set(0.4, 0.2, 0.5);
+    camera.position.set(0.9, 1.7, 3.8);
+    controls.target.set(0, 1.5, 0);
+
+    document.getElementById('arm-material').value = 'diamond';
+    document.getElementById('arm-helmet').checked = false;
+    document.getElementById('arm-chest').checked = true;
+    document.getElementById('arm-legs').checked = true;
+    document.getElementById('arm-boots').checked = true;
+    document.getElementById('right-item').value = 'totem';
+    document.getElementById('left-item').value = 'totem';
+    document.getElementById('show-crystal').checked = false;
+
+    document.getElementById('bg-preset').value = 'cpvp_sunset';
+    document.getElementById('text-main').value = 'CLUTCH';
+    document.getElementById('text-sub').value = 'MONTAGE';
+    document.getElementById('text-col1').value = '#fef08a';
+    document.getElementById('text-col2').value = '#eab308';
+
+    setPoseSliders(-20, 10, -110, -25, -105, -20, 25, -15);
+  }
+  else if (tplName === 'sword_duel') {
+    // ソードPvP
+    playerGroup.position.set(0.7, 0, 0.4);
+    camera.position.set(-0.6, 2.2, 4.0);
+    controls.target.set(0.2, 1.4, 0);
+
+    document.getElementById('arm-material').value = 'diamond';
+    document.getElementById('arm-helmet').checked = true;
+    document.getElementById('arm-chest').checked = true;
+    document.getElementById('arm-legs').checked = true;
+    document.getElementById('arm-boots').checked = true;
+    document.getElementById('right-item').value = 'diamond_sword';
+    document.getElementById('left-item').value = 'none';
+    document.getElementById('show-crystal').checked = false;
+
+    document.getElementById('bg-preset').value = 'cyber_blue';
+    document.getElementById('text-main').value = 'SWORD PVP';
+    document.getElementById('text-sub').value = 'HIGHLIGHTS';
+    document.getElementById('text-col1').value = '#bae6fd';
+    document.getElementById('text-col2').value = '#0284c7';
+
+    setPoseSliders(10, 25, -45, -15, 25, 20, -20, -35);
+  }
+  else if (tplName === 'clean_render') {
+    // 装備なしスキン立ち姿
+    playerGroup.position.set(0, 0, 0);
+    camera.position.set(0.8, 1.7, 3.8);
+    controls.target.set(0, 1.35, 0);
+
+    document.getElementById('arm-helmet').checked = false;
+    document.getElementById('arm-chest').checked = false;
+    document.getElementById('arm-legs').checked = false;
+    document.getElementById('arm-boots').checked = false;
+    document.getElementById('right-item').value = 'none';
+    document.getElementById('left-item').value = 'none';
+    document.getElementById('show-crystal').checked = false;
+
+    document.getElementById('bg-preset').value = 'transparent';
+    setPoseSliders(-5, 10, -15, -8, 15, 10, -10, -15);
+  }
+
+  updateEnvironment();
+  updateArmor();
+  updateHeldItems();
+  updateCrystal();
+  updateTextOverlays();
+  controls.update();
+}
+
+function resetCamera() {
+  camera.position.set(1.3, 2.0, 4.3);
+  controls.target.set(-0.2, 1.4, 0);
+  controls.update();
+}
+
+// ==========================================
+// 7. 3D風テキスト＆画像オーバーレイ制御
+// ==========================================
+function updateTextOverlays() {
+  const show = document.getElementById('toggle-text').checked;
+  const mainEl = document.getElementById('overlay-main');
+  const subEl = document.getElementById('overlay-sub');
+
+  mainEl.style.display = show ? 'block' : 'none';
+  subEl.style.display = show ? 'block' : 'none';
+
+  mainEl.textContent = document.getElementById('text-main').value;
+  subEl.textContent = document.getElementById('text-sub').value;
+
+  const c1 = document.getElementById('text-col1').value;
+  const c2 = document.getElementById('text-col2').value;
+  const sh = document.getElementById('text-shadow-col').value;
+
+  const mainSize = document.getElementById('text-main-size').value;
+  const subSize = document.getElementById('text-sub-size').value;
+  document.getElementById('text-main-size-val').textContent = mainSize;
+  document.getElementById('text-sub-size-val').textContent = subSize;
+
+  [mainEl, subEl].forEach((el, idx) => {
+    el.style.fontSize = (idx === 0 ? mainSize : subSize) + 'px';
+    el.style.background = `linear-gradient(180deg, ${c1} 20%, ${c2} 90%)`;
+    el.style.webkitBackgroundClip = 'text';
+    el.style.webkitTextFillColor = 'transparent';
+    // 3D押し出し風の多重ドロップシャドウ
+    el.style.filter = `
+      drop-shadow(0px 3px 0px ${sh})
+      drop-shadow(0px 6px 0px ${sh})
+      drop-shadow(0px 10px 15px rgba(0,0,0,0.85))
+    `;
+  });
+}
+
+function addCustomImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    img.className = 'draggable-item custom-overlay-img';
+    img.style.left = '35%';
+    img.style.top = '25%';
+    img.style.width = '200px';
+    img.dataset.rot = '0';
+    img.dataset.glow = '10';
+    img.style.filter = 'drop-shadow(0 0 10px rgba(232,121,249,0.8))';
+
+    document.getElementById('overlay-layer').appendChild(img);
+    makeElementDraggable(img);
+    selectOverlayElement(img);
+    showToast('画像を追加しました！ドラッグで位置を動かせます');
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function selectOverlayElement(el) {
+  document.querySelectorAll('.draggable-item').forEach(i => i.classList.remove('selected-overlay'));
+  selectedOverlayEl = el;
+  if (el && el.classList.contains('custom-overlay-img')) {
+    el.classList.add('selected-overlay');
+    document.getElementById('selected-img-controls').style.display = 'block';
+    document.getElementById('img-scale').value = parseInt(el.style.width) || 200;
+    document.getElementById('img-scale-val').textContent = parseInt(el.style.width) || 200;
+    document.getElementById('img-rot').value = el.dataset.rot || 0;
+    document.getElementById('img-rot-val').textContent = el.dataset.rot || 0;
+    document.getElementById('img-glow').value = el.dataset.glow || 10;
+    document.getElementById('img-glow-val').textContent = el.dataset.glow || 10;
+  } else {
+    document.getElementById('selected-img-controls').style.display = 'none';
+  }
+}
+
+function updateSelectedImage() {
+  if (!selectedOverlayEl || !selectedOverlayEl.classList.contains('custom-overlay-img')) return;
+  const w = document.getElementById('img-scale').value;
+  const r = document.getElementById('img-rot').value;
+  const g = document.getElementById('img-glow').value;
+
+  document.getElementById('img-scale-val').textContent = w;
+  document.getElementById('img-rot-val').textContent = r;
+  document.getElementById('img-glow-val').textContent = g;
+
+  selectedOverlayEl.style.width = w + 'px';
+  selectedOverlayEl.style.transform = `rotate(${r}deg)`;
+  selectedOverlayEl.dataset.rot = r;
+  selectedOverlayEl.dataset.glow = g;
+  selectedOverlayEl.style.filter = g > 0 ? `drop-shadow(0 0 ${g}px rgba(232,121,249,0.9))` : 'none';
+}
+
+function deleteSelectedImage() {
+  if (selectedOverlayEl && selectedOverlayEl.classList.contains('custom-overlay-img')) {
+    selectedOverlayEl.remove();
+    selectedOverlayEl = null;
+    document.getElementById('selected-img-controls').style.display = 'none';
+    showToast('画像を削除しました');
+  }
+}
+
+function initDraggableOverlays() {
+  document.querySelectorAll('.draggable-item').forEach(makeElementDraggable);
+  document.getElementById('three-canvas').addEventListener('mousedown', () => selectOverlayElement(null));
+}
+
+function makeElementDraggable(el) {
+  let isDragging = false, startX, startY, origLeft, origTop;
+
+  el.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    isDragging = true;
+    selectOverlayElement(el);
+    startX = e.clientX;
+    startY = e.clientY;
+    origLeft = el.offsetLeft;
+    origTop = el.offsetTop;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const box = document.getElementById('preview-box');
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    el.style.left = ((origLeft + dx) / box.clientWidth * 100) + '%';
+    el.style.top = ((origTop + dy) / box.clientHeight * 100) + '%';
+  });
+
+  window.addEventListener('mouseup', () => { isDragging = false; });
+}
+
+// ==========================================
+// 8. 高解像度(1920x1080) PNG画像書き出し合成
+// ==========================================
+function exportThumbnail() {
+  selectOverlayElement(null);
+  const outW = 1920, outH = 1080;
+
+  // 1. 3Dシーンを1920x1080でレンダリング
+  renderer.setSize(outW, outH, false);
+  renderer.render(scene, camera);
+
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = outW;
+  exportCanvas.height = outH;
+  const ctx = exportCanvas.getContext('2d');
+
+  // 3Dキャンバス転写
+  ctx.drawImage(renderer.domElement, 0, 0, outW, outH);
+
+  // プレビュー枠との比率
+  const previewBox = document.getElementById('preview-box');
+  const scaleX = outW / previewBox.clientWidth;
+  const scaleY = outH / previewBox.clientHeight;
+
+  // 2. カスタム画像オーバーレイの合成
+  document.querySelectorAll('.custom-overlay-img').forEach(img => {
+    const rect = img.getBoundingClientRect();
+    const boxRect = previewBox.getBoundingClientRect();
+    const cx = (rect.left - boxRect.left + rect.width / 2) * scaleX;
+    const cy = (rect.top - boxRect.top + rect.height / 2) * scaleY;
+    const w = rect.width * scaleX;
+    const h = rect.height * scaleY;
+    const rot = (parseFloat(img.dataset.rot) || 0) * Math.PI / 180;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    if (parseFloat(img.dataset.glow) > 0) {
+      ctx.shadowColor = 'rgba(232, 121, 249, 0.9)';
+      ctx.shadowBlur = parseFloat(img.dataset.glow) * scaleX;
+    }
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  });
+
+  // 3. 3D風Montageテキストの合成
+  if (document.getElementById('toggle-text').checked) {
+    const c1 = document.getElementById('text-col1').value;
+    const c2 = document.getElementById('text-col2').value;
+    const sh = document.getElementById('text-shadow-col').value;
+
+    ['overlay-sub', 'overlay-main'].forEach(id => {
+      const el = document.getElementById(id);
+      const text = el.textContent;
+      if (!text) return;
+
+      const rect = el.getBoundingClientRect();
+      const boxRect = previewBox.getBoundingClientRect();
+      const fontSize = parseFloat(el.style.fontSize) * scaleX;
+      const x = (rect.left - boxRect.left) * scaleX;
+      const y = (rect.top - boxRect.top) * scaleY + fontSize * 0.85;
+
+      ctx.save();
+      ctx.font = `italic 900 ${fontSize}px 'Montserrat', 'Noto Sans JP', sans-serif`;
+
+      // 立体的な黒/濃紺の縁取りと押し出し影
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = fontSize * 0.14;
+      ctx.strokeStyle = sh;
+      ctx.strokeText(text, x, y + fontSize * 0.08);
+      ctx.strokeText(text, x, y);
+
+      // グラデーション塗り
+      const grad = ctx.createLinearGradient(0, y - fontSize * 0.8, 0, y + fontSize * 0.1);
+      grad.addColorStop(0.2, c1);
+      grad.addColorStop(0.9, c2);
+      ctx.fillStyle = grad;
+      ctx.fillText(text, x, y);
+      ctx.restore();
     });
   }
 
-  function parsePayload(bytes) {
-    if (bytes.length < 11 || bytes[0] !== 80 || bytes[1] !== 67 || bytes[2] !== 68 || bytes[3] !== 50) {
-      throw new Error("データ識別子が違います。コードが正しいか確認してください。");
-    }
-    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    const mimeLength = bytes[4];
-    const nameLength = view.getUint16(5, false);
-    const dataLength = view.getUint32(7, false);
-    const expectedLength = 11 + mimeLength + nameLength + dataLength;
-    if (expectedLength !== bytes.length) {
-      throw new Error("データサイズが一致しません。コードが途中で欠けている可能性があります。");
-    }
-    let position = 11;
-    const decoder = new TextDecoder();
-    const mime = decoder.decode(bytes.slice(position, position + mimeLength)); position += mimeLength;
-    const name = decoder.decode(bytes.slice(position, position + nameLength)); position += nameLength;
-    const data = bytes.slice(position);
-    return { mime: mime || "application/octet-stream", name: name || "restored-image", data };
+  // 元サイズへ戻す
+  renderer.setSize(1280, 720, false);
+
+  // ダウンロード発火
+  const link = document.createElement('a');
+  link.download = `mc_montage_${Date.now()}.png`;
+  link.href = exportCanvas.toDataURL('image/png');
+  link.click();
+  showToast('1920x1080 の高画質PNGを保存しました！');
+}
+
+// ==========================================
+// 9. アニメーションループ
+// ==========================================
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // エンドクリスタルの浮遊・回転アニメーション
+  if (crystalGroup && crystalGroup.visible) {
+    crystalInner.rotation.y = t * 1.4;
+    crystalOuter1.rotation.x = t * 0.9;
+    crystalOuter1.rotation.y = t * 1.1;
+    crystalOuter2.rotation.z = -t * 0.8;
+    crystalOuter2.rotation.x = t * 0.7;
+    crystalInner.position.y = Math.sin(t * 2.5) * 0.08;
   }
 
-  function showImage(container, url) {
-    container.replaceChildren();
-    const image = document.createElement("img");
-    image.alt = "選択または復元した画像";
-    image.src = url;
-    container.appendChild(image);
+  // パーティクルの緩やかな上昇
+  if (particleSystem && particleSystem.visible) {
+    particleSystem.rotation.y = t * 0.05;
   }
 
-  $("imageFile").addEventListener("change", () => {
-    const file = $("imageFile").files && $("imageFile").files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      status("encodeStatus", "画像ファイルを選択してください。", "bad");
-      return;
-    }
-    selectedFile = file;
-    if (selectedObjectURL) URL.revokeObjectURL(selectedObjectURL);
-    selectedObjectURL = URL.createObjectURL(file);
-    showImage($("sourcePreview"), selectedObjectURL);
-    $("sourceInfo").textContent =
-      `選択中：${file.name} / ${file.type || "形式不明"} / ${file.size.toLocaleString()} bytes`;
-    $("encodeButton").disabled = false;
-    $("encodedCode").value = "";
-    $("copyButton").disabled = true;
-    status("encodeStatus", "選択した画像をプレビューに表示しました。コードに変換できます。", "good");
-  });
+  controls.update();
+  renderer.render(scene, camera);
+}
 
-  $("encodeButton").addEventListener("click", async () => {
-    if (!selectedFile) return;
-    const button = $("encodeButton");
-    button.disabled = true;
-    try {
-      status("encodeStatus", "元画像データを読み込み、可逆圧縮しています...");
-      const payload = await buildPayload(selectedFile);
-      const compressed = await deflate(payload);
-      const code = "PCD2:" + bytesTo85(compressed);
-      $("encodedCode").value = code;
-      $("copyButton").disabled = false;
-      const length = code.length;
-      const limitMessage = length <= MAX_CODE_LENGTH
-        ? "50,000文字以内です。"
-        : "50,000文字を超えています。画質を維持したまま短縮できるとは限りません。";
-      status("encodeStatus",
-        `変換完了！\n画像：${selectedFile.name}\n元ファイル：${selectedFile.size.toLocaleString()} bytes\n圧縮後コード：${length.toLocaleString()} 文字\n${limitMessage}`,
-        length <= MAX_CODE_LENGTH ? "good" : "bad");
-    } catch (error) {
-      status("encodeStatus", error.message || String(error), "bad");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  $("copyButton").addEventListener("click", async () => {
-    const code = $("encodedCode").value;
-    if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-      status("encodeStatus", "コードをコピーしました！", "good");
-    } catch {
-      $("encodedCode").focus();
-      $("encodedCode").select();
-      status("encodeStatus", "コードを選択しました。コピー操作をしてください。");
-    }
-  });
-
-  $("decodeButton").addEventListener("click", async () => {
-    const button = $("decodeButton");
-    button.disabled = true;
-    try {
-      status("decodeStatus", "コードを確認して画像データを復元しています...");
-      const input = $("inputCode").value.trim();
-      if (!input.startsWith("PCD2:")) throw new Error("PCD2: から始まるコードを貼り付けてください。");
-      const compressed = base85ToBytes(input.slice(5));
-      const payload = await inflate(compressed);
-      const result = parsePayload(payload);
-      restoredBlob = new Blob([result.data], { type: result.mime });
-      restoredFileName = result.name;
-      if (restoredObjectURL) URL.revokeObjectURL(restoredObjectURL);
-      restoredObjectURL = URL.createObjectURL(restoredBlob);
-      showImage($("resultPreview"), restoredObjectURL);
-      $("resultInfo").textContent =
-        `復元完了：${result.name} / ${result.mime} / ${result.data.length.toLocaleString()} bytes`;
-      $("saveButton").disabled = false;
-      status("decodeStatus", "デコード成功！元ファイルのバイナリをそのまま復元しました。", "good");
-    } catch (error) {
-      status("decodeStatus", error.message || String(error), "bad");
-      $("saveButton").disabled = true;
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  $("saveButton").addEventListener("click", () => {
-    if (!restoredBlob || !restoredObjectURL) return;
-    const link = document.createElement("a");
-    link.href = restoredObjectURL;
-    link.download = restoredFileName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  });
-})();
+window.onload = initThree;
 </script>
 </body>
 </html>
